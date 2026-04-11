@@ -1,0 +1,43 @@
+# =========================================================
+# COPIA este archivo como: application.properties
+# y completa con tus valores locales (no lo subas a Git)
+# =========================================================
+spring.application.name=mundial-backend
+spring.docker.compose.enabled=false
+
+# --- Datasource LOCAL ---
+spring.datasource.url=jdbc:postgresql://localhost:5432/mundial
+spring.datasource.username=postgres
+spring.datasource.password=TU_PASSWORD_POSTGRES_LOCAL
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+
+# --- JPA / Hibernate ---
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+spring.jpa.open-in-view=false
+
+# --- GraphQL ---
+spring.graphql.graphiql.enabled=true
+spring.graphql.graphiql.path=/graphiql
+spring.graphql.path=/graphql
+
+# --- JWT (puede ser cualquier string largo para desarrollo) ---
+jwt.secret=CAMBIA_ESTO_POR_UN_STRING_LARGO_Y_SECRETO_MINIMO_32_CHARS
+jwt.expiration=86400000
+
+# --- Google Sign-In ---
+# Obtener en: https://console.cloud.google.com/
+google.client-id=TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com
+
+# --- API-Football (opcional para desarrollo) ---
+# Registrarse gratis en: https://www.api-football.com/
+api-football.api-key=TU_API_KEY_AQUI
+api-football.base-url=https://v3.football.api-sports.io
+api-football.league-id=1
+api-football.season=2026
+api-football.cache-ttl-minutes=5

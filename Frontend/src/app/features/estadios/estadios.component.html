@@ -1,0 +1,73 @@
+<div class="estadios-page">
+
+  <!-- Hero -->
+  <header class="hero-header">
+    <h1><span class="hero-icon">🏟️</span> Estadios del Mundial 2026</h1>
+    <p *ngIf="!loading">{{ estadios.length }} sedes en Estados Unidos, México y Canadá</p>
+  </header>
+
+  <!-- Loading -->
+  <div class="state-container" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando estadios…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="state-container error" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Grid de Estadios -->
+  <div class="estadios-grid" *ngIf="!loading && !error">
+    <div *ngFor="let e of estadios" class="estadio-card" (click)="toggleEstadio(e)">
+
+      <!-- Imagen -->
+      <div class="card-img">
+        <img *ngIf="e.foto" [src]="e.foto" [alt]="e.nombre" loading="lazy" />
+        <div class="img-placeholder" *ngIf="!e.foto">
+          <mat-icon>stadium</mat-icon>
+        </div>
+        <span class="match-count-badge">
+          <mat-icon>sports_soccer</mat-icon> {{ e.partidos.length }}
+        </span>
+      </div>
+
+      <!-- Info -->
+      <div class="card-body">
+        <h3>{{ e.nombre }}</h3>
+        <div class="card-meta">
+          <span><mat-icon>location_on</mat-icon> {{ e.ciudad }}</span>
+          <span><mat-icon>people</mat-icon> {{ formatCapacity(e.capacidad) }}</span>
+        </div>
+        <span class="country-tag">{{ e.pais }}</span>
+      </div>
+
+      <!-- Partidos expandible -->
+      <div class="matches-panel" *ngIf="e.expanded" (click)="$event.stopPropagation()">
+        <div class="matches-title">
+          <mat-icon>calendar_month</mat-icon>
+          Partidos en {{ e.nombre }}
+        </div>
+        <div class="match-list">
+          <div *ngFor="let m of e.partidos" class="match-row">
+            <span class="match-date">{{ formatDate(m.fechaHora) }}</span>
+            <span class="match-teams">
+              <strong>{{ m.equipoLocalNombre }}</strong>
+              <span class="vs">vs</span>
+              <strong>{{ m.equipoVisitanteNombre }}</strong>
+            </span>
+            <span class="match-fase">{{ m.faseNombre }}</span>
+            <span class="match-score" *ngIf="m.estado === 'FINALIZADO'">
+              {{ m.golLocal }} - {{ m.golVisitante }}
+            </span>
+            <span class="match-status pending" *ngIf="m.estado === 'PENDIENTE'">Pendiente</span>
+            <span class="match-status live" *ngIf="m.estado === 'EN_CURSO'">En vivo</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

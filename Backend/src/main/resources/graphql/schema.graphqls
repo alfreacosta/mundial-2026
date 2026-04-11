@@ -1,0 +1,140 @@
+# ============================================================
+# MUNDIAL 2026 - GraphQL Schema
+# ============================================================
+
+# ---- Tipos base ----
+
+type Usuario {
+    internalId: ID!
+    user: String!
+    email: String!
+    nombre: String
+    apellido: String
+    urlAvatar: String
+    puntaje: Int!
+    activo: Boolean!
+}
+
+type Confederacion {
+    internalId: ID!
+    nombre: String!
+    codigo: String!
+    abreviatura: String!
+    activo: Boolean!
+}
+
+type Fase {
+    internalId: ID!
+    nombre: String!
+    codigo: String!
+    orden: Int!
+    activo: Boolean!
+}
+
+type PosicionJugador {
+    internalId: ID!
+    nombre: String!
+    codigo: String!
+    abreviatura: String!
+    activo: Boolean!
+}
+
+type Pais {
+    internalId: ID!
+    nombre: String!
+    codigo: String!
+    confederacion: Confederacion!
+    grupo: String
+    activo: Boolean!
+    pj: Int!
+    pg: Int!
+    pe: Int!
+    pp: Int!
+    pts: Int!
+    apiTeamId: Int
+    logoUrl: String
+}
+
+type Club {
+    internalId: ID!
+    nombre: String!
+    codigo: String!
+    pais: Pais!
+    urlEscudo: String
+    activo: Boolean!
+}
+
+type Jugador {
+    internalId: ID!
+    nombre: String!
+    apellido: String!
+    nombreCompleto: String
+    pais: Pais!
+    posicion: PosicionJugador!
+    club: Club
+    edad: Int
+    numeroCamiseta: Int
+    urlFoto: String
+    apiPlayerId: Int
+    statsJson: String
+    ultimaStatsSync: String
+    partidosTemporada: Int
+    convocadoEliminatoria: Boolean
+}
+
+type Partido {
+    internalId: ID!
+    equipoLocal: Pais
+    equipoVisitante: Pais
+    fase: Fase!
+    fechaHora: String
+    estadio: String
+    golLocal: Int
+    golVisitante: Int
+    estado: String!
+    finalizado: Boolean!
+}
+
+# ---- Queries ----
+
+type Query {
+    # Catálogos
+    confederaciones: [Confederacion!]!
+    fases: [Fase!]!
+    posiciones: [PosicionJugador!]!
+
+    # Países
+    paises: [Pais!]!
+    paisesPorConfederacion(codigo: String!): [Pais!]!
+
+    # Jugadores
+    jugadores: [Jugador!]!
+    jugador(id: ID!): Jugador
+    jugadoresPorPais(paisId: ID!): [Jugador!]!
+    jugadoresPorPosicion(codigo: String!): [Jugador!]!
+
+    # Partidos
+    partidos: [Partido!]!
+    partidosPorFase(faseCodigo: String!): [Partido!]!
+
+    # Convocatorias
+    miConvocatoria(paisId: ID!): ConvocatoriaResponse
+
+    # Ranking de usuarios (excluye admin, ordenado por puntaje)
+    ranking: [Usuario!]!
+}
+
+# ---- Mutations ----
+
+type Mutation {
+    guardarConvocatoria(paisId: ID!, jugadorIds: [ID!]!, noVaIds: [ID!]): ConvocatoriaResponse!
+}
+
+# ---- Tipos de respuesta ----
+
+type ConvocatoriaResponse {
+    totalJugadores: Int!
+    estado: String!
+    jugadoresIds: [ID!]!
+    noVaIds: [ID!]!
+}

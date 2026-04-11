@@ -1,0 +1,100 @@
+<div class="mis-grupos-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>group</mat-icon>
+        Mis Grupos
+      </h1>
+      <p class="page-subtitle">Creá o unite a grupos con amigos y competí eligiendo tus equipos favoritos</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="showUnirseModal = true">
+        <mat-icon>login</mat-icon>
+        Unirse con código
+      </button>
+      <button class="btn btn-primary" (click)="showCrearModal = true">
+        <mat-icon>add</mat-icon>
+        Crear grupo
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando grupos...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-card" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button class="btn btn-secondary" (click)="cargarGrupos()">Reintentar</button>
+  </div>
+
+  <!-- Sin grupos -->
+  <div class="empty-state" *ngIf="!loading && !error && grupos.length === 0">
+    <mat-icon>group_off</mat-icon>
+    <h2>Todavía no tenés grupos</h2>
+    <p>Usá los botones de arriba para crear uno o unirte con un código</p>
+  </div>
+
+  <!-- Lista de grupos -->
+  <div class="grupos-grid" *ngIf="!loading && grupos.length > 0">
+    <div class="grupo-card" *ngFor="let grupo of grupos">
+      <div class="grupo-card-header">
+        <div class="grupo-codigo">#{{ grupo.codigoInvitacion }}</div>
+        <div class="grupo-actions">
+          <a class="btn-icon" [routerLink]="['/mis-grupos', grupo.internalId]" title="Ver grupo">
+            <mat-icon>visibility</mat-icon>
+          </a>
+          <button class="btn-icon" (click)="$event.stopPropagation()"
+                  [cdkCopyToClipboard]="grupo.codigoInvitacion" title="Copiar código">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+          <a class="btn-icon" [href]="getWhatsAppLink(grupo)" target="_blank" title="Invitar por WhatsApp">
+            <mat-icon>share</mat-icon>
+          </a>
+          <button *ngIf="esCreador(grupo)" class="btn-icon btn-icon-danger"
+                  (click)="eliminarGrupo(grupo.internalId)" title="Eliminar grupo">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button *ngIf="!esCreador(grupo)" class="btn-icon btn-icon-danger"
+                  (click)="salirDeGrupo(grupo.internalId)" title="Salir del grupo">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="grupo-card-body">
+        <h3 class="grupo-nombre">{{ grupo.nombre }}</h3>
+        <p class="grupo-creador">Creado por {{ grupo.creadorNombre }}</p>
+        <p class="grupo-premio" *ngIf="grupo.premio">Premio: {{ grupo.premio }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Crear Grupo -->
+<div class="modal-overlay" *ngIf="showCrearModal" (click)="showCrearModal = false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <app-crear-grupo
+      (grupoCreado)="onGrupoCreado($event)"
+      (cancelar)="showCrearModal = false">
+    </app-crear-grupo>
+  </div>
+</div>
+
+<!-- Modal: Unirse al Grupo -->
+<div class="modal-overlay" *ngIf="showUnirseModal" (click)="showUnirseModal = false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <app-unirse-grupo
+      [codigoInicial]="codigoInvitacionInicial"
+      (grupoUnido)="onGrupoUnido($event)"
+      (cancelar)="showUnirseModal = false">
+    </app-unirse-grupo>
+  </div>
+</div>

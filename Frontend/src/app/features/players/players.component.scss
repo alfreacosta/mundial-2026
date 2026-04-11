@@ -1,0 +1,339 @@
+/**
+ * Players Component Styles
+ */
+@import '../../../styles/variables';
+
+.players-page {
+  min-height: 100vh;
+  background: $gray-50;
+  padding-top: 80px;
+}
+
+// Header
+.players-header {
+  background: $fantasy-purple;
+  color: $white;
+  padding: $spacing-lg 0;
+  box-shadow: $shadow-md;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .back-btn {
+      color: $white;
+    }
+
+    .header-text {
+      h1 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        margin: 0 0 $spacing-xs 0;
+        font-size: 28px;
+        font-weight: 700;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Filtros
+.filters-section {
+  padding: $spacing-lg 0;
+
+  .filters-card {
+    padding: $spacing-lg;
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $spacing-md;
+
+      @media (min-width: $tablet) {
+        grid-template-columns: 2fr 1fr 1fr auto;
+      }
+
+      .filter-field {
+        width: 100%;
+      }
+
+      .clear-btn {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+      }
+    }
+  }
+}
+
+// Loading y Error
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-2xl;
+  text-align: center;
+
+  mat-spinner {
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    color: $gray-600;
+    margin: $spacing-md 0;
+  }
+}
+
+.error-card {
+  padding: $spacing-xl;
+  text-align: center;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// Lista de Jugadores
+.players-list {
+  padding: 0 0 $spacing-2xl 0;
+
+  .results-count {
+    margin-bottom: $spacing-lg;
+    padding: 0 $spacing-md;
+
+    p {
+      color: $gray-600;
+      margin: 0;
+    }
+  }
+
+  .players-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+    padding: 0 $spacing-md;
+
+    @media (min-width: $tablet) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: $desktop) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (min-width: $desktop-lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .player-card {
+    position: relative;
+    transition: transform $transition-normal, box-shadow $transition-normal;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $shadow-lg;
+    }
+
+    .player-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 140px;
+      background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+      margin-bottom: $spacing-md;
+      overflow: hidden;
+
+      .avatar-icon {
+        font-size: 80px;
+        width: 80px;
+        height: 80px;
+        color: #999;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .position-badge {
+      position: absolute;
+      top: $spacing-md;
+      left: $spacing-md;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $radius-full;
+      color: $white;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 10;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .shirt-number {
+      position: absolute;
+      top: $spacing-md;
+      right: $spacing-md;
+      width: 48px;
+      height: 48px;
+      background: $fantasy-purple;
+      color: $white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .player-info {
+      padding: $spacing-md;
+      text-align: center;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 $spacing-sm 0;
+        color: $gray-900;
+      }
+
+      .player-details {
+        display: flex;
+        justify-content: center;
+        gap: $spacing-md;
+        margin-bottom: $spacing-sm;
+
+        .detail-item {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: 13px;
+          color: $gray-600;
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+
+      .player-club {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-xs;
+        font-size: 12px;
+        color: $gray-500;
+        margin-top: $spacing-xs;
+
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+
+    .player-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-md;
+      padding: $spacing-md;
+      background: $gray-50;
+      border-top: 1px solid $gray-200;
+      border-bottom: 1px solid $gray-200;
+
+      .stat-box {
+        text-align: center;
+
+        .stat-label {
+          display: block;
+          font-size: 11px;
+          color: $gray-500;
+          text-transform: uppercase;
+          margin-bottom: $spacing-xs;
+        }
+
+        .stat-value {
+          display: block;
+          font-size: 18px;
+          font-weight: 700;
+
+          &.price {
+            color: $fantasy-green;
+          }
+
+          &.points {
+            color: $fantasy-purple;
+          }
+        }
+      }
+    }
+
+    .player-actions {
+      display: flex;
+      gap: $spacing-sm;
+      padding: $spacing-md;
+
+      .select-btn {
+        flex: 1;
+      }
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: $spacing-2xl;
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: $gray-400;
+      margin-bottom: $spacing-md;
+    }
+
+    h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: $gray-700;
+      margin: 0 0 $spacing-sm 0;
+    }
+
+    p {
+      color: $gray-500;
+      margin-bottom: $spacing-lg;
+    }
+  }
+}

@@ -1,0 +1,522 @@
+// Variables
+$fantasy-purple: #c1272d;
+$fantasy-purple-dark: #991b1b;
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-900: #111827;
+$gold: #fbbf24;
+$silver: #9ca3af;
+$bronze: #ea580c;
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+$radius-md: 12px;
+$transition-normal: 0.3s ease-in-out;
+
+// ── Page Shell ──────────────────────────────────────────
+.stats-page {
+  padding-top: 80px;
+  min-height: 100vh;
+  background: transparent;
+}
+
+// ── Hero Header ──────────────────────────────────────────
+.stats-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  color: $white;
+  padding: $spacing-2xl $spacing-md $spacing-xl;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .header-text {
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 $spacing-xs 0;
+      letter-spacing: -0.5px;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: $gold;
+      }
+    }
+
+    p {
+      margin: 0;
+      opacity: 0.85;
+      font-size: 15px;
+    }
+  }
+}
+
+// ── Content ──────────────────────────────────────────────
+.stats-content {
+  padding: $spacing-xl 0 $spacing-2xl 0;
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+}
+
+// ── States ────────────────────────────────────────────────
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: 80px $spacing-md;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+
+  p { margin: 0; font-size: 16px; }
+
+  &.error {
+    .state-icon { font-size: 56px; width: 56px; height: 56px; color: #ef4444; }
+  }
+}
+
+// ── Ranking Card ──────────────────────────────────────────
+.ranking-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: $radius-md !important;
+
+  mat-card-header {
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: 18px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9) !important;
+
+      mat-icon { color: $gold; }
+    }
+
+    mat-card-subtitle {
+      color: rgba(255, 255, 255, 0.5) !important;
+      font-size: 13px;
+    }
+  }
+
+  mat-card-content { padding: 0 !important; }
+}
+
+// ── Empty state ───────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: 60px $spacing-md;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+
+  mat-icon { font-size: 48px; width: 48px; height: 48px; }
+  p { margin: 0; font-size: 15px; }
+}
+
+// ── Ranking Table ─────────────────────────────────────────
+.ranking-table-wrapper {
+  overflow-x: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead tr {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  th {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.45);
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  tbody tr {
+    transition: background $transition-normal;
+
+    &:last-child td { border-bottom: none; }
+
+    &:hover { background: rgba(255, 255, 255, 0.04); }
+
+    &.top-row td { background: rgba(251, 191, 36, 0.04); }
+  }
+
+  .col-pos {
+    width: 60px;
+    text-align: center;
+
+    th { text-align: center; }
+  }
+
+  .col-pts {
+    width: 100px;
+    text-align: right;
+
+    th { text-align: right; }
+  }
+}
+
+// ── Rank Badge ────────────────────────────────────────────
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+
+  &.gold   { font-size: 22px; background: rgba(251, 191, 36, 0.15); }
+  &.silver { font-size: 22px; background: rgba(156, 163, 175, 0.15); }
+  &.bronze { font-size: 22px; background: rgba(234, 88, 12, 0.15); }
+}
+
+// ── Points Badge ──────────────────────────────────────────
+.points-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, $fantasy-purple, $fantasy-purple-dark);
+  color: $white;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  float: right;
+}
+
+// ── User Info ─────────────────────────────────────────────
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-circle {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.user-names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  .display-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .username {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+}
+
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-900: #111827;
+$gold: #fbbf24;
+$silver: #9ca3af;
+$bronze: #ea580c;
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+$radius-md: 12px;
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$transition-normal: 0.3s ease-in-out;
+
+$tablet: 768px;
+
+// Estilos
+.stats-page {
+  padding-top: 80px;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.stats-header {
+  background: linear-gradient(135deg, $fantasy-purple 0%, $fantasy-purple-dark 100%);
+  color: $white;
+  padding: $spacing-2xl $spacing-md $spacing-xl;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .back-btn {
+      color: $white;
+    }
+
+    .header-text {
+      h1 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 $spacing-xs 0;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+.stats-content {
+  padding: $spacing-xl 0 $spacing-2xl 0;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .stats-tabs {
+    ::ng-deep .mat-mdc-tab-labels {
+      justify-content: center;
+    }
+
+    ::ng-deep .mat-mdc-tab-label {
+      min-width: 120px;
+
+      .mat-icon {
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+
+  .tab-content {
+    padding: $spacing-xl 0;
+
+    mat-card {
+      mat-card-header {
+        margin-bottom: $spacing-lg;
+
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          font-size: 20px;
+          font-weight: 700;
+
+          mat-icon {
+            color: $fantasy-purple;
+          }
+        }
+      }
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .rankings-table {
+    width: 100%;
+    background: $white;
+
+    th {
+      background: $gray-50;
+      font-weight: 700;
+      color: $gray-900;
+      padding: $spacing-md;
+    }
+
+    td {
+      padding: $spacing-md;
+      border-bottom: 1px solid $gray-200;
+    }
+
+    tr.highlight-row {
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, transparent 100%);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: 12px;
+      font-weight: 600;
+      background: $gray-100;
+      color: $gray-600;
+      min-width: 50px;
+      justify-content: center;
+
+      &.top-3 {
+        font-size: 16px;
+      }
+    }
+
+    .points-badge {
+      display: inline-flex;
+      padding: $spacing-xs $spacing-md;
+      background: $fantasy-purple;
+      color: $white;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .goals-badge,
+    .cleansheet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      background: $gray-100;
+      border-radius: 12px;
+      font-weight: 600;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .player-cell {
+      display: flex;
+      flex-direction: column;
+
+      strong {
+        margin-bottom: 2px;
+      }
+
+      small {
+        color: $gray-500;
+        font-size: 12px;
+      }
+    }
+
+    .position-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: 12px;
+      font-weight: 600;
+      padding: $spacing-xs $spacing-sm;
+      background: $gray-100;
+      border-radius: 12px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .small-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      margin-right: $spacing-xs;
+      color: $fantasy-purple;
+    }
+  }
+}

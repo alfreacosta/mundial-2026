@@ -1,0 +1,330 @@
+<!-- Convocados Component - Selección de Jugadores por País -->
+<div class="convocados-page">
+
+  <!-- ═══ STICKY HEADER + TABS + SEARCH ═══ -->
+  <div class="sticky-top" [style.--header-color]="confColor">
+
+    <!-- Header -->
+    <header class="conv-header" [style.--header-color]="confColor">
+      <div class="header-inner">
+
+        <div class="header-main" *ngIf="pais && !loading">
+          <!-- Línea 1: ← bandera + nombre → count -->
+          <div class="header-row">
+            <button class="back-btn" (click)="irAPlantel()" aria-label="Volver">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <img *ngIf="getLogoUrl()" [src]="getLogoUrl()" [alt]="pais.nombre" class="country-logo">
+            <span *ngIf="!getLogoUrl()" class="country-flag-big">{{ getFlagEmoji(pais.codigo) }}</span>
+            <h1 class="country-name">{{ pais.nombre }}</h1>
+            <div class="progress-numbers">
+              <span class="current-count" [style.color]="confColor">{{ totalSel() }}</span>
+              <span class="separator">/</span>
+              <span class="max-count">{{ MAX_CONVOCADOS }}</span>
+              <span class="label-convocados">convocados</span>
+            </div>
+          </div>
+          <!-- Línea 2: badges → posiciones -->
+          <div class="header-row">
+            <div class="country-meta">
+              <span class="meta-badge group-badge" *ngIf="pais.grupo">
+                <mat-icon>grid_view</mat-icon> Grupo {{ pais.grupo }}
+              </span>
+            </div>
+            <div class="progress-bar-track">
+              <div
+                class="progress-bar-fill"
+                [style.width.%]="(totalSel() / MAX_CONVOCADOS) * 100"
+                [style.background-color]="confColor">
+              </div>
+            </div>
+            <div class="position-summary">
+              <span *ngFor="let pg of positionGroups" class="pos-stat" [style.--pos-color]="pg.color">
+                <span class="pos-dot" [style.background-color]="pg.color"></span>
+                {{ pg.label | slice:0:3 }}: <strong>{{ posCounts()[pg.codigo] || 0 }}</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="detail-tabs" *ngIf="pais && !loading">
+      <button class="tab-btn" (click)="irAPlantel()">
+        <mat-icon>groups</mat-icon>
+        Plantel
+      </button>
+      <button class="tab-btn active">
+        <mat-icon>assignment</mat-icon>
+        Convocatoria
+      </button>
+    </nav>
+
+    <!-- Search bar -->
+    <div class="search-bar-wrap" *ngIf="pais && !loading && !error && players().length > 0">
+      <div class="search-bar" [class.has-value]="searchQuery">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          [placeholder]="hasConvocados && !searchQuery ? 'Buscar en todo el plantel…' : 'Buscar por nombre o club…'"
+          [(ngModel)]="searchQuery"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery = ''" aria-label="Limpiar búsqueda">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <span class="search-count">
+        @if (searchQuery) {
+          {{ filteredCount }} resultado{{ filteredCount !== 1 ? 's' : '' }}
+        } @else if (hasConvocados) {
+          {{ filteredCount }} convocados · {{ players().length }} total
+        } @else {
+          {{ players().length }} jugadores
+        }
+      </span>
+    </div>
+
+    <!-- Estado badge -->
+    <div class="estado-bar" *ngIf="convocatoriaEstado === 'EN_PROGRESO'">
+      <span class="estado-badge">
+        <mat-icon>edit</mat-icon> Guardada
+      </span>
+    </div>
+
+  </div>
+
+  <!-- ═══ ESTADO: LOADING ═══ -->
+  <div class="state-container" *ngIf="loading">
+    <mat-spinner diameter="48" [style.--mdc-circular-progress-active-indicator-color]="confColor"></mat-spinner>
+    <p>Cargando plantilla de {{ pais?.nombre ?? 'la selección' }}…</p>
+  </div>
+
+  <!-- ═══ ESTADO: ERROR ═══ -->
+  <div class="state-container error" *ngIf="error && !loading">
+    <mat-icon class="state-icon">error_outline</mat-icon>
+    <h3>Algo salió mal</h3>
+    <p>{{ error }}</p>
+    <button mat-raised-button (click)="loadData()" [style.background-color]="confColor" style="color:white">
+      <mat-icon>refresh</mat-icon> Reintentar
+    </button>
+  </div>
+
+  <!-- ═══ ESTADO: NO ES FAVORITO ═══ -->
+  <div class="state-container" *ngIf="noEsFavorito && !loading">
+    <mat-icon class="state-icon" style="color: #f59e0b; font-size: 3rem; height: 3rem; width: 3rem;">star_border</mat-icon>
+    <h3>País no está en tus favoritos</h3>
+    <p>Solo podés armar convocatorias para tus <strong>5 equipos favoritos</strong>.<br>Primero sumalo desde tu perfil.</p>
+    <button mat-raised-button (click)="volverAPaises()" style="background:#374151; color:white; margin-right: 8px">
+      <mat-icon>arrow_back</mat-icon> Volver a Países
+    </button>
+    <button mat-raised-button routerLink="/perfil" style="background:#f59e0b; color:white">
+      <mat-icon>star</mat-icon> Ir al Perfil
+    </button>
+  </div>
+
+  <!-- ═══ CONTENT: SIN JUGADORES ═══ -->
+  <div class="state-container" *ngIf="!loading && !error && players().length === 0">
+    <mat-icon class="state-icon" style="color: #94a3b8;">group_off</mat-icon>
+    <h3>No hay jugadores</h3>
+    <p>No se encontraron jugadores cargados para <strong>{{ pais?.nombre }}</strong>.</p>
+    <button mat-raised-button (click)="volverAPaises()">
+      <mat-icon>arrow_back</mat-icon> Volver a Países
+    </button>
+  </div>
+
+  <!-- ═══ PLAYERS POR POSICIÓN ═══ -->
+  <div class="players-container" *ngIf="!loading && !error && players().length > 0">
+
+    <main class="players-main">
+
+      <section
+        *ngFor="let pg of positionGroups"
+        class="position-section"
+        [class.has-players]="getByPosition(pg.codigo).length > 0">
+
+      <!-- Header de sección de posición -->
+      <div class="position-header" [style.--pos-color]="pg.color"
+           *ngIf="getByPosition(pg.codigo).length > 0">
+        <div class="pos-title">
+          <div class="pos-icon-wrap" [style.background-color]="pg.color">
+            <mat-icon>{{ pg.icon }}</mat-icon>
+          </div>
+          <div>
+            <h2>{{ pg.label }}</h2>
+            <p>{{ getByPosition(pg.codigo).length }} disponibles · {{ posCounts()[pg.codigo] || 0 }} seleccionados</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de jugadores -->
+      <div class="players-grid" *ngIf="getByPosition(pg.codigo).length > 0">
+        <div
+          *ngFor="let player of getByPosition(pg.codigo)"
+          class="player-card"
+          [class.selected]="player.seleccionado"
+          [style.--player-color]="pg.color">
+
+          <!-- Checkmark overlay -->
+          <div class="selected-check" [style.background-color]="pg.color">
+            <mat-icon>check</mat-icon>
+          </div>
+
+          <!-- Avatar -->
+          <div class="player-avatar">
+            <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
+            <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
+              <mat-icon [style.color]="pg.color">person</mat-icon>
+            </div>
+            <span class="jersey-number" *ngIf="player.numeroCamiseta">
+              #{{ player.numeroCamiseta }}
+            </span>
+          </div>
+
+          <!-- Info del jugador -->
+          <div class="player-info">
+            <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
+            <p class="player-club" *ngIf="player.club">
+              <mat-icon>apartment</mat-icon>
+              {{ player.club.nombre }}
+            </p>
+            <p class="player-club no-club" *ngIf="!player.club">
+              <mat-icon>remove</mat-icon>
+              Sin club registrado
+            </p>
+          </div>
+
+          <!-- Footer del card: dos botones -->
+          <div class="player-card-footer">
+            <button class="footer-btn btn-convocar"
+              [class.active]="player.seleccionado"
+              [style.--btn-color]="pg.color"
+              (click)="convocarPlayer(player, $event)">
+              {{ player.seleccionado ? 'Convocado ✓' : 'Convocar' }}
+            </button>
+            <button class="footer-btn btn-nova"
+              (click)="markNoVa(player, $event)">
+              No Va
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+      <!-- ═══ SECCIÓN NO VA ═══ -->
+      <section class="nova-section" *ngIf="jugadoresNoVa.length > 0">
+        <div class="nova-header">
+          <div class="nova-title">
+            <div class="nova-icon-wrap">
+              <mat-icon>person_off</mat-icon>
+            </div>
+            <div>
+              <h2>No Va</h2>
+              <p>{{ jugadoresNoVa.length }} jugadores descartados</p>
+            </div>
+          </div>
+        </div>
+        <div class="nova-grid">
+          <div *ngFor="let player of jugadoresNoVa" class="nova-card">
+            <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="nova-avatar">
+            <div *ngIf="!player.urlFoto" class="nova-avatar-placeholder">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="nova-info">
+              <p class="nova-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
+              <p class="nova-pos">{{ player.posicion?.nombre }}</p>
+            </div>
+            <button mat-icon-button class="nova-undo" matTooltip="Restaurar" (click)="undoNoVa(player)">
+              <mat-icon>undo</mat-icon>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ═══ SIDEBAR DERECHO: JUGADORES SELECCIONADOS ═══ -->
+    <aside class="selected-sidebar">
+      <div class="sidebar-header">
+        <h3>Convocados</h3>
+        <span class="selected-count" [style.background-color]="confColor">{{ totalSel() }}/{{ MAX_CONVOCADOS }}</span>
+      </div>
+
+      <!-- Lista de seleccionados -->
+      <div class="selected-list" *ngIf="totalSel() > 0">
+        <div *ngFor="let player of jugadoresSeleccionados" class="selected-item" [style.border-left-color]="confColor">
+          <div class="item-header">
+            <span class="player-pos-badge" [style.background-color]="getPosColor(player.posicion?.codigo)">
+              {{ player.posicion?.abreviatura || '?' }}
+            </span>
+            <span class="player-name">{{ player.apellido }}</span>
+            <button
+              mat-icon-button
+              (click)="togglePlayer(player)"
+              class="remove-btn"
+              matTooltip="Quitar">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <p class="item-club" *ngIf="player.club">{{ player.club.nombre }}</p>
+        </div>
+      </div>
+
+      <!-- Vacío -->
+      <div class="sidebar-empty" *ngIf="totalSel() === 0">
+        <mat-icon>people</mat-icon>
+        <p>Seleccioná jugadores para verlos aquí</p>
+      </div>
+
+      <!-- Resumen por posición -->
+      <div class="sidebar-summary">
+        <div *ngFor="let pg of positionGroups" class="summary-row">
+          <span class="summary-label">{{ pg.label | slice:0:3 }}</span>
+          <span class="summary-count" [style.color]="pg.color">
+            {{ posCounts()[pg.codigo] || 0 }}/{{ pg.recommended }}
+          </span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ═══ STICKY BOTTOM BAR ═══ -->
+  <div class="save-bar" *ngIf="!loading && !error && players().length > 0" [style.--bar-color]="confColor">
+    <div class="save-bar-inner">
+      <div class="save-info">
+        <span class="save-count">
+          <strong [style.color]="confColor">{{ totalSel() }}</strong> / {{ MAX_CONVOCADOS }} jugadores
+        </span>
+        <span class="save-hint" *ngIf="totalSel() > 0 && !canAddMore">¡Plantilla completa!</span>
+      </div>
+      <div class="save-actions">
+        <button
+          mat-stroked-button
+          class="clear-btn"
+          [disabled]="totalSel() === 0 && totalNoVa() === 0"
+          (click)="clearAll()">
+          <mat-icon>clear_all</mat-icon>
+          Limpiar
+        </button>
+        <button
+          mat-raised-button
+          class="save-btn"
+          [style.background-color]="confColor"
+          [disabled]="(totalSel() === 0 && totalNoVa() === 0) || saving"
+          (click)="guardarConvocatoria()">
+          <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block; margin-right:8px;"></mat-spinner>
+          <mat-icon *ngIf="!saving">save</mat-icon>
+          {{ saving ? 'Guardando…' : 'Guardar Convocatoria' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

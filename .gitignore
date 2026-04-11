@@ -1,0 +1,48 @@
+# ── Backend ──────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ── Frontend ─────────────────────────────────────────────
+node_modules/
+dist/
+.angular/
+*.log
+
+# ── IDE ──────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# ── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Secretos / variables de entorno ──────────────────────
+# NUNCA subir estos archivos (tienen passwords, API keys, etc.)
+.env
+.env.local
+.env.*.local
+*.env
+
+# application.properties tiene credenciales locales (DB, API keys)
+# application-prod.properties SÍ se sube (usa variables de entorno)
+Backend/src/main/resources/application.properties
+Backend/src/main/resources/application-local.properties
+Backend/src/main/resources/application.yml
+
+# ── Base de datos ─────────────────────────────────────────
+*.sql.backup
+*.db
+
+# ── Archivos temporales del proyecto ─────────────────────
+# Archivos creados accidentalmente por historial de terminal
+: print(r)
+ycopg2
+10*' psql*
+Log/
+tools/respuestas/

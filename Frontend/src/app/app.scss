@@ -1,0 +1,28 @@
+@import '../styles/variables';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+router-outlet {
+  display: none;
+}
+
+// Asegurar que el footer esté al final
+:host {
+  app-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  router-outlet + * {
+    flex: 1;
+  }
+
+  app-footer {
+    margin-top: auto;
+  }
+}

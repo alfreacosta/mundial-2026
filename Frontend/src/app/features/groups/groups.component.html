@@ -1,0 +1,121 @@
+<!-- =====================================================
+     GRUPOS - FIFA World Cup 2026
+     ===================================================== -->
+<div class="groups-page">
+
+  <!-- ── HERO ───────────────────────────────────────── -->
+  <section class="groups-hero">
+    <div class="hero-bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title">Fase de Grupos</h1>
+      <p class="hero-subtitle">48 selecciones · 12 grupos · 3 países sede</p>
+      <!--
+      <div class="host-flags">
+        <span class="host-chip">🇺🇸 Estados Unidos</span>
+        <span class="host-chip">🇲🇽 México</span>
+        <span class="host-chip">🇨🇦 Canadá</span>
+      </div>
+      -->
+    </div>
+    <!--
+    <div class="hero-stats">
+      <div class="stat-pill"><span class="pill-num">42</span><span class="pill-label">confirmados</span></div>
+      <div class="stat-pill pending-pill"><span class="pill-num">6</span><span class="pill-label">⏳ repechaje</span></div>
+      <div class="stat-pill"><span class="pill-num">11 Jun</span><span class="pill-label">inicio</span></div>
+      <div class="stat-pill"><span class="pill-num">19 Jul</span><span class="pill-label">final</span></div>
+    </div>
+    -->
+  </section>
+
+  <!-- ── LOADING ─────────────────────────────────────── -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner [diameter]="56" color="accent"></mat-spinner>
+    <p>Cargando grupos…</p>
+  </div>
+
+  <!-- ── ERROR ──────────────────────────────────────── -->
+  <div class="error-state" *ngIf="errorMsg && !isLoading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ errorMsg }}</p>
+  </div>
+
+  <!-- ── GRUPOS GRID ────────────────────────────────── -->
+  <main class="groups-main" *ngIf="!isLoading && !errorMsg">
+    <div class="groups-grid">
+
+      <article class="group-card" *ngFor="let group of groups" [id]="'grupo-' + group.letra">
+
+        <!-- Barra de color superior -->
+        <div class="card-top-bar" [style.background]="group.color"></div>
+
+        <!-- Encabezado del grupo -->
+        <header class="card-header">
+          <div class="group-badge"
+               [style.color]="group.color"
+               [style.border-color]="group.color + '66'"
+               [style.box-shadow]="'0 0 20px ' + group.color + '33'">
+            {{ group.letra }}
+          </div>
+          <div class="group-meta">
+            <span class="group-name">Grupo {{ group.letra }}</span>
+            <!--
+            <span class="group-status" [style.color]="group.color">
+              {{ getConfirmedCount(group) }}/4
+              <span class="status-dot" *ngIf="getConfirmedCount(group) < 4"> · pendiente</span>
+              <span class="status-dot confirmed" *ngIf="getConfirmedCount(group) === 4"> · completo ✓</span>
+            </span>
+            -->
+          </div>
+        </header>
+
+        <!-- Tabla de estadísticas -->
+        <div class="stats-table">
+          <div class="stats-header">
+            <span class="col-pos">#</span>
+            <span class="col-team">Selección</span>
+            <span class="col-stat" title="Partidos Jugados">PJ</span>
+            <span class="col-stat" title="Ganados">PG</span>
+            <span class="col-stat col-pe" title="Empatados">PE</span>
+            <span class="col-stat col-pp" title="Perdidos">PP</span>
+            <span class="col-stat col-pts" title="Puntos">PTS</span>
+          </div>
+          <div class="stats-row"
+              *ngFor="let pais of group.paises; let i = index"
+              [class.pending]="isPending(pais)"
+              [class.top2]="i < 2 && !isPending(pais)"
+              [matTooltip]="getTooltip(pais)"
+              [matTooltipDisabled]="!isPending(pais)"
+              matTooltipPosition="above">
+
+            <span class="col-pos">{{ i + 1 }}</span>
+
+            <div class="col-team">
+              <span class="team-flag">{{ getFlag(pais.codigo) }}</span>
+              <span class="team-name">{{ pais.nombre }}</span>
+            </div>
+
+            <span class="col-stat">{{ pais.pj }}</span>
+            <span class="col-stat">{{ pais.pg }}</span>
+            <span class="col-stat col-pe">{{ pais.pe }}</span>
+            <span class="col-stat col-pp">{{ pais.pp }}</span>
+            <span class="col-stat col-pts" [style.color]="group.color">{{ pais.pts }}</span>
+          </div>
+        </div>
+
+      </article>
+
+    </div><!-- /groups-grid -->
+  </main><!-- /groups-main -->
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer class="groups-footer">
+    <div class="container">
+      <p>© 2026 Mundial 2026 · Sorteo realizado el 5 de diciembre de 2025 · Kennedy Center, Washington D.C.</p>
+    </div>
+  </footer>
+
+</div><!-- /groups-page -->

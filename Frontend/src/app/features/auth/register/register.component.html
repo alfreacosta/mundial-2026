@@ -1,0 +1,366 @@
+<div class="register-page" [class.auth-open]="showAuthPanel">
+  <!-- Canvas 3D – fondo global -->
+  <canvas #threeCanvas class="three-canvas"></canvas>
+
+  <!-- ══ LANDING NAV ══ -->
+  <nav class="landing-nav">
+    <div class="nav-inner">
+      <span class="nav-logo"><svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4l4.5 2.5"/><path d="M22 12h-4l-2.5 4.5"/><path d="M17.5 20.5l-2.5-3.5h-6"/><path d="M6.5 20.5l2.5-3.5"/><path d="M2 12h4l2.5-4.5"/></svg> DT26</span>
+      <div class="nav-links">
+        <button class="nav-link" (click)="scrollTo('como-jugar')">Cómo Jugar</button>
+        <button class="nav-link" (click)="scrollTo('puntajes')">Puntajes</button>
+      </div>
+      <div class="nav-auth-buttons">
+        <button class="nav-login-btn" (click)="openAuth('login')">
+          <mat-icon>person</mat-icon>
+          <span class="nav-login-text">Iniciar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Mundial 2026</div>
+      <h1 class="hero-title">Convertite en el mejor<br>DT del Mundial</h1>
+      <p class="hero-subtitle">Elegí tus selecciones, armá tu lista de 26, predecí resultados y competí contra todos por ser el número 1.</p>
+
+      <div class="hero-actions">
+        <button class="hero-cta" (click)="openAuth('register')">
+          <mat-icon>rocket_launch</mat-icon> Crear cuenta gratis
+        </button>
+        <button class="hero-cta-secondary" (click)="scrollTo('como-jugar')">
+          <mat-icon>play_circle</mat-icon> ¿Cómo se juega?
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num">48</span>
+          <span class="hero-stat-label">Selecciones</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">700+</span>
+          <span class="hero-stat-label">Jugadores</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">104</span>
+          <span class="hero-stat-label">Partidos</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CÓMO JUGAR ══ -->
+  <section class="game-intro-section" id="como-jugar">
+    <div class="game-intro-container">
+      <div class="game-intro-badge"><svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg> Cómo Jugar</div>
+      <h2 class="game-intro-title">6 pasos para ser DT mundialista</h2>
+      <p class="game-intro-subtitle">Demostrá que sabés más que nadie. Armá tu lista, elegí tus titulares, predecí resultados y competí por ser el mejor del Mundial.</p>
+
+      <div class="game-intro-steps">
+        <div class="step-card">
+          <div class="step-icon si-globe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <h3>Elegí tus 5 selecciones</h3>
+          <p>Seleccioná 5 selecciones para seguir durante todo el torneo. De estas dependerá gran parte de tu puntaje.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon si-list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+          <h3>Armá tu lista de 26</h3>
+          <p>Para cada una de tus selecciones, elegí los 26 jugadores convocados. Anticipate a la lista oficial.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon si-ball"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4l4.5 2.5"/><path d="M22 12h-4l-2.5 4.5"/><path d="M17.5 20.5l-2.5-3.5h-6"/><path d="M6.5 20.5l2.5-3.5"/><path d="M2 12h4l2.5-4.5"/></svg></div>
+          <h3>Elegí tu XI titular</h3>
+          <p>En cada partido de tus selecciones, definí los 11 titulares. Ajustá tu equipo partido a partido.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon si-target"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+          <h3>Elegí goleadores</h3>
+          <p>Apostá quién marca gol en cada partido. Modo riesgo: +50 si acertás, −20 si fallás.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon si-chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg></div>
+          <h3>Predecí resultados</h3>
+          <p>Pronosticá ganador/empate, diferencia de goles o el resultado exacto de todos los partidos.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon si-users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>Competí con amigos</h3>
+          <p>Creá grupos privados y desafiá a tus amigos. Ranking general + ligas privadas.</p>
+        </div>
+      </div>
+
+      <div class="game-intro-deadline">
+        <mat-icon>schedule</mat-icon>
+        <span>Podés modificar tus predicciones hasta <strong>48 horas antes</strong> del anuncio oficial de cada lista o partido. Este plazo puede variar según la selección.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SISTEMA DE PUNTAJES ══ -->
+  <section class="scoring-section" id="puntajes">
+    <div class="scoring-container">
+      <div class="scoring-header">
+        <span class="scoring-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Reglamento</span>
+        <h2 class="scoring-title">Sistema de Puntos</h2>
+        <p class="scoring-subtitle">Cada acierto suma. Mientras más preciso seas, más alto llegás.</p>
+      </div>
+
+      <div class="scoring-grid">
+        <div class="score-card sc-green">
+          <div class="sc-header">
+            <span class="sc-icon sc-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></span>
+            <h3>Convocados</h3>
+          </div>
+          <div class="sc-rules">
+            <div class="sc-rule"><span class="sc-pts">+5</span> por jugador acertado</div>
+            <div class="sc-rule sc-bonus"><span class="sc-pts">×2</span> si acertás 25 o 26 jugadores</div>
+          </div>
+        </div>
+
+        <div class="score-card sc-blue">
+          <div class="sc-header">
+            <span class="sc-icon sc-icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>
+            <h3>XI Titular</h3>
+          </div>
+          <div class="sc-rules">
+            <div class="sc-rule"><span class="sc-pts">+10</span> por cada titular acertado</div>
+            <div class="sc-rule sc-bonus"><span class="sc-pts">×2</span> si acertás los 11 titulares</div>
+          </div>
+        </div>
+
+        <div class="score-card sc-red">
+          <div class="sc-header">
+            <span class="sc-icon sc-icon-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+            <h3>Resultados</h3>
+          </div>
+          <div class="sc-rules">
+            <div class="sc-rule"><span class="sc-pts">+25</span> acertar ganador o empate</div>
+            <div class="sc-rule sc-bonus"><span class="sc-pts">+50</span> acertar resultado exacto</div>
+            <div class="sc-rule"><span class="sc-pts">+30</span> acertar diferencia de goles (no aplica a empates)</div>
+          </div>
+        </div>
+
+        <div class="score-card sc-purple">
+          <div class="sc-header">
+            <span class="sc-icon sc-icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+            <h3>Goleadores</h3>
+          </div>
+          <div class="sc-rules">
+            <div class="sc-rule sc-highlight"><span class="sc-pts">+50</span> modo riesgo (acierto)</div>
+            <div class="sc-rule sc-danger"><span class="sc-pts">−20</span> modo riesgo (fallo)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scoring-cta">
+        <p class="scoring-key">No gana el que más arriesga… <strong>gana el que mejor anticipa.</strong></p>
+        <button class="hero-cta small" (click)="openAuth('register')">
+          <mat-icon>rocket_launch</mat-icon> Empezar ahora
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="landing-footer">
+    <p class="footer-text">Hecho con pasión por un grupo de amigos — ¡Vamos Paraguay!</p>
+    <div class="social-links">
+      <a href="https://x.com/fifaworldcup_es" target="_blank" rel="noopener" class="social-link" title="X (Twitter)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/fifaworldcup/?hl=es" target="_blank" rel="noopener" class="social-link" title="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/channel/UCpcTrCXblq78GZrTUTLWeBw" target="_blank" rel="noopener" class="social-link" title="YouTube">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ══ AUTH OVERLAY (slide-in panel + backdrop) ══ -->
+@if (showAuthPanel) {
+  <div class="auth-backdrop" (click)="toggleAuth()"></div>
+  <div class="auth-panel">
+    <div class="auth-panel-header">
+      <span class="nav-logo"><svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4l4.5 2.5"/><path d="M22 12h-4l-2.5 4.5"/><path d="M17.5 20.5l-2.5-3.5h-6"/><path d="M6.5 20.5l2.5-3.5"/><path d="M2 12h4l2.5-4.5"/></svg> DT26</span>
+      <button class="auth-close" (click)="toggleAuth()" aria-label="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="form-box">
+      <!-- Pestañas -->
+      <div class="form-tabs">
+        <button type="button" class="tab-btn" [class.active]="mode === 'register'" (click)="setMode('register')">
+          <mat-icon>person_add</mat-icon> Registrarse
+        </button>
+        <button type="button" class="tab-btn" [class.active]="mode === 'login'" (click)="setMode('login')">
+          <mat-icon>login</mat-icon> Iniciar Sesión
+        </button>
+      </div>
+
+      <!-- ── FORMULARIO REGISTRO ── -->
+      @if (mode === 'register') {
+      <div class="form-header">
+        <h2 class="form-title">Crear cuenta</h2>
+        <p class="form-sub">Es gratis. Tardás menos de 1 minuto.</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="reg-form" novalidate>
+        <div class="field-group">
+          <label class="field-label">Usuario <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="registerForm.get('user')?.invalid && registerForm.get('user')?.touched">
+            <mat-icon class="field-icon">person</mat-icon>
+            <input class="field-input" formControlName="user" placeholder="tu_usuario" autocomplete="username">
+          </div>
+          <span class="field-error" *ngIf="registerForm.get('user')?.invalid && registerForm.get('user')?.touched">{{ getErrorMessage('user') }}</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Email <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <mat-icon class="field-icon">email</mat-icon>
+            <input class="field-input" type="email" formControlName="email" placeholder="tu@email.com" autocomplete="email">
+          </div>
+          <span class="field-error" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">{{ getErrorMessage('email') }}</span>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Nombre <span class="opt">(opcional)</span></label>
+            <div class="field-wrap">
+              <mat-icon class="field-icon">badge</mat-icon>
+              <input class="field-input" formControlName="nombre" placeholder="Tu nombre" autocomplete="given-name">
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Apellido <span class="opt">(opcional)</span></label>
+            <div class="field-wrap">
+              <mat-icon class="field-icon">badge</mat-icon>
+              <input class="field-input" formControlName="apellido" placeholder="Tu apellido" autocomplete="family-name">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Contraseña <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <mat-icon class="field-icon">lock</mat-icon>
+            <input class="field-input" [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Mín. 8 caracteres" autocomplete="new-password">
+            <button type="button" class="toggle-pass" (click)="hidePassword = !hidePassword">
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">{{ getErrorMessage('password') }}</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Confirmar contraseña <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+            <mat-icon class="field-icon">lock_reset</mat-icon>
+            <input class="field-input" [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Repetí la contraseña" autocomplete="new-password">
+            <button type="button" class="toggle-pass" (click)="hideConfirmPassword = !hideConfirmPassword">
+              <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">{{ getErrorMessage('confirmPassword') }}</span>
+        </div>
+
+        <div class="alert-error" *ngIf="errorMessage">
+          <mat-icon>error_outline</mat-icon> {{ errorMessage }}
+        </div>
+
+        <button type="submit" class="btn-submit" [class.loading]="loading" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading"><mat-icon>rocket_launch</mat-icon> Crear mi cuenta gratis</span>
+        </button>
+      </form>
+      }
+
+      <!-- ── FORMULARIO LOGIN ── -->
+      @if (mode === 'login') {
+      <div class="form-header">
+        <h2 class="form-title">Bienvenido</h2>
+        <p class="form-sub">Ingresá con tu usuario o email.</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="reg-form" novalidate>
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">Usuario o Email <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="loginForm.get('identifier')?.invalid && loginForm.get('identifier')?.touched">
+            <mat-icon class="field-icon">person</mat-icon>
+            <input class="field-input" formControlName="identifier" placeholder="tu_usuario o tu@email.com" autocomplete="username">
+          </div>
+          <span class="field-error" *ngIf="loginForm.get('identifier')?.invalid && loginForm.get('identifier')?.touched">Este campo es requerido</span>
+        </div>
+
+        <div class="field-group" style="margin-bottom:1.5rem;">
+          <label class="field-label">Contraseña <span class="req">*</span></label>
+          <div class="field-wrap" [class.has-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <mat-icon class="field-icon">lock</mat-icon>
+            <input class="field-input" [type]="hideLoginPassword ? 'password' : 'text'" formControlName="password" placeholder="Tu contraseña" autocomplete="current-password">
+            <button type="button" class="toggle-pass" (click)="hideLoginPassword = !hideLoginPassword">
+              <mat-icon>{{ hideLoginPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">Este campo es requerido</span>
+        </div>
+
+        <div class="alert-error" *ngIf="errorLogin">
+          <mat-icon>error_outline</mat-icon> {{ errorLogin }}
+        </div>
+
+        <button type="submit" class="btn-submit" [class.loading]="loadingLogin" [disabled]="loadingLogin">
+          <mat-spinner *ngIf="loadingLogin" diameter="20"></mat-spinner>
+          <span *ngIf="!loadingLogin"><mat-icon>login</mat-icon> Entrar al juego</span>
+        </button>
+
+        <div class="forgot-link-wrap">
+          <button type="button" class="forgot-link" (click)="setMode('forgot')">¿Olvidaste tu contraseña?</button>
+        </div>
+      </form>
+      }
+
+      <!-- ── FORMULARIO FORGOT PASSWORD ── -->
+      @if (mode === 'forgot') {
+      <div class="form-header">
+        <h2 class="form-title">Restablecer contraseña</h2>
+        <p class="form-sub">Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña.</p>
+      </div>
+
+      <div class="reg-form">
+        <div class="field-group">
+          <label class="field-label">Email <span class="req">*</span></label>
+          <div class="field-wrap">
+            <mat-icon class="field-icon">email</mat-icon>
+            <input class="field-input" type="email" [(ngModel)]="forgotEmail" placeholder="tu@email.com" autocomplete="email"
+                   (keydown.enter)="onForgotPassword()">
+          </div>
+        </div>
+
+        <div class="alert-error" *ngIf="forgotError">
+          <mat-icon>error_outline</mat-icon> {{ forgotError }}
+        </div>
+
+        <div class="alert-success" *ngIf="forgotMessage">
+          <mat-icon>check_circle</mat-icon> {{ forgotMessage }}
+        </div>
+
+        <button type="button" class="btn-submit" [class.loading]="loadingForgot" [disabled]="loadingForgot" (click)="onForgotPassword()">
+          <mat-spinner *ngIf="loadingForgot" diameter="20"></mat-spinner>
+          <span *ngIf="!loadingForgot"><mat-icon>send</mat-icon> Enviar enlace</span>
+        </button>
+
+        <div class="forgot-link-wrap">
+          <button type="button" class="forgot-link" (click)="setMode('login')">← Volver a iniciar sesión</button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+}

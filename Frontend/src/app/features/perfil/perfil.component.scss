@@ -1,0 +1,946 @@
+// Variables de colores oscuros
+$bg: #0a0e1a;
+$bg-card: rgba(255, 255, 255, 0.04);
+$bg-card-hover: rgba(255, 255, 255, 0.08);
+$border: rgba(255, 255, 255, 0.08);
+$text: rgba(255, 255, 255, 0.92);
+$text-muted: rgba(255, 255, 255, 0.5);
+$accent: #00d4ff;
+$gold: #f59e0b;
+$radius: 14px;
+$ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ── HERO ──
+.hero {
+  background: linear-gradient(135deg, rgba($accent, 0.15) 0%, rgba($accent, 0.05) 50%, transparent 100%);
+  border-bottom: 1px solid $border;
+  color: $text;
+  padding: 20px 24px 14px;
+  padding-top: calc(72px + 14px);
+  text-align: center;
+
+  h1 { 
+    font-size: 1.4rem; 
+    margin: 0 0 3px; 
+    color: $accent;
+    font-weight: 800;
+  }
+  p { 
+    margin: 0; 
+    color: $text-muted; 
+    font-size: 0.82rem; 
+  }
+}
+
+// ── CONTAINER ──
+.perfil-container {
+  max-width: 720px;
+  margin: 0 auto 24px;
+  padding: 0 12px;
+  padding-top: 16px;
+}
+
+// ── USER CARD ──
+.user-card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  transition: all $ease;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($accent, 0.3);
+  }
+}
+
+.avatar-display {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba($accent, 0.1);
+  border: 2px solid rgba($accent, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  .initials {
+    color: $accent;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+}
+
+.avatar-icon {
+  width: 60px;
+  height: 60px;
+}
+
+.avatar-svg {
+  width: 60px;
+  height: 60px;
+}
+
+.user-info-card {
+  h2 { 
+    margin: 0 0 1px; 
+    color: $text; 
+    font-size: 1.1rem; 
+    font-weight: 700;
+  }
+  .username { 
+    margin: 0; 
+    color: $text-muted; 
+    font-size: .8rem; 
+  }
+  .email { 
+    margin: 2px 0 6px; 
+    color: $text-muted; 
+    font-size: .78rem; 
+  }
+
+  .puntaje-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, $gold, darken($gold, 10%));
+    color: $bg;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba($gold, 0.3);
+  }
+}
+
+// ── FORM SECTIONS ──
+.form-section {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  margin-bottom: 14px;
+  transition: all $ease;
+
+  &:hover {
+    background: $bg-card-hover;
+  }
+
+  h3 {
+    margin: 0 0 14px;
+    color: $accent;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+
+  h3 { margin: 0; }
+  .toggle-icon { 
+    font-size: 1rem; 
+    color: $text-muted; 
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+
+  label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: $text;
+    margin-bottom: 4px;
+  }
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid $border;
+    border-radius: 8px;
+    font-size: .88rem;
+    color: $text;
+    transition: all $ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.04);
+      border-color: $accent;
+      box-shadow: 0 0 0 3px rgba($accent, 0.1);
+    }
+  }
+}
+
+// ── AVATAR SELECTOR ──
+.avatar-section {
+  margin-bottom: 20px;
+
+  > label {
+    display: block;
+    font-size: .85rem;
+    font-weight: 600;
+    color: $text;
+    margin-bottom: 12px;
+  }
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.avatar-option {
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid $border;
+  border-radius: $radius;
+  padding: 10px 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all $ease;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($accent, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: $accent;
+    background: rgba($accent, 0.1);
+    box-shadow: 0 0 0 2px rgba($accent, .25);
+  }
+
+  .avatar-svg-small {
+    width: 48px;
+    height: 48px;
+  }
+
+  .avatar-label {
+    font-size: .65rem;
+    color: $text-muted;
+    text-transform: capitalize;
+  }
+}
+
+// ── MESSAGES ──
+.msg {
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: .9rem;
+  border: 1px solid;
+
+  &.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  &.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+// ── BUTTON ──
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, $accent, darken($accent, 10%));
+  color: $bg;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $ease;
+  box-shadow: 0 4px 12px rgba($accent, 0.3);
+
+  &:hover:not(:disabled) { 
+    background: linear-gradient(135deg, lighten($accent, 5%), $accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($accent, 0.4);
+  }
+  
+  &:disabled { 
+    opacity: .5; 
+    cursor: not-allowed; 
+    transform: none;
+  }
+}
+
+// ── MOBILE ──
+@media (max-width: 600px) {
+  .hero {
+    padding: 14px 16px 10px;
+  }
+
+  .perfil-container {
+    padding: 0 10px;
+    padding-top: 12px;
+  }
+
+  .user-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-section {
+    padding: 14px 12px;
+  }
+
+  .avatar-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .avatar-option {
+    padding: 6px 2px 4px;
+  }
+
+  .avatar-option .avatar-svg-small {
+    width: 32px;
+    height: 32px;
+  }
+
+  .avatar-option .avatar-label {
+    font-size: .55rem;
+  }
+}
+
+// ── Toggle switch ──────────────────────────────────────
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.toggle-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $text;
+}
+
+.toggle-desc {
+  font-size: 0.8rem;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+
+  input { opacity: 0; width: 0; height: 0; }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid $border;
+    border-radius: 26px;
+    transition: 0.3s;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      bottom: 3px;
+      background: $text-muted;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+  }
+
+  input:checked + .slider {
+    background: $accent;
+    border-color: $accent;
+  }
+
+  input:checked + .slider::before {
+    transform: translateX(22px);
+    background: $bg;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MI JUEGO - Sección de resumen
+// ══════════════════════════════════════════════════════════════
+
+.my-game-section {
+  h3 {
+    margin-bottom: 20px;
+  }
+}
+
+.game-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s, transform 0.2s;
+
+  &:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateY(-2px);
+  }
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+
+  .summary-icon {
+    font-size: 24px;
+  }
+
+  .summary-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .confirmed-tag {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4ade80;
+    background: rgba(74,222,128,0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(74,222,128,0.2);
+  }
+}
+
+// ── Convocatorias Compactas ──────────────────────────────
+
+.convocatorias-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.convocatoria-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(0,212,255,0.3);
+    transform: translateX(4px);
+  }
+
+  .flag-mini {
+    width: 28px;
+    height: 21px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+
+  .player-photo-mini {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    border: 1.5px solid rgba(0,212,255,0.4);
+    flex-shrink: 0;
+  }
+
+  .pais-nombre {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .progress-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+
+    &.complete {
+      color: #4ade80;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+    }
+  }
+}
+
+// ── Predicciones Summary ─────────────────────────────────
+
+.predictions-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pred-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+
+  .pred-type {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .pred-team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .flag-mini {
+      width: 28px;
+      height: 21px;
+      object-fit: cover;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    span {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+    }
+  }
+}
+
+.empty-pred {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+
+  span {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  a {
+    font-size: 12px;
+    font-weight: 600;
+    color: #00d4ff;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #0ea5e9;
+    }
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────
+.tabs-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  color: $text-muted;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $ease;
+
+  &.active {
+    background: rgba($accent, 0.15);
+    color: $accent;
+    box-shadow: 0 0 0 1px rgba($accent, 0.3);
+  }
+
+  &:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+    color: $text;
+  }
+}
+
+// ── MI JUEGO ──────────────────────────────────────────
+.loading-juego {
+  text-align: center;
+  padding: 32px;
+  color: $text-muted;
+  font-size: 0.9rem;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  .section-icon { font-size: 1rem; }
+
+  h3 { margin: 0; color: $accent; font-size: 0.95rem; font-weight: 700; flex: 1; }
+}
+
+.btn-edit-pred {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border: 1px solid rgba($accent, 0.35);
+  border-radius: 20px;
+  color: $accent;
+  background: rgba($accent, 0.06);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: rgba($accent, 0.15); }
+}
+
+.confirmed-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+.pred-section { }
+
+.pred-row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pred-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .pred-label {
+    font-size: 0.75rem;
+    color: $text-muted;
+    min-width: 64px;
+    font-weight: 600;
+  }
+
+  .pred-value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    color: $text;
+    font-weight: 600;
+  }
+}
+
+.pred-empty-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  p { margin: 0; color: $text-muted; font-size: 0.88rem; flex: 1; }
+}
+
+.btn-primary-sm {
+  font-size: 0.78rem;
+  padding: 5px 14px;
+  background: rgba($accent, 0.12);
+  border: 1px solid rgba($accent, 0.35);
+  border-radius: 20px;
+  color: $accent;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s;
+
+  &:hover { background: rgba($accent, 0.22); }
+}
+
+.flag-xs {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.player-xs {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.pred-empty {
+  font-size: 0.85rem;
+  color: $text-muted;
+  a { color: $accent; text-decoration: none; }
+}
+
+.empty-fav-msg {
+  font-size: 0.88rem;
+  color: $text-muted;
+  margin: 0;
+  a { color: $accent; text-decoration: none; }
+}
+
+// ── FAVORITOS CON CONVOCADOS ───────────────────────────
+.favoritos-juego-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fav-juego-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid $border;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: rgba($accent, 0.25); }
+}
+
+.fav-juego-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  flex-wrap: wrap;
+}
+
+.fav-flag-img {
+  width: 26px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.fav-nombre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $text;
+  flex: 1;
+}
+
+.fav-progress {
+  font-size: 0.72rem;
+  color: $text-muted;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 7px;
+  border-radius: 12px;
+
+  &.complete { color: #22c55e; background: rgba(34,197,94,0.1); }
+}
+
+.btn-ver-convocados {
+  font-size: 0.7rem;
+  padding: 3px 9px;
+  background: rgba($accent, 0.08);
+  border: 1px solid rgba($accent, 0.25);
+  border-radius: 12px;
+  color: $accent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) { background: rgba($accent, 0.18); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-edit-small {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  color: $text-muted;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover { border-color: rgba($accent,0.35); color: $accent; }
+}
+
+// ── LISTA COMPACTA CONVOCADOS ──────────────────────────
+.convocados-lista {
+  padding: 6px 10px 10px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.sin-convocados {
+  font-size: 0.8rem;
+  color: $text-muted;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.convocados-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px 8px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.conv-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+
+  &:last-child { border-bottom: none; }
+}
+
+.conv-num {
+  font-size: 0.62rem;
+  color: $text-muted;
+  min-width: 16px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.conv-pos {
+  font-size: 0.6rem;
+  font-weight: 800;
+  min-width: 26px;
+  text-align: center;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  color: $text-muted;
+
+  &[data-pos="POR"] { color: #facc15; background: rgba(250,204,21,0.1); }
+  &[data-pos="DEF"] { color: #60a5fa; background: rgba(96,165,250,0.1); }
+  &[data-pos="MED"] { color: #a78bfa; background: rgba(167,139,250,0.1); }
+  &[data-pos="DEL"] { color: #f87171; background: rgba(248,113,113,0.1); }
+}
+
+.conv-nombre {
+  font-size: 0.72rem;
+  color: $text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+// ── MI PERFIL TAB ─────────────────────────────────────────────────────────────
+.mi-perfil-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mp-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  gap: 1rem;
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.mp-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $text-muted;
+  min-width: 80px;
+}
+
+.mp-value {
+  font-size: 0.95rem;
+  color: $text;
+  font-weight: 500;
+}
+

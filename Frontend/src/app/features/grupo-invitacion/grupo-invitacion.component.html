@@ -1,0 +1,87 @@
+<div class="preview-page">
+
+  <!-- Loading -->
+  <div class="state-box" *ngIf="loading">
+    <mat-spinner diameter="44"></mat-spinner>
+    <p>Cargando grupo…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="state-box error" *ngIf="error && !loading">
+    <mat-icon class="err-icon">error_outline</mat-icon>
+    <h3>Grupo no encontrado</h3>
+    <p>{{ error }}</p>
+    <a routerLink="/register" class="btn btn-primary">Crear cuenta</a>
+  </div>
+
+  <!-- Contenido del grupo -->
+  <ng-container *ngIf="grupo && !loading">
+
+    <!-- Tarjeta central de invitación -->
+    <div class="invite-card">
+
+      <!-- Encabezado -->
+      <div class="invite-header">
+        <div class="invite-trophy">🏆</div>
+        <p class="invite-eyebrow">Te invitaron a unirte a</p>
+        <h1 class="invite-nombre">{{ grupo.nombre }}</h1>
+        <p class="invite-creador">Creado por <strong>{{ grupo.creadorNombre }}</strong></p>
+      </div>
+
+      <!-- Stats simples -->
+      <div class="invite-stats">
+        <div class="i-stat">
+          <span class="i-stat-num">{{ grupo.cantidadMiembros || 0 }}</span>
+          <span class="i-stat-label">{{ (grupo.cantidadMiembros || 0) === 1 ? 'participante' : 'participantes' }}</span>
+        </div>
+        <div class="i-stat-divider"></div>
+        <div class="i-stat">
+          <span class="i-stat-num">#{{ grupo.numero }}</span>
+          <span class="i-stat-label">número de grupo</span>
+        </div>
+        <ng-container *ngIf="grupo.premio">
+          <div class="i-stat-divider"></div>
+          <div class="i-stat">
+            <mat-icon class="i-prize-icon">emoji_events</mat-icon>
+            <span class="i-stat-label">{{ grupo.premio }}</span>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Avatares de miembros (sin nombres ni puntos) -->
+      <div class="invite-avatares" *ngIf="(grupo.cantidadMiembros || 0) > 0">
+        <div class="av-stack">
+          <div
+            *ngFor="let m of miembrosPreview; let i = index"
+            class="av-circle"
+            [style.z-index]="10 - i">
+            <app-avatar-icon [avatarId]="m.urlAvatar" [nombre]="m.usuarioNombre" [apellido]="m.usuarioApellido" [size]="36"></app-avatar-icon>
+          </div>
+          <div class="av-more" *ngIf="(grupo.cantidadMiembros || 0) > miembrosPreview.length">
+            +{{ (grupo.cantidadMiembros || 0) - miembrosPreview.length }}
+          </div>
+        </div>
+        <span class="av-texto">ya están compitiendo</span>
+      </div>
+
+      <!-- Mensaje bloqueo -->
+      <div class="invite-lock">
+        <mat-icon>lock</mat-icon>
+        <span>Uníte para ver el ranking y las predicciones del grupo</span>
+      </div>
+
+      <!-- Único CTA -->
+      <button class="btn-join-main" (click)="unirseAlGrupo()">
+        <mat-icon>group_add</mat-icon>
+        {{ authService.isAuthenticated() ? 'Unirme al grupo' : 'Crear cuenta y unirme' }}
+      </button>
+
+      <p class="invite-hint" *ngIf="!authService.isAuthenticated()">
+        ¿Ya tenés cuenta?
+        <a [routerLink]="['/register']" [queryParams]="{mode: 'login', redirect: '/grupo/' + grupo.codigoInvitacion}">Iniciá sesión</a>
+      </p>
+
+    </div>
+
+  </ng-container>
+</div>

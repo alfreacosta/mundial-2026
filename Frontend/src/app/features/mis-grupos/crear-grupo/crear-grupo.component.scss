@@ -1,0 +1,209 @@
+@use '../../../../styles/variables' as v;
+
+.modal-form {
+  padding: v.$spacing-xl;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: v.$spacing-xl;
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: v.$white;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: v.$spacing-sm;
+
+      mat-icon { color: v.$fantasy-cyan; }
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: v.$gray-500;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: v.$radius-sm;
+
+      &:hover { color: v.$white; background: rgba(255,255,255,0.08); }
+    }
+  }
+
+  .form-error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    border-radius: v.$radius-sm;
+    padding: v.$spacing-sm v.$spacing-md;
+    color: #fca5a5;
+    margin-bottom: v.$spacing-md;
+    font-size: 0.85rem;
+  }
+
+  .form-group {
+    margin-bottom: v.$spacing-md;
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: v.$gray-300;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: v.$radius-sm;
+      color: v.$white;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+
+      &::placeholder { color: v.$gray-600; }
+
+      &:focus {
+        outline: none;
+        border-color: v.$fantasy-cyan;
+        background: rgba(0, 212, 255, 0.04);
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: v.$spacing-sm;
+    margin-top: v.$spacing-xl;
+    padding-top: v.$spacing-md;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+}
+
+// Éxito
+.success-view {
+  text-align: center;
+  padding: v.$spacing-md 0;
+
+  .success-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid #34d399;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto v.$spacing-md;
+
+    mat-icon { font-size: 2.5rem; color: #34d399; }
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    color: v.$white;
+    margin-bottom: v.$spacing-xs;
+  }
+
+  .success-nombre {
+    font-size: 1.1rem;
+    color: v.$fantasy-cyan;
+    font-weight: 600;
+    margin-bottom: v.$spacing-xl;
+  }
+
+  .codigo-grande {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: v.$radius-md;
+    padding: v.$spacing-lg;
+    margin-bottom: v.$spacing-xl;
+
+    .codigo-label {
+      font-size: 0.8rem;
+      color: v.$gray-500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: v.$spacing-sm;
+    }
+
+    .codigo-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: v.$spacing-sm;
+
+      .codigo-texto {
+        font-family: monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: v.$fantasy-cyan;
+        letter-spacing: 4px;
+      }
+
+      .btn-copy {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: v.$radius-sm;
+        color: v.$fantasy-cyan;
+        cursor: pointer;
+        padding: 6px;
+
+        &:hover { background: rgba(0, 212, 255, 0.2); }
+      }
+    }
+
+    .codigo-hint {
+      font-size: 0.8rem;
+      color: v.$gray-500;
+      margin-top: v.$spacing-sm;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: v.$radius-sm;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &.btn-full { width: 100%; justify-content: center; }
+
+  &.btn-primary {
+    background: v.$fantasy-cyan;
+    color: #0a0e1a;
+    &:hover:not(:disabled) { background: color-mix(in srgb, v.$fantasy-cyan 85%, #fff); }
+  }
+
+  &.btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: v.$white;
+    border: 1px solid rgba(255,255,255,0.15);
+    &:hover:not(:disabled) { background: rgba(255,255,255,0.14); }
+  }
+
+  &.btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: v.$spacing-sm;
+    &:hover { background: #1ebe5a; }
+  }
+}

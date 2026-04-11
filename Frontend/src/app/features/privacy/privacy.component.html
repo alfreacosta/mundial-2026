@@ -1,0 +1,477 @@
+<div class="privacy-page">
+
+  <!-- Hero -->
+  <div class="privacy-hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <mat-icon>shield</mat-icon>
+        <span>Política de Privacidad</span>
+      </div>
+      <h1 class="hero-title">Protegemos tus datos personales</h1>
+      <p class="hero-sub">
+        Mundial 2026 · Última actualización: <strong>{{ lastUpdated }}</strong>
+      </p>
+      <p class="hero-desc">
+        En Mundial 2026 nos importa tu privacidad. Esta política explica qué datos
+        recolectamos, por qué los usamos y cómo los protegemos, siguiendo los estándares
+        internacionales de protección de datos (GDPR / Ley N.° 1682 de Paraguay).
+      </p>
+    </div>
+  </div>
+
+  <div class="privacy-body">
+
+    <!-- Índice -->
+    <aside class="toc">
+      <div class="toc-title">
+        <mat-icon>format_list_numbered</mat-icon> Contenido
+      </div>
+      <ol class="toc-list">
+        <li *ngFor="let s of sections; let i = index" (click)="scrollTo(s.id)">
+          <span class="toc-num">{{ i + 1 }}.</span> {{ s.title }}
+        </li>
+      </ol>
+    </aside>
+
+    <!-- Contenido principal -->
+    <article class="privacy-content">
+
+      <!-- 1 -->
+      <section id="defending" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>shield</mat-icon></div>
+          <h2>1. Defendemos tus datos</h2>
+        </div>
+        <p>
+          Tu privacidad no es un privilegio — es un derecho. En Mundial 2026 tratamos tus
+          datos personales con el mismo cuidado con el que un arquero cuida su portería: con
+          concentración total y cero descuidos.
+        </p>
+        <p>
+          Esta Política de Privacidad se aplica a todos los usuarios registrados en la plataforma
+          Mundial 2026 (<em>"la Plataforma"</em>). Al registrarte, aceptás que tus datos
+          sean procesados de acuerdo con esta política.
+        </p>
+        <div class="pp-highlight">
+          <mat-icon>info</mat-icon>
+          <span>Nunca venderemos tus datos personales a terceros. Jamás.</span>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section id="how-we-look" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>manage_accounts</mat-icon></div>
+          <h2>2. Cómo cuidamos tus datos</h2>
+        </div>
+        <p>
+          Mundial 2026 es un proyecto universitario desarrollado por un grupo de amigos
+          apasionados por el fútbol y la tecnología. Actuamos como <strong>responsables del
+          tratamiento</strong> de los datos que nos proporcionás al registrarte y usar la
+          Plataforma.
+        </p>
+        <p>
+          Usamos tus datos únicamente para las finalidades descritas en esta política. No
+          realizamos perfilado automatizado con efectos legales ni decisiones que te afecten sin
+          intervención humana.
+        </p>
+        <ul class="pp-list">
+          <li>Almacenamos tus datos en servidores con acceso restringido.</li>
+          <li>Usamos contraseñas almacenadas con hash seguro (bcrypt).</li>
+          <li>Las comunicaciones entre tu navegador y el servidor usan HTTPS.</li>
+          <li>El acceso a la base de datos está limitado al equipo de desarrollo.</li>
+        </ul>
+      </section>
+
+      <!-- 3 -->
+      <section id="your-rights" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>verified_user</mat-icon></div>
+          <h2>3. Tus derechos</h2>
+        </div>
+        <p>Tenés los siguientes derechos sobre tus datos personales:</p>
+        <div class="rights-grid">
+          <div class="right-card">
+            <mat-icon>visibility</mat-icon>
+            <strong>Acceso</strong>
+            <span>Podés solicitar una copia de todos los datos que tenemos sobre vos.</span>
+          </div>
+          <div class="right-card">
+            <mat-icon>edit</mat-icon>
+            <strong>Rectificación</strong>
+            <span>Podés corregir datos incorrectos o incompletos en cualquier momento.</span>
+          </div>
+          <div class="right-card">
+            <mat-icon>delete</mat-icon>
+            <strong>Eliminación</strong>
+            <span>Podés pedir que eliminemos tu cuenta y todos tus datos asociados.</span>
+          </div>
+          <div class="right-card">
+            <mat-icon>pause_circle</mat-icon>
+            <strong>Limitación</strong>
+            <span>Podés solicitar que limitemos el procesamiento de tus datos.</span>
+          </div>
+          <div class="right-card">
+            <mat-icon>download</mat-icon>
+            <strong>Portabilidad</strong>
+            <span>Podés pedir una exportación de tus datos en formato legible.</span>
+          </div>
+          <div class="right-card">
+            <mat-icon>block</mat-icon>
+            <strong>Objeción</strong>
+            <span>Podés oponerte al procesamiento de tus datos en ciertos casos.</span>
+          </div>
+        </div>
+        <p>
+          Para ejercer cualquiera de estos derechos, escribinos a través de la sección
+          <a (click)="scrollTo('contact')" class="pp-link">Contáctanos</a>.
+        </p>
+      </section>
+
+      <!-- 4 -->
+      <section id="collecting" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>data_usage</mat-icon></div>
+          <h2>4. Recolección de datos</h2>
+        </div>
+        <p>
+          Recolectamos datos cuando:
+        </p>
+        <ul class="pp-list">
+          <li>Te registrás en la Plataforma.</li>
+          <li>Iniciás sesión y usás las funcionalidades (armar equipo, ver stats, etc.).</li>
+          <li>Navegás por las distintas secciones de la Plataforma.</li>
+        </ul>
+        <p>
+          La base legal para el tratamiento es el <strong>consentimiento</strong> que otorgás al
+          crear tu cuenta y aceptar esta política, junto con el <strong>interés legítimo</strong>
+          necesario para operar la Plataforma correctamente.
+        </p>
+      </section>
+
+      <!-- 5 -->
+      <section id="what-data" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>list_alt</mat-icon></div>
+          <h2>5. ¿Qué datos recolectamos?</h2>
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dato</th>
+                <th>Para qué lo usamos</th>
+                <th>¿Obligatorio?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Nombre y apellido</strong></td>
+                <td>Identificarte en el ranking y premios</td>
+                <td><span class="badge-yes">Sí</span></td>
+              </tr>
+              <tr>
+                <td><strong>Nombre de usuario</strong></td>
+                <td>Iniciar sesión y aparecer en clasificaciones</td>
+                <td><span class="badge-yes">Sí</span></td>
+              </tr>
+              <tr>
+                <td><strong>Correo electrónico</strong></td>
+                <td>Recuperación de cuenta y notificaciones del torneo</td>
+                <td><span class="badge-yes">Sí</span></td>
+              </tr>
+              <tr>
+                <td><strong>Contraseña (hash)</strong></td>
+                <td>Autenticación segura — nunca se almacena en texto plano</td>
+                <td><span class="badge-yes">Sí</span></td>
+              </tr>
+              <tr>
+                <td><strong>Equipo fantasy</strong></td>
+                <td>Calcular puntuación y mostrar rankings</td>
+                <td><span class="badge-no">Funcional</span></td>
+              </tr>
+              <tr>
+                <td><strong>Actividad en la plataforma</strong></td>
+                <td>Mejorar la experiencia de uso y detectar errores</td>
+                <td><span class="badge-no">Automático</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>No recolectamos</strong> datos sensibles como: origen racial, opiniones
+          políticas, datos de salud, datos biométricos ni datos de menores de 13 años.
+        </p>
+      </section>
+
+      <!-- 6 -->
+      <section id="sharing" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>share</mat-icon></div>
+          <h2>6. Compartir tus datos</h2>
+        </div>
+        <p>
+          Tu privacidad es sagrada para nosotros. <strong>No vendemos ni alquilamos</strong> tus
+          datos personales a ningún tercero. Solo compartimos datos cuando es estrictamente
+          necesario para operar la Plataforma o cuando la ley lo exige.
+        </p>
+        <p>
+          Los datos de ranking (nombre de usuario y puntuación) son visibles para todos los
+          participantes del torneo, ya que forman parte central de la experiencia competitiva.
+        </p>
+      </section>
+
+      <!-- 7 -->
+      <section id="when-share" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>schedule</mat-icon></div>
+          <h2>7. ¿Cuándo compartimos datos?</h2>
+        </div>
+        <p>Podemos compartir datos limitados en los siguientes casos:</p>
+        <ul class="pp-list">
+          <li>
+            <strong>Con el equipo organizador:</strong> para gestionar premios y verificar la
+            identidad de los ganadores.
+          </li>
+          <li>
+            <strong>Por obligación legal:</strong> si una autoridad competente lo requiere
+            mediante orden judicial o resolución administrativa.
+          </li>
+          <li>
+            <strong>En estadísticas agregadas:</strong> podemos publicar estadísticas del torneo
+            que no identifican a ningún participante individualmente.
+          </li>
+        </ul>
+      </section>
+
+      <!-- 8 -->
+      <section id="keeping-safe" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>lock</mat-icon></div>
+          <h2>8. Mantenemos tus datos seguros</h2>
+        </div>
+        <p>
+          Implementamos medidas técnicas y organizativas apropiadas para proteger tus datos
+          contra acceso no autorizado, pérdida o divulgación:
+        </p>
+        <div class="security-list">
+          <div class="sec-item">
+            <mat-icon>https</mat-icon>
+            <div>
+              <strong>Cifrado en tránsito (HTTPS)</strong>
+              <span>Toda la comunicación entre tu navegador y el servidor está cifrada.</span>
+            </div>
+          </div>
+          <div class="sec-item">
+            <mat-icon>password</mat-icon>
+            <div>
+              <strong>Contraseñas hasheadas (bcrypt)</strong>
+              <span>Nunca almacenamos tu contraseña en texto plano.</span>
+            </div>
+          </div>
+          <div class="sec-item">
+            <mat-icon>token</mat-icon>
+            <div>
+              <strong>Autenticación con JWT</strong>
+              <span>Las sesiones se gestionan con tokens seguros de corta vida.</span>
+            </div>
+          </div>
+          <div class="sec-item">
+            <mat-icon>admin_panel_settings</mat-icon>
+            <div>
+              <strong>Acceso restringido a la base de datos</strong>
+              <span>Solo el equipo de desarrollo accede directamente a los datos.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 -->
+      <section id="updating" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>edit</mat-icon></div>
+          <h2>9. Actualización y eliminación de datos</h2>
+        </div>
+        <p>
+          Podés actualizar tus datos desde los ajustes de tu perfil en cualquier momento.
+        </p>
+        <p>
+          Si querés eliminar tu cuenta y todos tus datos, escribinos a través de la sección
+          <a (click)="scrollTo('contact')" class="pp-link">Contáctanos</a>. Procesaremos tu
+          solicitud en un plazo máximo de <strong>30 días hábiles</strong>.
+        </p>
+        <p>
+          Tené en cuenta que algunos datos mínimos (como registros de auditoría) pueden
+          conservarse por obligaciones legales por hasta 5 años, incluso tras la eliminación
+          de tu cuenta.
+        </p>
+      </section>
+
+      <!-- 10 -->
+      <section id="children" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>child_care</mat-icon></div>
+          <h2>10. Menores y datos</h2>
+        </div>
+        <p>
+          Mundial 2026 está orientado a usuarios mayores de 13 años. <strong>No
+          recolectamos conscientemente datos de menores de 13 años.</strong>
+        </p>
+        <p>
+          Si sos padre, madre o tutor/a y creés que un menor bajo tu cuidado nos ha
+          proporcionado datos personales sin tu consentimiento, contactanos de inmediato para
+          que podamos eliminar esa información.
+        </p>
+        <p>
+          Los participantes menores de 18 años que resulten ganadores de premios deberán
+          presentar autorización de sus padres o tutores para reclamar el premio.
+        </p>
+      </section>
+
+      <!-- 11 -->
+      <section id="where" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>public</mat-icon></div>
+          <h2>11. ¿Dónde procesamos tus datos?</h2>
+        </div>
+        <p>
+          Los datos se almacenan y procesan en servidores ubicados en Paraguay o en la región
+          de América del Sur. No transferimos datos personales fuera de la región sin
+          garantías adecuadas de protección.
+        </p>
+        <p>
+          La aplicación corre sobre infraestructura local controlada por el equipo de desarrollo
+          durante el período del torneo (11 de junio – 19 de julio de 2026).
+        </p>
+      </section>
+
+      <!-- 12 -->
+      <section id="cookies" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>cookie</mat-icon></div>
+          <h2>12. Cookies</h2>
+        </div>
+        <p>
+          Usamos un número mínimo de cookies estrictamente necesarias para el funcionamiento
+          de la Plataforma:
+        </p>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cookie</th>
+                <th>Propósito</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>auth_token</code></td>
+                <td>Mantener tu sesión iniciada (JWT)</td>
+                <td>Hasta cerrar sesión o 24 h</td>
+              </tr>
+              <tr>
+                <td><code>lang_pref</code></td>
+                <td>Recordar tu preferencia de idioma</td>
+                <td>1 año</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>No usamos cookies de rastreo, publicidad ni analítica de terceros.</strong>
+        </p>
+      </section>
+
+      <!-- 13 -->
+      <section id="complaints" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>report_problem</mat-icon></div>
+          <h2>13. Reclamaciones</h2>
+        </div>
+        <p>
+          Si considerás que el tratamiento de tus datos personales no es correcto o que hemos
+          violado tus derechos, podés:
+        </p>
+        <ul class="pp-list">
+          <li>Contactarnos directamente (ver sección 15) para resolver la situación.</li>
+          <li>
+            Presentar una reclamación ante la autoridad de protección de datos competente
+            en Paraguay o en tu país de residencia.
+          </li>
+        </ul>
+        <p>
+          Nos tomamos todas las reclamaciones muy en serio y te responderemos en un plazo
+          máximo de <strong>15 días hábiles</strong>.
+        </p>
+      </section>
+
+      <!-- 14 -->
+      <section id="small-print" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>article</mat-icon></div>
+          <h2>14. La letra chica</h2>
+        </div>
+        <p>
+          Mundial 2026 es un proyecto académico y recreativo sin fines de lucro,
+          desarrollado como proyecto final de curso universitario. La Plataforma opera
+          exclusivamente durante el período del torneo FIFA World Cup 2026.
+        </p>
+        <p>
+          Esta política puede actualizarse en cualquier momento. Los cambios significativos
+          se comunicarán mediante un aviso visible dentro de la Plataforma con al menos
+          <strong>7 días de anticipación</strong>.
+        </p>
+        <p>
+          El uso continuado de la Plataforma tras la publicación de cambios implica la
+          aceptación de la nueva política. Si no estás de acuerdo, podés eliminar tu cuenta
+          en cualquier momento.
+        </p>
+        <p>
+          Esta política se rige por las leyes de la República del Paraguay. Cualquier
+          disputa se someterá a la jurisdicción de los Tribunales de Asunción.
+        </p>
+      </section>
+
+      <!-- 15 -->
+      <section id="contact" class="pp-section">
+        <div class="section-header">
+          <div class="section-icon"><mat-icon>mail</mat-icon></div>
+          <h2>15. Contáctanos</h2>
+        </div>
+        <p>
+          Para cualquier consulta sobre esta política, para ejercer tus derechos o para
+          reportar un problema de privacidad, podés contactarnos:
+        </p>
+        <div class="contact-box">
+          <div class="contact-item">
+            <mat-icon>mail_outline</mat-icon>
+            <span>Envianos un mensaje desde la sección de soporte dentro de la Plataforma</span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>schedule</mat-icon>
+            <span>Tiempo de respuesta: máximo <strong>15 días hábiles</strong></span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>location_on</mat-icon>
+            <span>Mundial 2026 · Asunción, Paraguay</span>
+          </div>
+        </div>
+        <div class="back-home">
+          <a routerLink="/dashboard" class="btn-back">
+            <mat-icon>arrow_back</mat-icon> Volver al inicio
+          </a>
+        </div>
+      </section>
+
+    </article>
+  </div>
+
+  <!-- Footer mini -->
+  <div class="privacy-footer">
+    <p>© 2026 Mundial 2026 · Hecho con ❤️ en Paraguay · 
+      <span>Esta política está inspirada en el modelo de FIFA Data Protection</span>
+    </p>
+  </div>
+
+</div>

@@ -1,0 +1,327 @@
+<div class="predicciones-page">
+
+  <!-- ── PAGE HEADER ────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <mat-icon>sports_soccer</mat-icon>
+        Predicciones
+        @if (!loadingPartidos) {
+          <span class="progress-inline">{{ totalPredichos }}/{{ totalPartidos }}</span>
+        }
+      </h1>
+      <p class="page-subtitle">Mundial 2026 — Elegí el campeón, el goleador y los marcadores</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 1: PREDICCIÓN DEL TORNEO                                     -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <section class="pred-section torneo-section">
+
+    @if (loadingTorneo) {
+      <div class="center-state">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
+    } @else {
+
+      <!-- ── Predicción existente ── -->
+      @if (prediccionTorneo) {
+        <div class="torneo-summary">
+          <div class="torneo-left">
+            <div class="torneo-card campeon">
+              <div class="tc-icon">🏆</div>
+              <div class="tc-info">
+                <span class="tc-label">Campeón</span>
+                <div class="tc-value">
+                  <span class="fi fi-{{ prediccionTorneo.paisCampeonCodigo | fifaToFlag }}"></span>
+                  {{ prediccionTorneo.paisCampeonNombre }}
+                </div>
+              </div>
+            </div>
+            <div class="torneo-card goleador">
+              <div class="tc-icon">⚽</div>
+              <div class="tc-info">
+                <span class="tc-label">Goleador</span>
+                <div class="tc-value">
+                  @if (prediccionTorneo.jugadorGoleadorPaisCodigo) {
+                    <span class="fi fi-{{ prediccionTorneo.jugadorGoleadorPaisCodigo | fifaToFlag }}"></span>
+                  }
+                  {{ prediccionTorneo.jugadorGoleadorNombre }}
+                </div>
+              </div>
+            </div>
+            @if (!torneoConfirmado) {
+              <button class="btn-edit-torneo"
+                      [class.cancel]="mostrarFormTorneo"
+                      (click)="mostrarFormTorneo = !mostrarFormTorneo">
+                <mat-icon>{{ mostrarFormTorneo ? 'close' : 'edit' }}</mat-icon>
+                {{ mostrarFormTorneo ? 'Cancelar' : 'Modificar' }}
+              </button>
+            }
+          </div>
+          @if (prediccionTorneo.jugadorGoleadorUrlFoto) {
+            <div class="torneo-photo">
+              <img [src]="prediccionTorneo.jugadorGoleadorUrlFoto"
+                   [alt]="prediccionTorneo.jugadorGoleadorNombre"
+                   class="goleador-photo" loading="lazy">
+            </div>
+          }
+        </div>
+        @if (torneoConfirmado) {
+          <div class="torneo-locked">
+            <mat-icon>lock</mat-icon> Predicción confirmada — no se puede modificar
+          </div>
+        }
+      }
+
+      <!-- ── Formulario torneo ── -->
+      @if (!torneoConfirmado && mostrarFormTorneo) {
+        <div class="torneo-form">
+          <h3 class="form-heading">{{ prediccionTorneo ? 'Modificar predicción' : 'Crear predicción del torneo' }}</h3>
+          <div class="form-row">
+
+            <!-- Campeón -->
+            <div class="form-col">
+              <label class="form-label">
+                <mat-icon class="icon-gold">emoji_events</mat-icon> ¿Quién será el campeón?
+              </label>
+              <select [(ngModel)]="paisCampeonId" class="sel-field">
+                <option [ngValue]="null" disabled>Seleccioná un país...</option>
+                @for (pais of paises; track pais.internalId) {
+                  <option [ngValue]="pais.internalId">{{ pais.nombre }} ({{ pais.codigo }})</option>
+                }
+              </select>
+              @if (paisSeleccionado) {
+                <div class="sel-preview">
+                  <span class="fi fi-{{ paisSeleccionado.codigo | fifaToFlag }}"></span>
+                  <strong>{{ paisSeleccionado.nombre }}</strong>
+                  @if (paisSeleccionado.confederacion?.abreviatura) {
+                    <span class="conf-tag">{{ paisSeleccionado.confederacion!.abreviatura }}</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Goleador -->
+            <div class="form-col">
+              <label class="form-label">
+                <mat-icon class="icon-cyan">sports_soccer</mat-icon> ¿Quién será el goleador?
+              </label>
+              <input type="text"
+                     [(ngModel)]="busquedaJugador"
+                     (ngModelChange)="filtrarJugadores()"
+                     placeholder="Buscá por nombre o país..."
+                     class="search-field">
+              <select [(ngModel)]="jugadorGoleadorId" class="sel-field" size="6">
+                @for (j of jugadoresFiltrados; track j.internalId) {
+                  <option [ngValue]="j.internalId">
+                    {{ j.apellido }}, {{ j.nombre }} — {{ j.pais.nombre }} ({{ j.posicion.codigo }})
+                  </option>
+                }
+              </select>
+              @if (jugadorSeleccionado) {
+                <div class="sel-preview">
+                  <span class="fi fi-{{ jugadorSeleccionado.pais.codigo | fifaToFlag }}"></span>
+                  <strong>{{ jugadorSeleccionado.nombreCompleto }}</strong>
+                  <span class="pos-tag">{{ jugadorSeleccionado.posicion.codigo }}</span>
+                  @if (jugadorSeleccionado.club) {
+                    <span class="club-tag">{{ jugadorSeleccionado.club.nombre }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (msgTorneo) {
+            <div class="form-msg success"><mat-icon>check_circle</mat-icon> {{ msgTorneo }}</div>
+          }
+          @if (errorTorneo) {
+            <div class="form-msg error-msg"><mat-icon>error_outline</mat-icon> {{ errorTorneo }}</div>
+          }
+
+          <button class="btn-save-torneo"
+                  [disabled]="!formularioTorneoValido || savingTorneo"
+                  (click)="guardarTorneo()">
+            @if (savingTorneo) {
+              <mat-spinner diameter="16"></mat-spinner> Guardando...
+            } @else {
+              <mat-icon>save</mat-icon>
+              {{ prediccionTorneo ? 'Actualizar predicción' : 'Guardar predicción' }}
+            }
+          </button>
+        </div>
+      }
+
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECCIÓN 2: PREDICCIONES POR GRUPO                                    -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <section class="partidos-section">
+    <!-- Puntaje: inline sutil -->
+    <p class="puntaje-hint">
+      <span class="ph-exact">50pts</span> exacto ·
+      <span class="ph-diff">30pts</span> diferencia ·
+      <span class="ph-result">25pts</span> resultado ·
+      <span class="ph-wrong">0</span> incorrecto
+    </p>
+
+    @if (loadingPartidos) {
+      <div class="center-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando partidos...</p>
+      </div>
+    } @else if (errorPartidos) {
+      <div class="center-state error-state">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ errorPartidos }}</p>
+      </div>
+    } @else {
+
+      <!-- Tabs de fecha + grupo -->
+      <div class="filter-bar">
+        <button class="date-tab-btn" [class.active]="fechaActiva === 'HOY'"    (click)="setFechaActiva('HOY')">Hoy</button>
+        <button class="date-tab-btn" [class.active]="fechaActiva === 'MANANA'" (click)="setFechaActiva('MANANA')">Mañana</button>
+        <button class="date-tab-btn" [class.active]="fechaActiva === 'TODOS'"  (click)="setFechaActiva('TODOS')">Todos</button>
+        <span class="filter-sep"></span>
+        @for (g of grupos; track g) {
+          <button class="grupo-tab-btn" [class.active]="grupoFiltro === g"
+                  (click)="toggleGrupoFiltro(g)">{{ g }}</button>
+        }
+      </div>
+
+      <!-- Lista partidos filtrados -->
+      <div class="partidos-lista">
+        @for (item of listaFiltrada; track item.partido.id) {
+          <div class="partido-card"
+               [class.bloqueado]="item.prediccion?.bloqueada"
+               [class.finalizado]="item.partido.estado === 'FINALIZADO'">
+
+            <!-- Meta -->
+            <div class="partido-meta">
+              <span class="partido-estado {{ item.partido.estado.toLowerCase() }}">
+                {{ item.partido.estado === 'PENDIENTE' ? 'Pendiente'
+                 : item.partido.estado === 'EN_CURSO'  ? '⚽ En curso'
+                 : 'Finalizado' }}
+              </span>
+              @if (item.partido.grupo) {
+                <span class="partido-grupo">Grupo {{ item.partido.grupo }}</span>
+              }
+              <span class="partido-fecha">
+                {{ item.partido.fechaHora | date:'EEE dd MMM · HH:mm' }} hs
+              </span>
+              @if (isBloqueado(item) && item.partido.estado === 'PENDIENTE') {
+                <span class="locked-badge">
+                  <mat-icon>lock</mat-icon> Cerrado
+                </span>
+              }
+            </div>
+
+            <!-- Equipos + marcador en una línea -->
+            <div class="partido-row">
+
+              <!-- Local -->
+              <div class="equipo local">
+                <img class="equipo-flag"
+                     [src]="getFlagUrl(item.partido.equipoLocalCodigo)"
+                     [alt]="item.partido.equipoLocalNombre" loading="lazy">
+                <span class="equipo-nombre">{{ item.partido.equipoLocalNombre }}</span>
+              </div>
+
+              <!-- Centro: goles + botón -->
+              <div class="marcador-center">
+
+                @if (item.partido.estado === 'FINALIZADO' && item.partido.golLocal !== null) {
+                  <div class="resultado-real">
+                    <span class="real-score">{{ item.partido.golLocal }} – {{ item.partido.golVisitante }}</span>
+                  </div>
+                }
+
+                @if (!isBloqueado(item)) {
+                  <div class="pred-inputs">
+                    <div class="score-stepper">
+                      <span class="score-display">{{ item.golLocalEdit ?? '–' }}</span>
+                      <div class="stepper-btns">
+                        <button class="step-btn" (click)="cambiarGol(item, 'local', -1)"
+                                [disabled]="item.guardando || (item.golLocalEdit ?? 0) <= 0">−</button>
+                        <button class="step-btn" (click)="cambiarGol(item, 'local', 1)"
+                                [disabled]="item.guardando">+</button>
+                      </div>
+                    </div>
+                    <span class="vs-sep">–</span>
+                    <div class="score-stepper">
+                      <span class="score-display">{{ item.golVisitanteEdit ?? '–' }}</span>
+                      <div class="stepper-btns">
+                        <button class="step-btn" (click)="cambiarGol(item, 'visitante', -1)"
+                                [disabled]="item.guardando || (item.golVisitanteEdit ?? 0) <= 0">−</button>
+                        <button class="step-btn" (click)="cambiarGol(item, 'visitante', 1)"
+                                [disabled]="item.guardando">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button class="btn-guardar"
+                          [class.modified]="isModificado(item)"
+                          [class.saving]="item.guardando"
+                          [class.saved]="item.guardado"
+                          [disabled]="item.guardando || item.golLocalEdit === null || item.golVisitanteEdit === null"
+                          (click)="guardarPartido(item)">
+                    @if (item.guardando) {
+                      <mat-spinner diameter="12"></mat-spinner>
+                    } @else if (item.guardado) {
+                      <mat-icon>check_circle</mat-icon>
+                    } @else if (item.prediccion) {
+                      <mat-icon>save</mat-icon>
+                    } @else {
+                      <mat-icon>add</mat-icon>
+                    }
+                  </button>
+
+                } @else {
+                  <div class="pred-locked">
+                    @if (item.prediccion?.golLocalPred !== null) {
+                      <span class="locked-score">
+                        {{ item.prediccion?.golLocalPred }} – {{ item.prediccion?.golVisitantePred }}
+                      </span>
+                    } @else {
+                      <span class="no-pred-label">—</span>
+                    }
+                  </div>
+                }
+
+                @if (item.prediccion?.puntajeObtenido !== null && item.prediccion?.puntajeObtenido !== undefined) {
+                  <span class="puntaje-badge {{ getPuntajeClass(item.prediccion!.puntajeObtenido) }}">
+                    {{ getPuntajeLabel(item.prediccion!.puntajeObtenido) }}
+                  </span>
+                }
+
+                @if (item.error) {
+                  <span class="inline-error">{{ item.error }}</span>
+                }
+
+              </div>
+
+              <!-- Visitante -->
+              <div class="equipo visitante">
+                <span class="equipo-nombre">{{ item.partido.equipoVisitanteNombre }}</span>
+                <img class="equipo-flag"
+                     [src]="getFlagUrl(item.partido.equipoVisitanteCodigo)"
+                     [alt]="item.partido.equipoVisitanteNombre" loading="lazy">
+              </div>
+
+            </div>
+
+          </div>
+        } @empty {
+          <div class="empty-fecha">
+            <span>Sin partidos para este día</span>
+          </div>
+        }
+      </div>
+
+    }
+  </section>
+
+</div>

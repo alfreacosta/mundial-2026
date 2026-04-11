@@ -1,0 +1,508 @@
+<!-- Dashboard – Mundial 2026 -->
+<div class="dashboard-page">
+
+  <!-- ── MAIN 3-COLUMN LAYOUT ────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- COLUMNA IZQUIERDA – Foto + Stats rápidos -->
+    <aside class="col-left">
+      <div class="photo-slot left-photo">
+        <img [src]="slideshowPhotos[currentPhotoIndex]"
+             [class.visible]="photoVisible"
+             alt="Foto del Mundial" class="side-img slideshow-img" />
+      </div>
+
+      <!-- TOP 5 Ranking -->
+      <div class="side-card ranking-card">
+        <div class="side-card-title">
+          <mat-icon>emoji_events</mat-icon> Top 5
+        </div>
+        <div class="ranking-list">
+          @for (entry of top5; track entry.internalId) {
+            <div class="ranking-row" [class.is-me]="entry.user === userName">
+              <span class="rank-pos" [class.gold]="entry.pos === 1" [class.silver]="entry.pos === 2" [class.bronze]="entry.pos === 3">{{ entry.pos }}</span>
+              <app-avatar-icon [avatarId]="entry.urlAvatar" [nombre]="entry.nombre" [apellido]="entry.apellido" [size]="30"></app-avatar-icon>
+              <span class="rank-name">{{ entry.nombre || entry.user }}</span>
+              <span class="rank-score">{{ entry.puntaje }} pts</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Tu posición -->
+      @if (userEntry) {
+        <div class="side-card my-rank-card">
+          <div class="side-card-title">
+            <mat-icon>person</mat-icon> Tu posición
+          </div>
+          <div class="ranking-list">
+            <div class="ranking-row is-me highlight">
+              <span class="rank-pos">{{ userEntry.pos }}</span>
+              <app-avatar-icon [avatarId]="userEntry.urlAvatar" [nombre]="userEntry.nombre" [apellido]="userEntry.apellido" [size]="30"></app-avatar-icon>
+              <span class="rank-name">{{ userEntry.nombre || userEntry.user }}</span>
+              <span class="rank-score">{{ userEntry.puntaje }} pts</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Ranking completo -->
+      @if (fullRanking.length > 5) {
+        <div class="side-card ranking-card full-ranking">
+          <div class="side-card-title">
+            <mat-icon>leaderboard</mat-icon> Ranking completo
+          </div>
+          <div class="ranking-list scrollable">
+            @for (entry of fullRanking; track entry.internalId) {
+              <div class="ranking-row" [class.is-me]="entry.user === userName">
+                <span class="rank-pos" [class.gold]="entry.pos === 1" [class.silver]="entry.pos === 2" [class.bronze]="entry.pos === 3">{{ entry.pos }}</span>
+                <app-avatar-icon [avatarId]="entry.urlAvatar" [nombre]="entry.nombre" [apellido]="entry.apellido" [size]="30"></app-avatar-icon>
+                <span class="rank-name">{{ entry.nombre || entry.user }}</span>
+                <span class="rank-score">{{ entry.puntaje }} pts</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Redes Sociales FIFA -->
+      <div class="side-card social-card">
+        <div class="side-card-title"><mat-icon>share</mat-icon> Seguir FIFA en</div>
+        <a href="https://x.com/fifaworldcup_es" target="_blank" rel="noopener noreferrer" class="social-link x-link">
+          <span class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </span>
+          <span class="social-name">X</span>
+          <mat-icon class="social-arrow">chevron_right</mat-icon>
+        </a>
+        <a href="https://www.facebook.com/fifaworldcup/?locale=es_LA" target="_blank" rel="noopener noreferrer" class="social-link fb-link">
+          <span class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </span>
+          <span class="social-name">Facebook</span>
+          <mat-icon class="social-arrow">chevron_right</mat-icon>
+        </a>
+        <a href="https://www.instagram.com/fifaworldcup/?hl=es" target="_blank" rel="noopener noreferrer" class="social-link ig-link">
+          <span class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </span>
+          <span class="social-name">Instagram</span>
+          <mat-icon class="social-arrow">chevron_right</mat-icon>
+        </a>
+        <a href="https://www.youtube.com/channel/UCpcTrCXblq78GZrTUTLWeBw" target="_blank" rel="noopener noreferrer" class="social-link yt-link">
+          <span class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+          </span>
+          <span class="social-name">YouTube</span>
+          <mat-icon class="social-arrow">chevron_right</mat-icon>
+        </a>
+        <a href="https://open.spotify.com/show/5gHRXUKMVYwlMSkhGPCPUi" target="_blank" rel="noopener noreferrer" class="social-link sp-link">
+          <span class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </span>
+          <span class="social-name">Spotify</span>
+          <mat-icon class="social-arrow">chevron_right</mat-icon>
+        </a>
+      </div>
+    </aside>
+
+    <!-- COLUMNA CENTRAL – Mi Juego + Video + Noticias -->
+    <main class="col-center">
+
+      <!-- ══════════════════════════════════════════════════════════════
+           SECCIÓN: MI JUEGO - Favoritos, Convocatorias, Predicciones
+           (SIEMPRE VISIBLE - Primera sección)
+      ═══════════════════════════════════════════════════════════════ -->
+      
+      @if (datosPersonalesLoading) {
+        <div class="my-game-loading">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Cargando tus datos...</span>
+        </div>
+      }
+
+      @if (!datosPersonalesLoading) {
+        <!-- Con datos: Favoritos y/o Predicciones -->
+        @if (misFavoritos.length > 0 || miPrediccion) {
+          <div class="my-game-section">
+            <div class="section-header">
+              <mat-icon>sports_soccer</mat-icon>
+              <span>Mi Juego</span>
+            </div>
+
+            <div class="my-game-grid">
+            
+            <!-- Mis Equipos Favoritos -->
+            @if (misFavoritos.length > 0) {
+              <div class="game-card favorites-card">
+                <div class="game-card-title">
+                  <mat-icon>favorite</mat-icon>
+                  <span>Mis Equipos</span>
+                  <span class="badge">{{ misFavoritos.length }}</span>
+                </div>
+                <div class="favorites-list">
+                  @for (fav of misFavoritos; track fav.paisId) {
+                    <div class="fav-expandable">
+                      <!-- Cabecera del equipo -->
+                      <div class="fav-expandable-header">
+                        <div class="fav-expandable-main" [routerLink]="['/seleccion', fav.paisCodigo]">
+                          <img
+                            [src]="getFlagUrl(fav.paisCodigo)"
+                            [alt]="fav.paisNombre"
+                            class="flag-img"
+                            loading="lazy" />
+                          <div class="fav-info">
+                            <span class="fav-name">{{ fav.paisNombre }}</span>
+                            <span class="fav-progress">
+                              {{ getConvocatoriaProgress(fav.paisId).total }}/26 jugadores
+                            </span>
+                          </div>
+                          @if (getConvocatoriaProgress(fav.paisId).total >= 23) {
+                            <mat-icon class="check-icon">check_circle</mat-icon>
+                          }
+                        </div>
+                        <button
+                          class="btn-conv-dash"
+                          [class.open]="convocadosExpandidos.has(fav.paisId)"
+                          (click)="toggleConvocados(fav.paisId)">
+                          {{ convocadosExpandidos.has(fav.paisId) ? '▲ Ocultar' : '▼ Ver convocados' }}
+                        </button>
+                      </div>
+
+                      <!-- Lista expandible de convocados -->
+                      @if (convocadosExpandidos.has(fav.paisId)) {
+                        <div class="convocados-dash-lista">
+                          @if (convocadosCargando.has(fav.paisId)) {
+                            <div class="conv-loading">
+                              <mat-spinner diameter="18"></mat-spinner>
+                              <span>Cargando...</span>
+                            </div>
+                          } @else {
+                            <div class="convocados-dash-grid">
+                              @for (j of getDashboardConvocados(fav.paisId); track j.id) {
+                                <div class="conv-row">
+                                  <span class="conv-num">{{ j.numeroCamiseta ?? '–' }}</span>
+                                  <span class="conv-pos" [attr.data-pos]="j.posicionAbr">{{ j.posicionAbr }}</span>
+                                  <span class="conv-nombre">{{ j.nombre }}</span>
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Mis Predicciones -->
+            @if (miPrediccion) {
+              <div class="game-card predictions-card">
+                <div class="game-card-title">
+                  <mat-icon>emoji_events</mat-icon>
+                  <span>Mis Predicciones</span>
+                  @if (miPrediccion.confirmada) {
+                    <mat-icon class="confirmed-badge">lock</mat-icon>
+                  }
+                </div>
+                <div class="predictions-content">
+                  @if (miPrediccion.paisCampeonCodigo) {
+                    <div class="prediction-item champion">
+                      <div class="pred-label">
+                        <mat-icon>emoji_events</mat-icon>
+                        Campeón
+                      </div>
+                      <div class="pred-value">
+                        <img 
+                          [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" 
+                          [alt]="miPrediccion.paisCampeonNombre"
+                          class="flag-img-small" />
+                        <span>{{ miPrediccion.paisCampeonNombre }}</span>
+                      </div>
+                    </div>
+                  }
+                  @if (miPrediccion.jugadorGoleadorNombre) {
+                    <div class="prediction-item scorer">
+                      <div class="pred-label">
+                        <mat-icon>sports_soccer</mat-icon>
+                        Goleador
+                      </div>
+                      <div class="scorer-avatar-wrap">
+                        @if (miPrediccion.jugadorGoleadorUrlFoto) {
+                          <img
+                            [src]="miPrediccion.jugadorGoleadorUrlFoto"
+                            [alt]="miPrediccion.jugadorGoleadorNombre"
+                            class="scorer-avatar-img"
+                            (error)="$any($event.target).style.display='none'" />
+                        } @else {
+                          <div class="scorer-avatar-placeholder">
+                            <mat-icon>person</mat-icon>
+                          </div>
+                        }
+                      </div>
+                      <div class="pred-value scorer-name">
+                        @if (miPrediccion.jugadorGoleadorPaisCodigo) {
+                          <img 
+                            [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" 
+                            [alt]="miPrediccion.jugadorGoleadorNombre"
+                            class="flag-img-small" />
+                        }
+                        <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
+                      </div>
+                    </div>
+                  }
+                  @if (!miPrediccion.paisCampeonCodigo && !miPrediccion.jugadorGoleadorNombre) {
+                    <div class="empty-predictions">
+                      <mat-icon>help_outline</mat-icon>
+                      <span>Aún no hiciste tus predicciones</span>
+                      <a routerLink="/prediccion-torneo" class="pred-link">Hacer predicción →</a>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Mi Progreso en Partidos -->
+            @if (resumenPredicciones) {
+              <div class="game-card progreso-card" [routerLink]="'/prediccion-partidos'" style="cursor:pointer">
+                <div class="game-card-title">
+                  <mat-icon>bar_chart</mat-icon>
+                  <span>Mi Progreso</span>
+                  <span class="badge pts-badge">{{ resumenPredicciones.totalPuntosPartidos }} pts</span>
+                </div>
+                <div class="progreso-content">
+                  <div class="progreso-bar-wrap">
+                    <div class="progreso-bar">
+                      <div 
+                        class="progreso-fill"
+                        [style.width.%]="resumenPredicciones.totalPartidos > 0 
+                          ? (resumenPredicciones.predichas / resumenPredicciones.totalPartidos * 100) 
+                          : 0">
+                      </div>
+                    </div>
+                    <span class="progreso-label">
+                      {{ resumenPredicciones.predichas }}/{{ resumenPredicciones.totalPartidos }} partidos predichos
+                    </span>
+                  </div>
+                  <div class="progreso-stats-row">
+                    @if (resumenPredicciones.exactas > 0) {
+                      <span class="stat-chip exacto">
+                        <mat-icon>check_circle</mat-icon>{{ resumenPredicciones.exactas }} exactas
+                      </span>
+                    }
+                    @if (resumenPredicciones.correctas > 0) {
+                      <span class="stat-chip correcto">
+                        <mat-icon>thumb_up</mat-icon>{{ resumenPredicciones.correctas }} correctas
+                      </span>
+                    }
+                    @if (resumenPredicciones.incorrectas > 0) {
+                      <span class="stat-chip incorrecto">
+                        <mat-icon>close</mat-icon>{{ resumenPredicciones.incorrectas }} incorrectas
+                      </span>
+                    }
+                    @if (resumenPredicciones.predichas === 0) {
+                      <span class="progreso-hint">¡Empezá a predecir partidos!</span>
+                    }
+                  </div>
+                  @if (!resumenPredicciones.prediccionTorneoHecha) {
+                    <a routerLink="/prediccion-torneo" class="torneo-pending" (click)="$event.stopPropagation()">
+                      <mat-icon>warning</mat-icon> Falta tu predicción de torneo
+                    </a>
+                  } @else {
+                    <span class="torneo-done">
+                      <mat-icon>lock</mat-icon> Predicción de torneo confirmada
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      }
+
+      @if (!datosPersonalesLoading && misFavoritos.length === 0 && !miPrediccion) {
+        <div class="my-game-empty">
+          <mat-icon>info_outline</mat-icon>
+          <p>¡Empezá a jugar! Elegí tus equipos favoritos y hacé tus predicciones.</p>
+          <div class="empty-actions">
+            <a routerLink="/countries" class="empty-btn">
+              <mat-icon>favorite</mat-icon>
+              Elegir equipos
+            </a>
+            <a routerLink="/prediccion-torneo" class="empty-btn">
+              <mat-icon>emoji_events</mat-icon>
+              Hacer predicción
+            </a>
+          </div>
+        </div>
+      }
+    }
+
+      <!-- ══════════════════════════════════════════════════════════════
+           SECCIÓN: MIS GRUPOS (resumen compacto)
+      ═══════════════════════════════════════════════════════════════ -->
+      @if (misGrupos.length > 0) {
+        <div class="mis-grupos-dash">
+          <div class="section-header">
+            <mat-icon>group</mat-icon>
+            <span>Mis Grupos</span>
+            <a routerLink="/mis-grupos" class="section-link">Ver todos →</a>
+          </div>
+          <div class="grupos-dash-list">
+            @for (grupo of misGrupos; track grupo.internalId) {
+              <div class="grupo-dash-item">
+                <div class="grupo-dash-top">
+                  <span class="grupo-dash-code">#{{ grupo.codigoInvitacion }}</span>
+                  <div class="grupo-dash-actions">
+                    <a class="btn-icon-sm" [routerLink]="['/mis-grupos', grupo.internalId]" title="Ver">
+                      <mat-icon>visibility</mat-icon>
+                    </a>
+                    <button class="btn-icon-sm" [cdkCopyToClipboard]="grupo.codigoInvitacion" title="Copiar código">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <a class="btn-icon-sm" [href]="getWhatsAppLink(grupo)" target="_blank" rel="noopener noreferrer" title="Compartir">
+                      <mat-icon>share</mat-icon>
+                    </a>
+                  </div>
+                </div>
+                <div class="grupo-dash-bottom">
+                  <span class="grupo-dash-nombre">{{ grupo.nombre }}</span>
+                  @if (grupo.premio) {
+                    <span class="grupo-dash-premio">🏆 {{ grupo.premio }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════════════════════════════════════════════════════
+           SECCIÓN: TOP 10 USUARIOS + TOP 10 GRUPOS
+      ═══════════════════════════════════════════════════════════════ -->
+
+      <!-- Top 10 Usuarios -->
+      @if (top10.length > 0) {
+        <div class="center-ranking-section">
+          <div class="section-header">
+            <mat-icon>leaderboard</mat-icon>
+            <span>Top 10 Usuarios</span>
+          </div>
+          <div class="center-ranking-list">
+            @for (entry of top10; track entry.internalId) {
+              <div class="center-ranking-row" [class.is-me]="entry.user === userName">
+                <span class="rank-pos" [class.gold]="entry.pos === 1" [class.silver]="entry.pos === 2" [class.bronze]="entry.pos === 3">{{ entry.pos }}</span>
+                <app-avatar-icon [avatarId]="entry.urlAvatar" [nombre]="entry.nombre" [apellido]="entry.apellido" [size]="30"></app-avatar-icon>
+                <span class="rank-name">{{ entry.nombre || entry.user }}</span>
+                <span class="rank-score">{{ entry.puntaje }} pts</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Top 10 Grupos -->
+      @if (gruposRanking.length > 0) {
+        <div class="center-ranking-section grupos-ranking-section">
+          <div class="section-header">
+            <mat-icon>groups</mat-icon>
+            <span>Top 10 Grupos</span>
+          </div>
+          <div class="center-ranking-list">
+            @for (grupo of gruposRanking; track grupo.internalId; let i = $index) {
+              <div class="center-ranking-row grupo-row">
+                <span class="rank-pos" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">{{ i + 1 }}</span>
+                <div class="grupo-info">
+                  <span class="grupo-nombre">{{ grupo.nombre }}</span>
+                  <span class="grupo-meta">
+                    <mat-icon class="grupo-meta-icon">person</mat-icon>
+                    {{ grupo.cantidadMiembros }} miembros
+                  </span>
+                </div>
+                <span class="rank-score">{{ grupo.puntajeTotal }} pts</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </main>
+
+    <!-- COLUMNA DERECHA – Foto + Datos extra -->
+    <aside class="col-right">
+      <div class="photo-slot right-photo">
+        <img [src]="slideshowPhotos[(currentPhotoIndex + 3) % slideshowPhotos.length]"
+             [class.visible]="photoVisible"
+             alt="Foto del Mundial" class="side-img slideshow-img" />
+      </div>
+
+      <!-- Datos clave -->
+      <div class="side-card facts-card">
+        <div class="side-card-title"><mat-icon>info</mat-icon> Datos del torneo</div>
+        @for (fact of worldCupFacts; track fact.label) {
+          <div class="fact-row">
+            <span class="fact-emoji">{{ fact.emoji }}</span>
+            <div class="fact-content">
+              <div class="fact-label">{{ fact.label }}</div>
+              <div class="fact-value">{{ fact.value }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Grupos activos -->
+      <div class="side-card groups-preview">
+        <div class="side-card-title"><mat-icon>grid_view</mat-icon> Grupos (A–L)</div>
+        <div class="groups-badges">
+          @for (g of ['A','B','C','D','E','F','G','H','I','J','K','L']; track g) {
+            <a [routerLink]="['/groups']" class="group-badge">{{ g }}</a>
+          }
+        </div>
+        <a routerLink="/groups" class="side-link">Ver todos los grupos →</a>
+      </div>
+
+      <!-- Dejá tu sugerencia -->
+      <div class="side-card msg-card">
+        <div class="msg-header">
+          <mat-icon class="msg-icon">chat_bubble_outline</mat-icon>
+          <h3 class="msg-title">Dejá tu sugerencia</h3>
+          <p class="msg-sub">Opiniones, ideas o mejoras</p>
+        </div>
+
+        @if (mensajeEnviado) {
+          <div class="msg-success">
+            <mat-icon>check_circle</mat-icon>
+            ¡Gracias! Tu mensaje fue enviado.
+          </div>
+        }
+
+        @if (mensajeError) {
+          <div class="msg-err">
+            <mat-icon>error_outline</mat-icon>
+            {{ mensajeError }}
+          </div>
+        }
+
+        <textarea class="msg-textarea" [(ngModel)]="mensajeText" placeholder="Escribí tu idea acá..." maxlength="2000" rows="3"></textarea>
+        <div class="msg-footer">
+          <span class="msg-chars">{{ mensajeText.length }} / 2000</span>
+          <button class="msg-btn" (click)="enviarMensaje()" [disabled]="!mensajeText.trim() || mensajeLoading">
+            @if (mensajeLoading) {
+              <mat-spinner diameter="14"></mat-spinner>
+            } @else {
+              <mat-icon>send</mat-icon> Enviar
+            }
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+
+</div>
+
+

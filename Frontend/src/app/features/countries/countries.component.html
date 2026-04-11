@@ -1,0 +1,294 @@
+<div class="countries-page">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Selecciones Clasificadas</h1>
+      <p class="hero-sub" *ngIf="!loading">
+        {{ totalCountries }} naciones &middot; {{ countryGroups.length }} confederaciones &middot; Mundial 2026
+      </p>
+      <p class="hero-sub" *ngIf="loading">Cargando selecciones clasificadas…</p>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECCIÓN: MIS EQUIPOS FAVORITOS (Arriba de todo)
+  ═══════════════════════════════════════════════════════════════ -->
+  <section *ngIf="!loading && !error" class="favorites-banner" id="section-FAVORITOS">
+    <div class="fav-banner-content">
+      
+      <!-- Header -->
+      <div class="fav-header">
+        <div class="fav-title-group">
+          <mat-icon class="fav-icon">favorite</mat-icon>
+          <div>
+            <h2 class="fav-title">Mis Equipos Favoritos</h2>
+            <p class="fav-subtitle">Elegí hasta 5 selecciones para seguir de cerca</p>
+          </div>
+        </div>
+        <div class="fav-progress">
+          <span class="progress-label">{{ misFavoritos.length }}/5</span>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(misFavoritos.length / 5) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Favoritos Horizontal -->
+      <div class="fav-list" *ngIf="misFavoritos.length > 0">
+        <div 
+          *ngFor="let fav of misFavoritos; let i = index"
+          class="fav-item"
+          [routerLink]="['/seleccion', fav.paisCodigo]">
+          
+          <!-- Orden Badge -->
+          <span class="fav-orden">{{ i + 1 }}</span>
+          
+          <!-- Bandera -->
+          <div class="fav-flag-container">
+            <img 
+              [src]="getFlagUrl(fav.paisCodigo, 'w80')"
+              [alt]="fav.paisNombre"
+              class="fav-flag"
+              loading="lazy" />
+            
+            <!-- Estrella en esquina inferior derecha -->
+            <button 
+              class="fav-star-btn"
+              (click)="quitarFavoritoById(fav.paisId, $event)"
+              [matTooltip]="'Quitar de favoritos'"
+              [matTooltipShowDelay]="500"
+              matTooltipPosition="above">
+              <mat-icon>star</mat-icon>
+            </button>
+          </div>
+          
+          <!-- Nombre -->
+          <span class="fav-name">{{ fav.paisNombre }}</span>
+          
+          <!-- Barra de progreso de jugadores -->
+          <div class="fav-players-progress">
+            <div class="players-bar">
+              <div 
+                class="players-fill" 
+                [style.width.%]="(getConvocados(fav.paisId) / 26) * 100"></div>
+            </div>
+            <span class="players-label">{{ getConvocados(fav.paisId) }}/26</span>
+          </div>
+        </div>
+
+        <!-- Slots vacíos con picker -->
+        <div 
+          *ngFor="let slot of [].constructor(5 - misFavoritos.length); let i = index"
+          class="fav-item empty-slot"
+          (click)="abrirPicker(misFavoritos.length + i, $event)">
+          <span class="fav-orden">{{ misFavoritos.length + i + 1 }}</span>
+          <div class="fav-flag-container empty">
+            <mat-icon class="add-icon">add</mat-icon>
+          </div>
+          <span class="fav-name">Elegir equipo</span>
+
+          <!-- Dropdown picker -->
+          <div class="fav-picker" *ngIf="pickerSlot === (misFavoritos.length + i)" (click)="$event.stopPropagation()">
+            <div class="picker-header">
+              <span class="picker-title">Elegir equipo favorito</span>
+              <button class="picker-close" (click)="cerrarPicker()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <div class="picker-search">
+              <mat-icon class="picker-search-icon">search</mat-icon>
+              <input 
+                class="picker-input"
+                placeholder="Buscar selección..."
+                [(ngModel)]="pickerSearch"
+                (click)="$event.stopPropagation()"
+                autofocus />
+            </div>
+            <div class="picker-list">
+              <div
+                *ngFor="let p of paisesDisponibles"
+                class="picker-option"
+                (click)="seleccionarDesdeSlot(p, $event)">
+                <img [src]="getFlagUrl(p.codigo, 'w40')" [alt]="p.nombre" class="picker-flag" />
+                <span class="picker-name">{{ p.nombre }}</span>
+              </div>
+              <div class="picker-empty" *ngIf="paisesDisponibles.length === 0">
+                Sin resultados
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado Vacío - ahora con slots clickeables -->
+      <div class="fav-list" *ngIf="misFavoritos.length === 0">
+        <div
+          *ngFor="let slot of [].constructor(5); let i = index"
+          class="fav-item empty-slot"
+          (click)="abrirPicker(i, $event)">
+          <span class="fav-orden">{{ i + 1 }}</span>
+          <div class="fav-flag-container empty">
+            <mat-icon class="add-icon">add</mat-icon>
+          </div>
+          <span class="fav-name">Elegir equipo</span>
+
+          <!-- Dropdown picker -->
+          <div class="fav-picker" *ngIf="pickerSlot === i" (click)="$event.stopPropagation()">
+            <div class="picker-header">
+              <span class="picker-title">Elegir equipo favorito</span>
+              <button class="picker-close" (click)="cerrarPicker()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <div class="picker-search">
+              <mat-icon class="picker-search-icon">search</mat-icon>
+              <input
+                class="picker-input"
+                placeholder="Buscar selección..."
+                [(ngModel)]="pickerSearch"
+                (click)="$event.stopPropagation()"
+                autofocus />
+            </div>
+            <div class="picker-list">
+              <div
+                *ngFor="let p of paisesDisponibles"
+                class="picker-option"
+                (click)="seleccionarDesdeSlot(p, $event)">
+                <img [src]="getFlagUrl(p.codigo, 'w40')" [alt]="p.nombre" class="picker-flag" />
+                <span class="picker-name">{{ p.nombre }}</span>
+              </div>
+              <div class="picker-empty" *ngIf="paisesDisponibles.length === 0">
+                Sin resultados
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Sticky Conf Nav -->
+  <nav class="conf-nav" *ngIf="!loading && !error">
+    <div class="conf-nav-track">
+      <!-- Botón Mis Favoritos -->
+      <button
+        type="button"
+        class="conf-pill favs-pill"
+        [class.active]="activeConf === 'FAVORITOS'"
+        (click)="scrollToSection('FAVORITOS')">
+        <span class="pill-emoji">⭐</span>
+        <span class="pill-label">Mis Favoritos</span>
+        <span class="pill-count">{{ misFavoritos.length }}</span>
+      </button>
+
+      <!-- Botones de Confederaciones -->
+      <button
+        type="button"
+        *ngFor="let g of countryGroups; trackBy: trackByConfCode"
+        class="conf-pill"
+        [class.active]="activeConf === g.code"
+        [style.--conf-color]="g.color"
+        (click)="scrollToSection(g.code)">
+        <img class="pill-conf-logo" [src]="g.logoUrl" [alt]="g.label" (error)="onConfLogoError($event, g.emoji)" />
+        <span class="pill-label">{{ g.label }}</span>
+        <span class="pill-count">{{ g.countries.length }}</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Loading -->
+  <div class="state-box" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando selecciones…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="state-box error" *ngIf="error && !loading">
+    <mat-icon class="err-icon">error_outline</mat-icon>
+    <h3>Algo salió mal</h3>
+    <p>{{ error }}</p>
+    <button mat-raised-button (click)="loadCountries()">
+      <mat-icon>refresh</mat-icon> Reintentar
+    </button>
+  </div>
+
+  <!-- Sections -->
+  <main class="sections" *ngIf="!loading && !error">
+
+    <section
+      *ngFor="let g of countryGroups; trackBy: trackByConfCode"
+      [id]="'section-' + g.code"
+      class="conf-section">
+
+      <!-- Section Header -->
+      <div class="section-header" [style.--conf-color]="g.color" [style.--conf-light]="g.lightColor">
+        <div class="sh-left">
+          <img class="sh-conf-logo" [src]="g.logoUrl" [alt]="g.label" (error)="onConfLogoError($event, g.emoji)" />
+          <div>
+            <h2 class="sh-title">{{ g.label }}</h2>
+            <p class="sh-full">{{ g.fullName }}</p>
+          </div>
+        </div>
+        <div class="sh-right">
+          <span class="sh-count">{{ g.countries.length }}</span>
+          <span class="sh-count-label">selecciones</span>
+        </div>
+      </div>
+
+      <!-- Countries Grid -->
+      <div class="grid">
+        <div
+          *ngFor="let pais of g.countries; trackBy: trackByPaisId"
+          class="team-card"
+          [style.--conf-color]="g.color"
+          (click)="verSeleccion(pais)">
+
+          <!-- Logo -->
+          <div class="card-logo">
+            <ng-container *ngIf="getLogoUrl(pais) as logoUrl">
+              <img
+                [src]="logoUrl"
+                [alt]="pais.nombre"
+                (error)="onLogoError($event)"
+                loading="lazy" />
+            </ng-container>
+            <span class="card-flag-fallback" *ngIf="!getLogoUrl(pais)">
+              {{ getFlagEmoji(pais.codigo) }}
+            </span>
+          </div>
+
+          <!-- Info -->
+          <div class="card-body">
+            <h3 class="card-name">{{ pais.nombre }}</h3>
+            <span class="card-group" *ngIf="pais.grupo">Grupo {{ pais.grupo }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <!-- Botón Favorito -->
+            <button 
+              class="action-btn star-btn"
+              [class.is-fav]="esFavorito(pais)"
+              (click)="toggleFavorito(pais, $event)" 
+              [matTooltip]="esFavorito(pais) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+              matTooltipPosition="above">
+              <mat-icon>{{ esFavorito(pais) ? 'star' : 'star_border' }}</mat-icon>
+            </button>
+
+            <!-- Botón Ver -->
+            <button class="action-btn secondary" (click)="verSeleccion(pais)" title="Ver Selección">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

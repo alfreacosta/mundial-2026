@@ -1,0 +1,30 @@
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Footer Top -->
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="social-links">
+          @for (social of socialLinks(); track social.label) {
+            <a [href]="social.url" class="social-link" [attr.aria-label]="social.label" target="_blank" rel="noopener">
+              <i [class]="social.icon"></i>
+            </a>
+          }
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <p class="copyright">
+        &copy;  FIFA World Cup 2026™ <br>
+        ©  Mundial 2026. Todos los derechos reservados.
+      </p>
+      <p class="developer">
+        
+        Desarrollado con  <i class="fas fa-heart"></i>  para los fanáticos del fútbol<br>
+      </p>
+    </div>
+  </div>
+</footer>

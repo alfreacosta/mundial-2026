@@ -1,0 +1,47 @@
+<div class="modal-form">
+
+  <div class="modal-header">
+    <h2>
+      <mat-icon>login</mat-icon>
+      Unirse a un grupo
+    </h2>
+    <button class="btn-close" (click)="cancelar.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="form-error" *ngIf="error">
+    <mat-icon>error</mat-icon>{{ error }}
+  </div>
+
+  <div class="paso-contenido">
+    <p class="paso-descripcion">Ingresá el código de invitación que te compartieron</p>
+    <div class="form-group">
+      <label for="codigo">Código de invitación</label>
+      <input id="codigo" type="text" [(ngModel)]="codigoInvitacion"
+             placeholder="Ej: ABC12345" maxlength="20"
+             class="form-control codigo-input"
+             (input)="codigoInvitacion = codigoInvitacion.toUpperCase()">
+    </div>
+    <p class="join-hint">
+      <mat-icon>info_outline</mat-icon>
+      Tu predicción de campeón y goleador ya guardada en tu perfil se usará automáticamente.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancelar.emit()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+
+    <button class="btn btn-primary"
+            (click)="unirse()"
+            [disabled]="loading || !codigoInvitacion.trim()">
+      <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
+      <mat-icon *ngIf="!loading">check</mat-icon>
+      {{ loading ? 'Uniéndose...' : 'Unirse al grupo' }}
+    </button>
+  </div>
+
+</div>

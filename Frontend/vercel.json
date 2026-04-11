@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/mundial-2026/browser",
+  "env": {
+    "VERCEL_FORCE_NO_BUILD_CACHE": "1"
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+

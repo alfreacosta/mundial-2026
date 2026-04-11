@@ -1,0 +1,243 @@
+<div class="detalle-page">
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando grupo...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-card" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <a class="btn btn-secondary" routerLink="/mis-grupos">Volver a Mis Grupos</a>
+  </div>
+
+  <ng-container *ngIf="grupo && !loading">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a routerLink="/mis-grupos">
+        <mat-icon>arrow_back</mat-icon>
+        Mis Grupos
+      </a>
+      <span>/</span>
+      <span>{{ grupo.nombre }}</span>
+    </div>
+
+    <!-- Header del grupo -->
+    <div class="grupo-header">
+      <div class="grupo-info">
+        <div class="grupo-titulo-row">
+          <span class="grupo-numero">#{{ grupo.numero }}</span>
+          <h1 class="grupo-nombre">{{ grupo.nombre }}</h1>
+        </div>
+        <p class="grupo-creador">Creado por {{ grupo.creadorNombre }}</p>
+        <p class="grupo-premio" *ngIf="grupo.premio">
+          <mat-icon>emoji_events</mat-icon>
+          {{ grupo.premio }}
+        </p>
+      </div>
+      <div class="grupo-codigo-box">
+        <div class="codigo-inner">
+          <div class="codigo-left">
+            <span class="codigo-label">Código</span>
+            <span class="codigo-texto">{{ grupo.codigoInvitacion }}</span>
+            <span class="codigo-hint" *ngIf="copiado">¡Copiado!</span>
+          </div>
+          <div class="codigo-actions">
+            <button class="btn-copy" (click)="copiarCodigo()" [class.copiado]="copiado"
+                    matTooltip="Copiar código" matTooltipPosition="above">
+              <mat-icon>{{ copiado ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+            <button class="btn-whatsapp" (click)="compartirWhatsApp()"
+                    matTooltip="Invitar por WhatsApp" matTooltipPosition="above">
+              <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contador de miembros + toggle de vista -->
+    <div class="miembros-header">
+      <h2>
+        <mat-icon>people</mat-icon>
+        Miembros ({{ grupo.cantidadMiembros || grupo.miembros?.length || 0 }})
+      </h2>
+      <div class="vista-toggle">
+        <button class="toggle-btn" [class.active]="vistaTabla" (click)="vistaTabla = true"
+                matTooltip="Vista tabla comparativa" matTooltipPosition="above">
+          <mat-icon>table_chart</mat-icon>
+        </button>
+        <button class="toggle-btn" [class.active]="!vistaTabla" (click)="vistaTabla = false"
+                matTooltip="Vista detalle" matTooltipPosition="above">
+          <mat-icon>view_agenda</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         VISTA TABLA COMPARATIVA
+    ════════════════════════════════════════════════ -->
+    <div class="tabla-comparativa-wrap" *ngIf="vistaTabla && grupo.miembros?.length">
+      <table class="tabla-comparativa">
+        <thead>
+          <tr>
+            <th class="th-pos">#</th>
+            <th class="th-miembro">Miembro</th>
+            <th class="th-pred">Campeón</th>
+            <th class="th-pred">Goleador</th>
+            <th class="th-favoritos">Favoritos</th>
+            <th class="th-pts">Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of miembrosOrdenados; let i = index; trackBy: trackByRow"
+              class="tabla-row" [class.tabla-row-top]="i === 0">
+            <td class="td-pos">
+              <span class="pos-badge" [class.pos-1]="i===0" [class.pos-2]="i===1" [class.pos-3]="i===2">
+                {{ i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : (i+1) }}
+              </span>
+            </td>
+            <td class="td-miembro">
+              <div class="tabla-miembro">
+                <div class="tabla-avatar">
+                  <app-avatar-icon [avatarId]="row.urlAvatar" [nombre]="row.usuarioNombre" [apellido]="row.usuarioApellido" [size]="32"></app-avatar-icon>
+                </div>
+                <span class="tabla-nombre">{{ row.usuarioNombre }}</span>
+                <mat-icon *ngIf="row.rol === 'CREADOR'" class="tabla-crown" matTooltip="Creador">star</mat-icon>
+              </div>
+            </td>
+            <td class="td-pred">
+              <ng-container *ngIf="row.perfilPublico !== false; else incognitoCell">
+                <div class="pred-cell-flag" *ngIf="row.paisCampeonCodigo; else sinPrediccion">
+                  <span class="fi" [class]="'fi-' + (row.paisCampeonCodigo | fifaToFlag)"></span>
+                  <span class="pred-cell-nombre">{{ row.paisCampeonNombre }}</span>
+                </div>
+              </ng-container>
+            </td>
+            <td class="td-pred">
+              <ng-container *ngIf="row.perfilPublico !== false">
+                <div class="pred-cell-player" *ngIf="row.goleadorApellido; else sinPrediccion">
+                  <img *ngIf="row.goleadorFoto" [src]="row.goleadorFoto" class="jugador-td-foto" [alt]="row.goleadorApellido">
+                  <mat-icon *ngIf="!row.goleadorFoto" class="jugador-icon-sm">person</mat-icon>
+                  <span class="pred-cell-nombre">{{ row.goleadorApellido }}</span>
+                </div>
+              </ng-container>
+            </td>
+            <td class="td-favoritos">
+              <ng-container *ngIf="row.perfilPublico !== false">
+                <div class="tabla-flags" *ngIf="row.equiposFavoritos?.length; else sinFavTd">
+                  <span *ngFor="let fav of row.equiposFavoritos.slice(0,3)"
+                        class="fi tabla-flag-item"
+                        [class]="'fi-' + (fav.paisCodigo | fifaToFlag)"
+                        [title]="fav.paisNombre">
+                  </span>
+                  <span *ngIf="row.equiposFavoritos.length > 3" class="mas-flags">
+                    +{{ row.equiposFavoritos.length - 3 }}
+                  </span>
+                </div>
+              </ng-container>
+            </td>
+            <td class="td-pts">
+              <span class="pts-tabla">{{ row.puntaje ?? 0 }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- Tabla de miembros (vista detalle - cards) -->
+    <div class="miembros-container" *ngIf="!vistaTabla && (grupo.miembros?.length); else sinMiembros">
+      <div class="miembro-card" *ngFor="let row of miembrosOrdenados; let i = index; trackBy: trackByRow">
+
+        <!-- Avatar + nombre -->
+        <div class="miembro-identidad">
+          <div class="miembro-avatar">
+            <app-avatar-icon [avatarId]="row.urlAvatar" [nombre]="row.usuarioNombre" [apellido]="row.usuarioApellido" [size]="44"></app-avatar-icon>
+          </div>
+          <div class="miembro-datos">
+            <span class="miembro-nombre">{{ row.usuarioNombre }} {{ row.usuarioApellido }}</span>
+            <span class="miembro-rol" [class.rol-creador]="row.rol === 'CREADOR'">
+              <mat-icon>{{ row.rol === 'CREADOR' ? 'star' : 'person' }}</mat-icon>
+              {{ row.rol === 'CREADOR' ? 'Creador' : 'Miembro' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Perfil privado: ocultar todo -->
+        <div class="miembro-incognito" *ngIf="row.perfilPublico === false">
+          <mat-icon>lock</mat-icon>
+          <span>Incógnito</span>
+        </div>
+
+        <!-- Predicciones (solo si perfil público) -->
+        <ng-container *ngIf="row.perfilPublico !== false">
+          <div class="miembro-predicciones">
+            <div class="prediccion-item">
+              <span class="pred-label">Campeón</span>
+              <div class="pred-valor">
+                <span class="fi" [class]="'fi-' + (row.paisCampeonCodigo | fifaToFlag)"></span>
+                {{ row.paisCampeonNombre }}
+              </div>
+            </div>
+            <div class="prediccion-item">
+              <span class="pred-label">Goleador</span>
+              <div class="pred-valor">
+                <img *ngIf="row.goleadorFoto" [src]="row.goleadorFoto" class="jugador-mini-foto" [alt]="row.goleadorApellido">
+                <mat-icon *ngIf="!row.goleadorFoto" class="jugador-icon">person</mat-icon>
+                {{ row.goleadorApellido }}, {{ row.goleadorNombre }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Equipos favoritos -->
+          <div class="miembro-favoritos" *ngIf="row.equiposFavoritos?.length">
+            <span class="pred-label">Favoritos</span>
+            <div class="favoritos-flags">
+              <div class="favorito-item" *ngFor="let fav of row.equiposFavoritos"
+                   [title]="'#' + fav.orden + ' ' + fav.paisNombre">
+                <span class="fav-orden">{{ fav.orden }}</span>
+                <span class="fi" [class]="'fi-' + (fav.paisCodigo | fifaToFlag)"></span>
+              </div>
+            </div>
+          </div>
+          <div class="miembro-favoritos sin-favoritos" *ngIf="!row.equiposFavoritos?.length">
+            <span class="pred-label">Favoritos</span>
+            <span class="gray-text">Sin equipos favoritos todavía</span>
+          </div>
+        </ng-container>
+
+        <!-- Puntaje -->
+        <div class="miembro-puntaje">
+          <span class="puntaje-num">{{ row.puntaje ?? 0 }}</span>
+          <span class="puntaje-label">PTS</span>
+        </div>
+
+      </div>
+    </div>
+
+    <ng-template #sinMiembros>
+      <div class="empty-state" *ngIf="!vistaTabla || !grupo.miembros?.length">
+        <mat-icon>person_off</mat-icon>
+        <p>Todavía no hay miembros en este grupo</p>
+      </div>
+    </ng-template>
+
+    <ng-template #incognitoCell>
+      <div class="incognito-cell"><mat-icon>lock</mat-icon></div>
+    </ng-template>
+    <ng-template #sinPrediccion>
+      <span class="sin-pred-cell">—</span>
+    </ng-template>
+    <ng-template #sinFavTd>
+      <span class="sin-pred-cell">—</span>
+    </ng-template>
+
+  </ng-container>
+
+</div>

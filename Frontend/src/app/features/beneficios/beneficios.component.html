@@ -1,0 +1,70 @@
+<div class="beneficios-page">
+
+  <!-- HERO -->
+  <header class="ben-hero">
+    <div class="hero-bg-orbs">
+      <span class="orb o1"></span>
+      <span class="orb o2"></span>
+      <span class="orb o3"></span>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-badge">🏆 Mundial 2026</div>
+      <h1 class="hero-title">Premios &amp; Beneficios</h1>
+      <p class="hero-sub">Los mejores managers del torneo se llevan estos premios exclusivos</p>
+      <a routerLink="/login" class="btn-back">
+        <mat-icon>arrow_back</mat-icon> Volver al inicio
+      </a>
+    </div>
+  </header>
+
+  <!-- PREMIOS GRID -->
+  <section class="premios-section">
+    <div class="section-label">¿Qué podés ganar?</div>
+    <div class="premios-grid">
+      @for (p of premios; track p.titulo) {
+        <article class="premio-card" [class.destacado]="p.destacado" [attr.data-color]="p.color">
+          <div class="premio-emoji">{{ p.emoji }}</div>
+          <div class="premio-cat">{{ p.categoria }}</div>
+          <h3 class="premio-titulo">{{ p.titulo }}</h3>
+          <p class="premio-desc">{{ p.descripcion }}</p>
+          <div class="premio-sponsor">
+            <mat-icon>handshake</mat-icon> {{ p.sponsor }}
+          </div>
+          @if (p.destacado) {
+            <div class="badge-destacado">⭐ Premio principal</div>
+          }
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- TABLA POR RANKING -->
+  <section class="ranking-section">
+    <div class="section-label">Premios según tu posición final</div>
+    <div class="ranking-table-wrap">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>Posición</th>
+            <th>Premios incluidos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of ranking; track r.posicion) {
+            <tr>
+              <td class="pos-cell">{{ r.posicion }}</td>
+              <td class="premios-cell">
+                @for (pr of r.premios; track pr) {
+                  <span class="tag-premio">{{ pr }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+
+</div>

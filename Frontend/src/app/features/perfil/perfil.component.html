@@ -1,0 +1,420 @@
+<!-- ── HERO HEADER ── -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Mi Perfil</h1>
+    <p>Gestiona tu información personal y preferencias</p>
+  </div>
+</section>
+
+<div class="perfil-container">
+
+  <!-- ── TARJETA DE USUARIO ── -->
+  <div class="user-card">
+    <div class="avatar-display" [class]="selectedAvatar || ''">
+      @if (selectedAvatar) {
+        <div class="avatar-icon">
+          <svg viewBox="0 0 80 80" class="avatar-svg">
+            @switch (selectedAvatar) {
+              @case ('avatar-goalkeeper') {
+                <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
+                <path d="M20 70 Q40 50 60 70" fill="#22c55e"/>
+                <rect x="32" y="16" width="16" height="4" rx="2" fill="#fff"/>
+              }
+              @case ('avatar-striker') {
+                <circle cx="40" cy="28" r="14" fill="#f87171"/>
+                <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
+                <circle cx="40" cy="60" r="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+              }
+              @case ('avatar-defender') {
+                <circle cx="40" cy="28" r="14" fill="#60a5fa"/>
+                <path d="M20 70 Q40 50 60 70" fill="#2563eb"/>
+                <path d="M33 50 L40 44 L47 50 L47 58 L33 58Z" fill="#fbbf24"/>
+              }
+              @case ('avatar-midfielder') {
+                <circle cx="40" cy="28" r="14" fill="#a78bfa"/>
+                <path d="M20 70 Q40 50 60 70" fill="#7c3aed"/>
+                <path d="M34 52 L46 52 L43 60 L37 60Z" fill="#fbbf24"/>
+              }
+              @case ('avatar-captain') {
+                <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
+                <path d="M20 70 Q40 50 60 70" fill="#1e3a5f"/>
+                <text x="40" y="32" text-anchor="middle" fill="#1e3a5f" font-size="12" font-weight="bold">C</text>
+              }
+              @case ('avatar-referee') {
+                <circle cx="40" cy="28" r="14" fill="#fde68a"/>
+                <path d="M20 70 Q40 50 60 70" fill="#111"/>
+                <rect x="36" y="48" width="8" height="12" rx="1" fill="#fbbf24"/>
+              }
+              @case ('avatar-coach') {
+                <circle cx="40" cy="28" r="14" fill="#d1d5db"/>
+                <path d="M20 70 Q40 50 60 70" fill="#374151"/>
+                <rect x="30" y="18" width="20" height="3" rx="1.5" fill="#374151"/>
+              }
+              @case ('avatar-fan-m') {
+                <circle cx="40" cy="28" r="14" fill="#fca5a5"/>
+                <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
+                <path d="M30 18 L40 10 L50 18" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+              }
+              @case ('avatar-fan-f') {
+                <circle cx="40" cy="28" r="14" fill="#fbcfe8"/>
+                <path d="M20 70 Q40 50 60 70" fill="#ec4899"/>
+                <circle cx="34" cy="22" r="2" fill="#ec4899"/>
+                <circle cx="46" cy="22" r="2" fill="#ec4899"/>
+              }
+              @case ('avatar-trophy') {
+                <circle cx="40" cy="28" r="14" fill="#fef3c7"/>
+                <path d="M20 70 Q40 50 60 70" fill="#d97706"/>
+                <path d="M34 20 L34 34 Q34 38 40 38 Q46 38 46 34 L46 20 L50 20 Q48 28 46 34 L34 34 Q32 28 30 20Z" fill="#fbbf24"/>
+              }
+            }
+          </svg>
+        </div>
+      } @else {
+        <span class="initials">{{ avatarInitials }}</span>
+      }
+    </div>
+    <div class="user-info-card">
+      <h2>{{ user?.nombre || '' }} {{ user?.apellido || '' }}</h2>
+      <p class="username">&#64;{{ user?.user }}</p>
+      <p class="email">{{ user?.email }}</p>
+      <div class="puntaje-badge">{{ user?.puntaje || 0 }} pts</div>
+    </div>
+  </div>
+
+  <!-- ── TABS ── -->
+  <div class="tabs-row">
+    <button class="tab-btn" [class.active]="tab === 'mi-juego'" (click)="tab = 'mi-juego'">
+      🎮 Mi Juego
+    </button>
+    <button class="tab-btn" [class.active]="tab === 'mi-perfil'" (click)="tab = 'mi-perfil'">
+      👤 Mi Perfil
+    </button>
+    <button class="tab-btn" [class.active]="tab === 'editar'" (click)="tab = 'editar'">
+      ✏️ Editar Perfil
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       TAB: MI JUEGO
+  ═══════════════════════════════════ -->
+  @if (tab === 'mi-juego') {
+
+    @if (datosJuegoLoading) {
+      <div class="loading-juego">Cargando datos del juego...</div>
+    } @else {
+
+      <!-- Predicción -->
+      @if (miPrediccion) {
+        <div class="form-section pred-section">
+          <div class="section-title-row">
+            <span class="section-icon">🏆</span>
+            <h3>Mi Predicción</h3>
+            @if (miPrediccion.confirmada) {
+              <span class="confirmed-badge">✓ Confirmada</span>
+            }
+            <a routerLink="/prediccion-torneo" class="btn-edit-pred">Editar</a>
+          </div>
+          <div class="pred-row-list">
+            @if (miPrediccion.paisCampeonCodigo) {
+              <div class="pred-item">
+                <span class="pred-label">Campeón</span>
+                <div class="pred-value">
+                  <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" class="flag-xs" [alt]="miPrediccion.paisCampeonNombre">
+                  <span>{{ miPrediccion.paisCampeonNombre }}</span>
+                </div>
+              </div>
+            }
+            @if (miPrediccion.jugadorGoleadorNombre) {
+              <div class="pred-item">
+                <span class="pred-label">Goleador</span>
+                <div class="pred-value">
+                  @if (miPrediccion.jugadorGoleadorUrlFoto) {
+                    <img [src]="miPrediccion.jugadorGoleadorUrlFoto" class="player-xs" [alt]="miPrediccion.jugadorGoleadorNombre" (error)="$any($event.target).style.display='none'">
+                  }
+                  @if (miPrediccion.jugadorGoleadorPaisCodigo) {
+                    <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" class="flag-xs">
+                  }
+                  <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
+                </div>
+              </div>
+            }
+            @if (!miPrediccion.paisCampeonCodigo && !miPrediccion.jugadorGoleadorNombre) {
+              <p class="pred-empty">Sin predicciones aún — <a routerLink="/prediccion-torneo">hacer predicción</a></p>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="form-section pred-empty-card">
+          <span class="section-icon">🏆</span>
+          <p>Todavía no hiciste tu predicción de torneo.</p>
+          <a routerLink="/prediccion-torneo" class="btn-primary-sm">Hacer predicción</a>
+        </div>
+      }
+
+      <!-- Mis Equipos Favoritos + Convocados -->
+      <div class="form-section">
+        <div class="section-title-row">
+          <span class="section-icon">⭐</span>
+          <h3>Mis Equipos Favoritos</h3>
+          <a routerLink="/countries" class="btn-edit-pred">Gestionar</a>
+        </div>
+
+        @if (misFavoritos.length === 0) {
+          <p class="empty-fav-msg">No elegiste equipos favoritos aún.
+            <a routerLink="/countries">Elegir favoritos →</a>
+          </p>
+        } @else {
+          <div class="favoritos-juego-list">
+            @for (fav of misFavoritos; track fav.paisId) {
+              <div class="fav-juego-item">
+                <div class="fav-juego-header">
+                  <img [src]="getFlagUrl(fav.paisCodigo)" class="fav-flag-img" [alt]="fav.paisNombre">
+                  <span class="fav-nombre">{{ fav.paisNombre }}</span>
+                  <span class="fav-progress" [class.complete]="getConvocatoriaProgress(fav.paisId).total >= 23">
+                    {{ getConvocatoriaProgress(fav.paisId).total }}/26
+                  </span>
+                  <button class="btn-ver-convocados"
+                          (click)="toggleConvocados(fav.paisId)"
+                          [disabled]="loadingConvocados.has(fav.paisId)">
+                    @if (loadingConvocados.has(fav.paisId)) {
+                      ···
+                    } @else {
+                      {{ convocadosExpandidos.has(fav.paisId) ? '▲ Ocultar' : '▼ Ver convocados' }}
+                    }
+                  </button>
+                  <a [routerLink]="['/convocados', fav.paisId]" class="btn-edit-small">Editar</a>
+                </div>
+
+                <!-- Lista compacta de convocados -->
+                @if (convocadosExpandidos.has(fav.paisId)) {
+                  <div class="convocados-lista">
+                    @if ((jugadoresPorEquipo.get(fav.paisId) || []).length === 0) {
+                      <p class="sin-convocados">Sin jugadores convocados aún.</p>
+                    } @else {
+                      <div class="convocados-grid">
+                        @for (j of jugadoresPorEquipo.get(fav.paisId) || []; track j.internalId; let i = $index) {
+                          <div class="conv-row">
+                            <span class="conv-num">{{ j.numeroCamiseta ?? '–' }}</span>
+                            <span class="conv-pos" [attr.data-pos]="j.posicion?.abreviatura">{{ j.posicion?.abreviatura ?? '?' }}</span>
+                            <span class="conv-nombre">{{ j.nombreCompleto || j.nombre }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Privacidad -->
+      <div class="form-section">
+        <div class="section-title-row">
+          <span class="section-icon">🔒</span>
+          <h3>Privacidad</h3>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-label">Perfil público</span>
+            <span class="toggle-desc">Otros usuarios pueden encontrarte al buscar y ver tu juego</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [checked]="perfilPublico" (change)="onTogglePerfilPublico($event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        @if (perfilPublicoMsg) {
+          <div class="msg success">{{ perfilPublicoMsg }}</div>
+        }
+      </div>
+
+    }
+  }
+
+  <!-- ═══════════════════════════════════
+       TAB: MI PERFIL
+  ═══════════════════════════════════ -->
+  @if (tab === 'mi-perfil') {
+    <div class="form-section mi-perfil-view">
+      <div class="mp-row">
+        <span class="mp-label">Nombre</span>
+        <span class="mp-value">{{ user?.nombre }} {{ user?.apellido }}</span>
+      </div>
+      <div class="mp-row">
+        <span class="mp-label">Usuario</span>
+        <span class="mp-value">&#64;{{ user?.user }}</span>
+      </div>
+      <div class="mp-row">
+        <span class="mp-label">Email</span>
+        <span class="mp-value">{{ user?.email }}</span>
+      </div>
+      @if (profileForm.get('telefono')?.value) {
+        <div class="mp-row">
+          <span class="mp-label">Teléfono</span>
+          <span class="mp-value">{{ profileForm.get('telefono')?.value }}</span>
+        </div>
+      }
+      <div class="mp-row">
+        <span class="mp-label">Puntaje</span>
+        <span class="mp-value"><span class="puntaje-badge">{{ user?.puntaje || 0 }} pts</span></span>
+      </div>
+      <button class="btn-primary-sm" style="margin-top:1.25rem" (click)="tab = 'editar'">
+        ✏️ Editar datos
+      </button>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════
+       TAB: EDITAR PERFIL
+  ═══════════════════════════════════ -->
+  @if (tab === 'editar') {
+
+    <!-- ── DATOS PERSONALES ── -->
+    <div class="form-section">
+      <h3>Datos Personales</h3>
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" formControlName="nombre" placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input id="apellido" formControlName="apellido" placeholder="Tu apellido">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" formControlName="telefono" placeholder="+595 xxx xxx xxx">
+        </div>
+
+        <!-- ── AVATAR SELECTOR ── -->
+        <div class="avatar-section">
+          <label>Elegí tu avatar</label>
+          <div class="avatar-grid">
+            @for (av of avatars; track av) {
+              <button type="button"
+                      class="avatar-option"
+                      [class.selected]="selectedAvatar === av"
+                      (click)="selectAvatar(av)">
+                <svg viewBox="0 0 80 80" class="avatar-svg-small">
+                  @switch (av) {
+                    @case ('avatar-goalkeeper') {
+                      <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#22c55e"/>
+                      <rect x="32" y="16" width="16" height="4" rx="2" fill="#fff"/>
+                    }
+                    @case ('avatar-striker') {
+                      <circle cx="40" cy="28" r="14" fill="#f87171"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
+                      <circle cx="40" cy="60" r="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                    }
+                    @case ('avatar-defender') {
+                      <circle cx="40" cy="28" r="14" fill="#60a5fa"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#2563eb"/>
+                      <path d="M33 50 L40 44 L47 50 L47 58 L33 58Z" fill="#fbbf24"/>
+                    }
+                    @case ('avatar-midfielder') {
+                      <circle cx="40" cy="28" r="14" fill="#a78bfa"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#7c3aed"/>
+                      <path d="M34 52 L46 52 L43 60 L37 60Z" fill="#fbbf24"/>
+                    }
+                    @case ('avatar-captain') {
+                      <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#1e3a5f"/>
+                      <text x="40" y="32" text-anchor="middle" fill="#1e3a5f" font-size="12" font-weight="bold">C</text>
+                    }
+                    @case ('avatar-referee') {
+                      <circle cx="40" cy="28" r="14" fill="#fde68a"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#111"/>
+                      <rect x="36" y="48" width="8" height="12" rx="1" fill="#fbbf24"/>
+                    }
+                    @case ('avatar-coach') {
+                      <circle cx="40" cy="28" r="14" fill="#d1d5db"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#374151"/>
+                      <rect x="30" y="18" width="20" height="3" rx="1.5" fill="#374151"/>
+                    }
+                    @case ('avatar-fan-m') {
+                      <circle cx="40" cy="28" r="14" fill="#fca5a5"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
+                      <path d="M30 18 L40 10 L50 18" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+                    }
+                    @case ('avatar-fan-f') {
+                      <circle cx="40" cy="28" r="14" fill="#fbcfe8"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#ec4899"/>
+                      <circle cx="34" cy="22" r="2" fill="#ec4899"/>
+                      <circle cx="46" cy="22" r="2" fill="#ec4899"/>
+                    }
+                    @case ('avatar-trophy') {
+                      <circle cx="40" cy="28" r="14" fill="#fef3c7"/>
+                      <path d="M20 70 Q40 50 60 70" fill="#d97706"/>
+                      <path d="M34 20 L34 34 Q34 38 40 38 Q46 38 46 34 L46 20 L50 20 Q48 28 46 34 L34 34 Q32 28 30 20Z" fill="#fbbf24"/>
+                    }
+                  }
+                </svg>
+                <span class="avatar-label">{{ av.replace('avatar-', '') | titlecase }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (profileMsg) {
+          <div class="msg success">{{ profileMsg }}</div>
+        }
+        @if (profileError) {
+          <div class="msg error">{{ profileError }}</div>
+        }
+
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- ── CAMBIAR CONTRASEÑA ── -->
+    <div class="form-section">
+      <div class="section-header" (click)="showPasswordSection = !showPasswordSection">
+        <h3>Cambiar Contraseña</h3>
+        <span class="toggle-icon">{{ showPasswordSection ? '▲' : '▼' }}</span>
+      </div>
+
+      @if (showPasswordSection) {
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="form-group">
+            <label for="currentPassword">Contraseña actual</label>
+            <input id="currentPassword" type="password" formControlName="currentPassword"
+                   placeholder="Ingresá tu contraseña actual">
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Nueva contraseña</label>
+            <input id="newPassword" type="password" formControlName="newPassword"
+                   placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar contraseña</label>
+            <input id="confirmPassword" type="password" formControlName="confirmPassword"
+                   placeholder="Repetí la nueva contraseña">
+          </div>
+
+          @if (passwordMsg) {
+            <div class="msg success">{{ passwordMsg }}</div>
+          }
+          @if (passwordError) {
+            <div class="msg error">{{ passwordError }}</div>
+          }
+
+          <button type="submit" class="btn-primary"
+                  [disabled]="changingPassword || passwordForm.invalid">
+            {{ changingPassword ? 'Cambiando...' : 'Cambiar Contraseña' }}
+          </button>
+        </form>
+      }
+    </div>
+
+  }
+
+</div>

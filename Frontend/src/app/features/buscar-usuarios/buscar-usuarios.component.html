@@ -1,0 +1,86 @@
+<div class="buscar-page">
+
+  <div class="page-header">
+    <h1 class="page-title">
+      <mat-icon>person_search</mat-icon>
+      Buscar Usuarios
+    </h1>
+    <p class="page-subtitle">Buscá a tus amigos y mirá sus perfiles públicos</p>
+  </div>
+
+  <!-- Buscador -->
+  <div class="search-box">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      type="text"
+      [(ngModel)]="query"
+      (ngModelChange)="onQueryChange()"
+      (keydown.enter)="$event.preventDefault()"
+      placeholder="Buscá por nombre, apellido o usuario..."
+      class="search-input"
+      autocomplete="off">
+    <button type="button" *ngIf="query.length > 0" class="btn-clear" (click)="limpiar()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <mat-spinner *ngIf="loading" diameter="20" class="search-spinner"></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div class="error-pill" *ngIf="error">
+    <mat-icon>error</mat-icon>{{ error }}
+  </div>
+
+  <!-- Hint inicial -->
+  <div class="hint-inicial" *ngIf="!buscado && !loading && query.length < 2">
+    <mat-icon>tips_and_updates</mat-icon>
+    <p>Escribí al menos 2 caracteres para buscar</p>
+  </div>
+
+  <!-- Sin resultados -->
+  <div class="empty-resultados" *ngIf="buscado && !loading && resultados.length === 0 && query.length >= 2">
+    <mat-icon>search_off</mat-icon>
+    <p>No encontramos usuarios con "<strong>{{ query }}</strong>"</p>
+    <small>Solo se muestran perfiles con perfil público activado</small>
+  </div>
+
+  <!-- Resultados: contador -->
+  <div class="resultados-count" *ngIf="resultados.length > 0">
+    <mat-icon>group</mat-icon>
+    {{ resultados.length }} resultado{{ resultados.length !== 1 ? 's' : '' }} encontrado{{ resultados.length !== 1 ? 's' : '' }}
+  </div>
+
+  <!-- Resultados -->
+  <div class="resultados-grid" *ngIf="resultados.length > 0">
+    <a class="usuario-card" *ngFor="let u of resultadosOrdenados; let i = index"
+       [routerLink]="['/perfil-publico', u.user]">
+
+      <!-- Ranking badge -->
+      <div class="rank-badge" [class.rank-top]="i < 3">
+        {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1) }}
+      </div>
+
+      <!-- Avatar -->
+      <div class="usuario-avatar">
+        <app-avatar-icon [avatarId]="u.urlAvatar" [nombre]="u.nombre" [apellido]="u.apellido" [size]="48"></app-avatar-icon>
+      </div>
+
+      <!-- Info -->
+      <div class="usuario-info">
+        <h3 class="usuario-nombre">
+          {{ u.nombre }} {{ u.apellido }}
+        </h3>
+        <p class="usuario-user">&#64;{{ u.user }}</p>
+      </div>
+
+      <!-- Puntaje -->
+      <div class="usuario-puntaje-box">
+        <span class="pts-num">{{ u.puntaje }}</span>
+        <span class="pts-label">PTS</span>
+      </div>
+
+      <!-- Arrow -->
+      <mat-icon class="card-arrow">chevron_right</mat-icon>
+    </a>
+  </div>
+
+</div>

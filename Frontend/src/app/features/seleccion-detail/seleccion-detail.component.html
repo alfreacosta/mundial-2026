@@ -1,0 +1,346 @@
+<div class="seleccion-detail-page">
+
+  <!-- ═══ STICKY HEADER + TABS + SEARCH ═══ -->
+  <div class="sticky-top" [style.--header-color]="confColor()">
+
+    <!-- Header -->
+    <header class="sel-header">
+      <div class="header-inner">
+        @if (seleccion(); as s) {
+          <div class="header-main">
+            <!-- Línea 1: ← bandera + nombre → count -->
+            <div class="header-row">
+              <button class="back-btn" (click)="volver()" aria-label="Volver">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+              @if (s.logoUrl) {
+                <img [src]="s.logoUrl" [alt]="s.nombre" class="country-logo" (error)="onImgError($event)">
+              }
+              <h1 class="country-name">{{ s.nombre }}</h1>
+              <div class="progress-numbers">
+                <span class="current-count" [style.color]="confColor()">{{ totalJugadores() }}</span>
+                <span class="label-convocados">jugadores</span>
+              </div>
+            </div>
+            <!-- Línea 2: badges → posiciones -->
+            <div class="header-row">
+              <div class="country-meta">
+                @if (s.grupo) {
+                  <a class="meta-badge group-badge" routerLink="/groups" [fragment]="'grupo-' + s.grupo">
+                    <mat-icon>grid_view</mat-icon> Grupo {{ s.grupo }}
+                  </a>
+                }
+              </div>
+              <div class="position-summary">
+                @for (pg of positionGroups; track pg.codigo) {
+                  <span class="pos-stat" [style.--pos-color]="pg.color">
+                    <span class="pos-dot" [style.background-color]="pg.color"></span>
+                    {{ pg.label | slice:0:3 }}: <strong>{{ posCounts()[pg.codigo] || 0 }}</strong>
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    @if (seleccion() && !isLoading() && !errorMsg()) {
+      <nav class="detail-tabs">
+        <button class="tab-btn" [class.active]="activeTab() === 'plantel'" (click)="activeTab.set('plantel')">
+          <mat-icon>groups</mat-icon>
+          Plantel ({{ totalJugadores() }})
+        </button>
+        <button class="tab-btn" (click)="irAConvocatoria()">
+          <mat-icon>assignment</mat-icon>
+          Convocatoria
+        </button>
+      </nav>
+
+      <!-- Search bar (inside sticky) -->
+      @if (activeTab() === 'plantel') {
+        <div class="search-bar-wrap">
+          <div class="search-bar" [class.has-value]="searchQuery()">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input
+              type="text"
+              class="search-input"
+              [placeholder]="isShowingConvocados() ? 'Buscar en todo el plantel…' : 'Buscar por nombre o club…'"
+              [value]="searchQuery()"
+              (input)="onSearch($event)"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            @if (searchQuery()) {
+              <button class="search-clear" (click)="clearSearch()" aria-label="Limpiar búsqueda">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+          <span class="search-count">
+            @if (searchQuery()) {
+              {{ totalFiltrados() }} de {{ totalJugadores() }} jugadores
+            } @else if (isShowingConvocados()) {
+              {{ totalConvocados() }} convocados · {{ totalJugadores() }} total
+            } @else {
+              {{ totalJugadores() }} jugadores
+            }
+          </span>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- ═══ LOADING ═══ -->
+  @if (isLoading()) {
+    <div class="state-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Cargando información de la selección…</p>
+    </div>
+  }
+
+  <!-- ═══ ERROR ═══ -->
+  @if (errorMsg() && !isLoading()) {
+    <div class="state-container error">
+      <mat-icon class="state-icon">error_outline</mat-icon>
+      <h3>Algo salió mal</h3>
+      <p>{{ errorMsg() }}</p>
+      <button mat-raised-button (click)="retry()">
+        <mat-icon>refresh</mat-icon> Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- ═══ CONTENT ═══ -->
+  @if (seleccion(); as s) {
+    @if (!isLoading() && !errorMsg()) {
+
+      <div class="tab-content">
+
+        <!-- ═══ TAB: PLANTEL ═══ -->
+        @if (activeTab() === 'plantel') {
+          <div class="plantel-container">
+
+            @for (pg of positionGroups; track pg.codigo) {
+              @if (getPlayersByPosition(pg.codigo).length > 0) {
+                <section class="position-section">
+                  <div class="position-header" [style.--pos-color]="pg.color">
+                    <div class="pos-icon-wrap" [style.background-color]="pg.color">
+                      <mat-icon>{{ pg.icon }}</mat-icon>
+                    </div>
+                    <div>
+                      <h2>{{ pg.label }}</h2>
+                      <span class="pos-count">{{ getPlayersByPosition(pg.codigo).length }} jugadores</span>
+                    </div>
+                  </div>
+
+                  <div class="players-grid">
+                    @for (player of getPlayersByPosition(pg.codigo); track player.id) {
+                      <div class="player-card" [style.--player-color]="pg.color"
+                           [class.expanded]="selectedPlayer()?.id === player.id"
+                           (click)="selectPlayer(player)">
+
+                        <!-- Photo -->
+                        <div class="player-photo">
+                          @if (player.fotoUrl) {
+                            <img [src]="player.fotoUrl" [alt]="player.nombreCompleto" (error)="onImgError($event)">
+                          } @else {
+                            <div class="photo-placeholder" [style.background]="pg.color + '22'">
+                              <mat-icon [style.color]="pg.color">person</mat-icon>
+                            </div>
+                          }
+                          @if (player.numeroCamiseta) {
+                            <span class="jersey-num">#{{ player.numeroCamiseta }}</span>
+                          }
+                        </div>
+
+                        <!-- Info -->
+                        <div class="player-info">
+                          <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
+                          @if (player.clubNombre) {
+                            <p class="player-club">
+                              @if (player.clubLogoUrl) {
+                                <img [src]="player.clubLogoUrl" class="club-logo-mini" (error)="onImgError($event)">
+                              }
+                              {{ player.clubNombre }}
+                            </p>
+                          }
+                          @if (player.edad) {
+                            <p class="player-age">{{ player.edad }} años</p>
+                          }
+                          @if (player.partidosTemporada !== null && player.partidosTemporada !== undefined) {
+                            <p class="player-apps">{{ player.partidosTemporada }} partidos</p>
+                          }
+                        </div>
+
+                        <!-- Convocado badge -->
+                        @if (player.convocadoEliminatoria) {
+                          <span class="conv-badge" title="Convocado a eliminatorias">🏅</span>
+                        }
+
+                        <!-- Pos badge -->
+                        <div class="pos-badge" [style.background-color]="pg.color">
+                          {{ player.posicionCodigo }}
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            }
+
+            @if (totalJugadores() === 0) {
+              <div class="empty-state">
+                <mat-icon>group_off</mat-icon>
+                <p>No hay jugadores disponibles para esta selección.</p>
+              </div>
+            }
+
+            @if (totalJugadores() > 0 && totalFiltrados() === 0 && searchQuery()) {
+              <div class="empty-state">
+                <mat-icon>search_off</mat-icon>
+                <p>Sin resultados para "<strong>{{ searchQuery() }}</strong>"</p>
+                <button mat-stroked-button (click)="clearSearch()">Limpiar búsqueda</button>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    }
+  }
+
+</div>
+
+<!-- ═══ STATS PANEL (slide-up) ═══ -->
+@if (selectedPlayer(); as player) {
+  <div class="stats-backdrop" (click)="selectPlayer(player)"></div>
+  <div class="stats-panel" role="dialog" [attr.aria-label]="'Estadísticas de ' + player.nombreCompleto">
+    <!-- Handle -->
+    <div class="stats-handle" (click)="selectPlayer(player)">
+      <span class="handle-bar"></span>
+    </div>
+
+    <!-- Header -->
+    <div class="stats-header">
+      <div class="stats-player-identity">
+        @if (player.fotoUrl) {
+          <img [src]="player.fotoUrl" [alt]="player.nombreCompleto" class="stats-avatar" (error)="onImgError($event)">
+        } @else {
+          <div class="stats-avatar-placeholder">
+            <mat-icon>person</mat-icon>
+          </div>
+        }
+        <div class="stats-player-name-block">
+          <h3>{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</h3>
+          @if (player.clubNombre) {
+            <span class="stats-club">
+              @if (player.clubLogoUrl) {
+                <img [src]="player.clubLogoUrl" class="stats-club-logo" (error)="onImgError($event)">
+              }
+              {{ player.clubNombre }}
+            </span>
+          }
+        </div>
+      </div>
+      <button mat-icon-button class="stats-close" (click)="selectPlayer(player)" aria-label="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (statsLoading()) {
+      <div class="stats-loading">
+        <mat-spinner diameter="32"></mat-spinner>
+        <p>Cargando estadísticas…</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (statsError() && !statsLoading()) {
+      <div class="stats-empty">
+        <mat-icon>info_outline</mat-icon>
+        <p>{{ statsError() }}</p>
+      </div>
+    }
+
+    <!-- Stats content -->
+    @if (playerStats(); as st) {
+      @if (!statsLoading()) {
+        <div class="stats-body">
+
+          <!-- Bio row -->
+          <div class="stats-bio">
+            @if (st.nacimiento) {
+              <span class="bio-item"><mat-icon>cake</mat-icon>{{ st.nacimiento }}</span>
+            }
+            @if (st.lugar_nacimiento) {
+              <span class="bio-item"><mat-icon>place</mat-icon>{{ st.lugar_nacimiento }}</span>
+            }
+            @if (st.altura) {
+              <span class="bio-item"><mat-icon>height</mat-icon>{{ st.altura }}</span>
+            }
+            @if (st.peso) {
+              <span class="bio-item"><mat-icon>monitor_weight</mat-icon>{{ st.peso }}</span>
+            }
+          </div>
+
+          <!-- Liga -->
+          @if (st.liga) {
+            <p class="stats-season-label">
+              {{ st.liga }}
+              @if (st.temporada) { · Temporada {{ st.temporada }} }
+            </p>
+          }
+
+          <!-- Main stats grid -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-val">{{ st.partidos }}</span>
+              <span class="stat-lbl">Partidos</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-val">{{ st.minutos }}</span>
+              <span class="stat-lbl">Minutos</span>
+            </div>
+            <div class="stat-box highlight">
+              <span class="stat-val">{{ st.goles }}</span>
+              <span class="stat-lbl">⚽ Goles</span>
+            </div>
+            <div class="stat-box highlight">
+              <span class="stat-val">{{ st.asistencias }}</span>
+              <span class="stat-lbl">🅺️ Asistencias</span>
+            </div>
+            @if (st.rating) {
+              <div class="stat-box rating-box">
+                <span class="stat-val">{{ (+st.rating).toFixed(1) }}</span>
+                <span class="stat-lbl">⭐ Rating</span>
+              </div>
+            }
+            <div class="stat-box">
+              <span class="stat-val">{{ st.pases_clave }}</span>
+              <span class="stat-lbl">🎯 P. Clave</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-val">{{ st.disparos_arco }}/{{ st.disparos }}</span>
+              <span class="stat-lbl">Disparos</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-val">{{ st.regates_ok }}/{{ st.regates_int }}</span>
+              <span class="stat-lbl">🏃 Regates</span>
+            </div>
+            <div class="stat-box card-box">
+              <span class="stat-val yellow-card">{{ st.amarillas }}</span>
+              <span class="stat-lbl">🟨 Amarillas</span>
+            </div>
+            <div class="stat-box card-box">
+              <span class="stat-val red-card">{{ st.rojas }}</span>
+              <span class="stat-lbl">🟥 Rojas</span>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+}

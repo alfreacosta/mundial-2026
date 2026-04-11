@@ -1,0 +1,453 @@
+// Variables
+$fantasy-purple: #c1272d;
+$fantasy-purple-dark: #991b1b;
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-900: #111827;
+
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+$radius-md: 12px;
+$radius-lg: 16px;
+
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+$transition-normal: 0.3s ease-in-out;
+
+$tablet: 768px;
+$desktop: 1024px;
+
+// Estilos
+.my-team-page {
+  min-height: 100vh;
+  background: $gray-50;
+  padding-top: 80px;
+}
+
+// Header
+.team-header {
+  background: linear-gradient(135deg, $fantasy-purple 0%, $fantasy-purple-dark 100%);
+  color: $white;
+  padding: $spacing-2xl $spacing-md $spacing-xl;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    .back-btn {
+      color: $white;
+    }
+
+    .header-text {
+      flex: 1;
+      min-width: 200px;
+
+      h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 0 $spacing-xs 0;
+        color: $white;
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+    }
+
+    .add-players-btn {
+      mat-icon {
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+}
+
+// Stats Section
+.stats-section {
+  padding: $spacing-xl 0;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @media (min-width: $tablet) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: $desktop) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-lg !important;
+    transition: transform $transition-normal;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $gray-100;
+      color: $gray-600;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+
+      &.complete {
+        background: $success;
+        color: $white;
+      }
+
+      &.valid {
+        background: $success;
+        color: $white;
+      }
+
+      &.arquero {
+        background: #fef3c7;
+        color: #f59e0b;
+
+        &.valid {
+          background: $success;
+          color: $white;
+        }
+      }
+
+      &.defensor {
+        background: #dbeafe;
+        color: #3b82f6;
+
+        &.valid {
+          background: $success;
+          color: $white;
+        }
+      }
+
+      &.mediocampista {
+        background: #dcfce7;
+        color: #10b981;
+
+        &.valid {
+          background: $success;
+          color: $white;
+        }
+      }
+
+      &.delantero {
+        background: #fee2e2;
+        color: #ef4444;
+
+        &.valid {
+          background: $success;
+          color: $white;
+        }
+      }
+    }
+
+    .stat-content {
+      flex: 1;
+
+      h3 {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 $spacing-xs 0;
+        color: $gray-900;
+      }
+
+      p {
+        margin: 0;
+        color: $gray-600;
+        font-size: 14px;
+      }
+
+      mat-progress-bar {
+        margin-top: $spacing-sm;
+        border-radius: 4px;
+      }
+
+      small {
+        display: block;
+        margin-top: $spacing-xs;
+        font-size: 12px;
+        color: $gray-500;
+
+        &.warning {
+          color: $warning;
+          font-weight: 600;
+        }
+
+        &.remaining {
+          color: $gray-600;
+        }
+      }
+    }
+  }
+}
+
+// Roster Section
+.roster-section {
+  padding: 0 0 $spacing-2xl 0;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+  }
+
+  .empty-state {
+    text-align: center;
+
+    mat-card {
+      padding: $spacing-2xl;
+
+      mat-icon {
+        font-size: 80px;
+        width: 80px;
+        height: 80px;
+        color: #ced4da;
+        margin-bottom: $spacing-md;
+      }
+
+      h2 {
+        margin: 0 0 $spacing-sm 0;
+        color: $gray-900;
+      }
+
+      p {
+        margin: 0 0 $spacing-lg 0;
+        color: $gray-600;
+      }
+
+      button mat-icon {
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+
+  .roster-grid {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  .position-section {
+    .position-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 $spacing-md 0;
+      color: $gray-900;
+      padding: $spacing-sm $spacing-md;
+      border-radius: $radius-md;
+
+      &.arquero {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
+      &.defensor {
+        background: #dbeafe;
+        color: #3b82f6;
+      }
+
+      &.mediocampista {
+        background: #dcfce7;
+        color: #10b981;
+      }
+
+      &.delantero {
+        background: #fee2e2;
+        color: #ef4444;
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .players-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $spacing-sm;
+
+      @media (min-width: $tablet) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (min-width: $desktop) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $spacing-md !important;
+      transition: all $transition-normal;
+
+      &:hover {
+        box-shadow: $shadow-md;
+      }
+
+      .player-info {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        flex: 1;
+
+        .player-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: $gray-100;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          mat-icon {
+            color: $gray-500;
+          }
+        }
+
+        .player-details {
+          flex: 1;
+
+          h4 {
+            margin: 0 0 $spacing-xs 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: $gray-900;
+          }
+
+          .player-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 12px;
+            color: $gray-600;
+            margin-right: $spacing-sm;
+
+            mat-icon {
+              font-size: 14px;
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .roster-actions {
+    margin-top: $spacing-xl;
+
+    mat-card {
+      padding: $spacing-lg !important;
+    }
+
+    .validation-status {
+      margin-bottom: $spacing-lg;
+
+      .valid-roster {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        color: $success;
+        font-weight: 600;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      .invalid-roster {
+        display: flex;
+        align-items: flex-start;
+        gap: $spacing-sm;
+        color: $warning;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          flex-shrink: 0;
+        }
+
+        p {
+          margin: 0 0 $spacing-xs 0;
+          font-weight: 600;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: $spacing-lg;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: $spacing-md;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      button mat-icon {
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+}

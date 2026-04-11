@@ -1,0 +1,306 @@
+@use '../../../../styles/variables' as v;
+
+.modal-form {
+  padding: v.$spacing-xl;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: v.$spacing-lg;
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: v.$white;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: v.$spacing-sm;
+      mat-icon { color: v.$fantasy-cyan; }
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: v.$gray-500;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: v.$radius-sm;
+      &:hover { color: v.$white; }
+    }
+  }
+
+  .form-error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    border-radius: v.$radius-sm;
+    padding: v.$spacing-sm v.$spacing-md;
+    color: #fca5a5;
+    margin-bottom: v.$spacing-md;
+    font-size: 0.85rem;
+  }
+}
+
+// Progreso de pasos
+.pasos-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: v.$spacing-xl;
+
+  .paso-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+
+    .paso-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: v.$gray-500;
+      transition: all 0.3s;
+    }
+
+    .paso-label {
+      font-size: 0.7rem;
+      color: v.$gray-600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.activo {
+      .paso-num {
+        background: v.$fantasy-purple;
+        border-color: v.$fantasy-purple;
+        color: v.$white;
+      }
+      .paso-label { color: v.$gray-300; }
+    }
+
+    &.completado .paso-num {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #34d399;
+      color: #34d399;
+    }
+  }
+
+  .paso-linea {
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 v.$spacing-sm;
+    margin-bottom: 18px;
+  }
+}
+
+// Contenido de pasos
+.paso-contenido {
+  min-height: 200px;
+
+  .paso-descripcion {
+    color: v.$gray-400;
+    font-size: 0.9rem;
+    margin-bottom: v.$spacing-lg;
+    display: flex;
+    align-items: flex-start;
+    gap: v.$spacing-sm;
+    flex-wrap: wrap;
+
+    mat-icon { font-size: 1.1rem; color: v.$fantasy-cyan; flex-shrink: 0; }
+    strong { color: v.$white; }
+
+    .seleccionados-count {
+      display: block;
+      width: 100%;
+      color: v.$fantasy-cyan;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+  }
+
+  .join-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: v.$spacing-md;
+    padding: 10px 14px;
+    background: rgba(0, 212, 255, 0.06);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    border-radius: v.$radius-sm;
+    font-size: 0.82rem;
+    color: v.$gray-400;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; color: v.$fantasy-cyan; flex-shrink: 0; margin-top: 1px; }
+  }
+}
+
+.loading-datos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$spacing-md;
+  padding: v.$spacing-xl 0;
+  color: v.$gray-400;
+}
+
+// Formulario
+.form-group {
+  margin-bottom: v.$spacing-md;
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: v.$gray-300;
+    margin-bottom: 6px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: v.$radius-sm;
+    color: v.$white;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+
+    &::placeholder { color: v.$gray-600; }
+
+    &:focus {
+      outline: none;
+      border-color: v.$fantasy-cyan;
+    }
+
+    option { background: #1a1a2e; color: v.$white; }
+
+    &.codigo-input {
+      font-family: monospace;
+      font-size: 1.4rem;
+      text-align: center;
+      letter-spacing: 4px;
+      font-weight: 700;
+    }
+
+    &.buscador { margin-bottom: 4px; }
+
+    &.select-jugador { min-height: 140px; }
+  }
+}
+
+// Grid de países favoritos
+.paises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: v.$spacing-sm;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+}
+
+.pais-btn {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-sm;
+  padding: v.$spacing-sm;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: v.$radius-sm;
+  color: v.$gray-300;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  position: relative;
+
+  .fi {
+    width: 20px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .pais-nombre {
+    flex: 1;
+    text-align: left;
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .check-icon {
+    font-size: 1rem;
+    color: #34d399;
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: v.$white;
+  }
+
+  &.seleccionado {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: #34d399;
+    color: v.$white;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// Footer
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: v.$spacing-sm;
+  margin-top: v.$spacing-xl;
+  padding-top: v.$spacing-md;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: v.$radius-sm;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &.btn-primary {
+    background: v.$fantasy-purple;
+    color: v.$white;
+    &:hover:not(:disabled) { background: v.$fantasy-violet; }
+  }
+
+  &.btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: v.$white;
+    border: 1px solid rgba(255,255,255,0.15);
+    &:hover:not(:disabled) { background: rgba(255,255,255,0.14); }
+  }
+}

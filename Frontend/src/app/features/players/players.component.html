@@ -1,0 +1,147 @@
+<!-- Players Component - Lista de Jugadores -->
+<div class="players-page">
+
+  <!-- Filtros -->
+  <section class="filters-section">
+    <div class="container">
+      <mat-card class="filters-card">
+        <div class="filters-grid">
+          
+          <!-- Búsqueda -->
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Buscar jugador</mat-label>
+            <input matInput 
+                   [(ngModel)]="searchTerm" 
+                   (ngModelChange)="applyFilters()"
+                   placeholder="Nombre o apellido">
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Posición -->
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Posición</mat-label>
+            <mat-select [(ngModel)]="selectedPosition" (ngModelChange)="applyFilters()">
+              <mat-option value="">Todas</mat-option>
+              <mat-option *ngFor="let pos of positions" [value]="pos.value">
+                {{ pos.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>sports</mat-icon>
+          </mat-form-field>
+
+          <!-- País -->
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>País</mat-label>
+            <mat-select [(ngModel)]="selectedCountry" (ngModelChange)="applyFilters()">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let country of countries" [value]="country">
+                {{ country }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>flag</mat-icon>
+          </mat-form-field>
+
+          <!-- Botón Limpiar -->
+          <button mat-raised-button 
+                  (click)="clearFilters()"
+                  class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Limpiar Filtros
+          </button>
+
+        </div>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Cargando jugadores...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-container" *ngIf="error">
+    <mat-card class="error-card">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadJugadores()">
+        Reintentar
+      </button>
+    </mat-card>
+  </div>
+
+  <!-- Lista de Jugadores -->
+  <section class="players-list" *ngIf="!loading && !error">
+    <div class="container">
+      
+      <!-- Contador -->
+      <div class="results-count">
+        <p>Mostrando <strong>{{ filteredJugadores.length }}</strong> de <strong>{{ jugadores.length }}</strong> jugadores</p>
+      </div>
+
+      <!-- Grid de Jugadores -->
+      <div class="players-grid">
+        <mat-card class="player-card" *ngFor="let j of filteredJugadores">
+          
+          <!-- Avatar/Foto del Jugador -->
+          <div class="player-avatar">
+            <mat-icon *ngIf="!j.urlFoto" class="avatar-icon">person</mat-icon>
+            <img *ngIf="j.urlFoto" [src]="j.urlFoto" [alt]="j.nombreCompleto">
+          </div>
+
+          <!-- Badge de Posición -->
+          <div class="position-badge" [ngClass]="getPositionColor(j.posicion?.codigo || '')">
+            <mat-icon>{{ getPositionIcon(j.posicion?.codigo || '') }}</mat-icon>
+            <span>{{ getPositionLabel(j.posicion?.codigo || '') }}</span>
+          </div>
+
+          <!-- Número de Camiseta -->
+          <div class="shirt-number" *ngIf="j.numeroCamiseta">
+            #{{ j.numeroCamiseta }}
+          </div>
+
+          <!-- Info del Jugador -->
+          <div class="player-info">
+            <h3>{{ j.nombreCompleto }}</h3>
+            <div class="player-details">
+              <span class="detail-item" *ngIf="j.pais">
+                <mat-icon>flag</mat-icon>
+                {{ j.pais.nombre }}
+              </span>
+            </div>
+            <div class="player-club" *ngIf="j.club">
+              <mat-icon>groups</mat-icon>
+              {{ j.club.nombre }}
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="player-actions">
+            <button 
+              mat-raised-button 
+              color="primary"
+              class="select-btn"
+              routerLink="/my-team">
+              <mat-icon>add</mat-icon>
+              Agregar
+            </button>
+          </div>
+
+        </mat-card>
+      </div>
+
+      <!-- Sin Resultados -->
+      <div class="no-results" *ngIf="filteredJugadores.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <h3>No se encontraron jugadores</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+        <button mat-raised-button (click)="clearFilters()">
+          Limpiar Filtros
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</div>

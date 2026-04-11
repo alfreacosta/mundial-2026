@@ -1,0 +1,381 @@
+$bg: #0a0e1a;
+$bg-card: rgba(255, 255, 255, 0.04);
+$bg-card-hover: rgba(255, 255, 255, 0.08);
+$border: rgba(255, 255, 255, 0.08);
+$text: rgba(255, 255, 255, 0.92);
+$text-muted: rgba(255, 255, 255, 0.5);
+$accent: #00d4ff;
+$gold: #f59e0b;
+$green: #22c55e;
+$red: #ef4444;
+$radius: 14px;
+$ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ── HERO ──
+.hero {
+  background: linear-gradient(135deg, rgba($gold, 0.18) 0%, rgba($accent, 0.08) 50%, transparent 100%);
+  border-bottom: 1px solid $border;
+  color: $text;
+  padding: calc(56px + 14px) 24px 14px;
+  text-align: center;
+
+  h1 {
+    font-size: 1.35rem;
+    margin: 0 0 4px;
+    color: $gold;
+    font-weight: 800;
+
+    i { margin-right: 8px; }
+  }
+  p {
+    margin: 0;
+    color: $text-muted;
+    font-size: 0.85rem;
+  }
+
+  @media (min-width: 768px) {
+    padding: calc(64px + 32px) 48px 32px;
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    p {
+      font-size: 1.05rem;
+    }
+  }
+}
+
+// ── CONTAINER ──
+.prediccion-container {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  padding: 20px 16px;
+
+  @media (min-width: 768px) {
+    max-width: 960px;
+    padding: 36px 32px;
+  }
+}
+
+// ── LOADING ──
+.loading-state {
+  text-align: center;
+  padding: 60px 0;
+  color: $text-muted;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $border;
+    border-top-color: $accent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── PREDICCIÓN ACTUAL ──
+.prediccion-actual {
+  margin-bottom: 16px;
+
+  .seccion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+      color: $text;
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .btn-modificar {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba($gold, 0.1);
+      border: 1px solid rgba($gold, 0.3);
+      border-radius: 8px;
+      color: $gold;
+      cursor: pointer;
+      transition: $ease;
+
+      &:hover { background: rgba($gold, 0.2); }
+
+      &.activo {
+        background: rgba($red, 0.1);
+        border-color: rgba($red, 0.3);
+        color: $red;
+        &:hover { background: rgba($red, 0.2); }
+      }
+    }
+
+    @media (min-width: 768px) {
+      margin-bottom: 20px;
+      h3 { font-size: 1.3rem; }
+      .btn-modificar {
+        padding: 7px 16px;
+        font-size: 0.85rem;
+        border-radius: 10px;
+      }
+    }
+  }
+}
+
+.prediccion-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+}
+
+.pred-card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: $ease;
+
+  &:hover { background: $bg-card-hover; }
+
+  &.campeon { border-left: 3px solid $gold; }
+  &.goleador { border-left: 3px solid $accent; }
+
+  .pred-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .pred-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .pred-label {
+    color: $text-muted;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .pred-value {
+    color: $text;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+
+    .fi { font-size: 1.1rem; flex-shrink: 0; }
+  }
+
+  @media (min-width: 768px) {
+    padding: 24px 28px;
+    gap: 18px;
+    border-radius: 18px;
+
+    .pred-icon { font-size: 2.4rem; }
+    .pred-label { font-size: 0.78rem; margin-bottom: 4px; }
+    .pred-value {
+      font-size: 1.4rem;
+      gap: 8px;
+      .fi { font-size: 1.5rem; }
+    }
+  }
+}
+
+.confirmada-badge {
+  background: rgba($green, 0.12);
+  border: 1px solid rgba($green, 0.25);
+  color: $green;
+  border-radius: 10px;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  i { margin-right: 6px; }
+}
+
+// ── FORMULARIO ──
+.form-section {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 28px 24px;
+  margin-bottom: 24px;
+
+  h3 {
+    color: $text;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 40px 48px;
+    border-radius: 20px;
+
+    h3 { font-size: 1.4rem; margin-bottom: 28px; }
+  }
+}
+
+.form-group {
+  margin-bottom: 24px;
+
+  label {
+    display: block;
+    color: $text;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+
+    .gold-icon { color: $gold; margin-right: 6px; }
+  }
+}
+
+.select-field,
+.search-field {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid $border;
+  border-radius: 10px;
+  color: $text;
+  font-size: 0.95rem;
+  transition: $ease;
+  outline: none;
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgba($accent, 0.12);
+  }
+
+  option {
+    background: #1a1f2e;
+    color: $text;
+    padding: 8px;
+  }
+}
+
+.select-field[size] {
+  height: auto;
+  max-height: 250px;
+  overflow-y: auto;
+
+  option {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+
+    &:hover { background: rgba($accent, 0.12); }
+    &:checked { background: rgba($accent, 0.2); color: $accent; }
+  }
+}
+
+.search-field {
+  margin-bottom: 10px;
+}
+
+// ── PREVIEW SELECCIÓN ──
+.seleccion-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba($accent, 0.08);
+  border: 1px solid rgba($accent, 0.15);
+  border-radius: 10px;
+  color: $text;
+  font-size: 0.9rem;
+
+  .fi { font-size: 1.3rem; }
+
+  strong { font-weight: 700; }
+}
+
+.conf-tag,
+.pos-tag,
+.club-tag {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.conf-tag { background: rgba($gold, 0.15); color: $gold; }
+.pos-tag { background: rgba($accent, 0.15); color: $accent; }
+.club-tag { background: rgba(255, 255, 255, 0.08); color: $text-muted; }
+
+// ── MENSAJES ──
+.msg {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+
+  i { margin-right: 6px; }
+
+  &.success {
+    background: rgba($green, 0.1);
+    border: 1px solid rgba($green, 0.2);
+    color: $green;
+  }
+  &.error {
+    background: rgba($red, 0.1);
+    border: 1px solid rgba($red, 0.2);
+    color: $red;
+  }
+}
+
+// ── BOTÓN ──
+.btn-primary {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, $gold 0%, darken($gold, 8%) 100%);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $ease;
+  letter-spacing: 0.3px;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba($gold, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  i { margin-right: 8px; }
+}

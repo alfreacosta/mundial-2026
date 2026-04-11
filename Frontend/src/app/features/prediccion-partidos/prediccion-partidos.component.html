@@ -1,0 +1,202 @@
+<div class="pred-partidos-page">
+
+  <!-- TEST v2 -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <mat-icon>sports_soccer</mat-icon>
+        Predicciones de Partidos
+      </h1>
+      <p class="page-subtitle">Ingresá el marcador que creés que va a tener cada partido</p>
+    </div>
+    @if (!loading && !error) {
+      <div class="progress-badge">
+        <span class="prog-num">{{ totalPredichos }}</span>
+        <span class="prog-sep">/</span>
+        <span class="prog-total">{{ totalPartidos }}</span>
+        <span class="prog-label">predichos</span>
+      </div>
+    }
+  </div>
+
+  <!-- Reglas de puntaje -->
+  <div class="puntaje-rules">
+    <div class="rule-item exacto">
+      <span class="rule-pts">50 pts</span>
+      <span class="rule-desc">Resultado exacto</span>
+    </div>
+    <div class="rule-item diferencia">
+      <span class="rule-pts">30 pts</span>
+      <span class="rule-desc">Diferencia de goles</span>
+    </div>
+    <div class="rule-item resultado">
+      <span class="rule-pts">25 pts</span>
+      <span class="rule-desc">Ganador o empate</span>
+    </div>
+    <div class="rule-item incorrecto">
+      <span class="rule-pts">0 pts</span>
+      <span class="rule-desc">Incorrecto</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="center-state">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Cargando partidos...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="center-state error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (!loading && !error) {
+
+    <!-- Tabs de grupos -->
+    @if (grupos.length > 0) {
+      <div class="grupos-tabs-wrap">
+        <div class="grupos-tabs">
+          @for (g of grupos; track g) {
+            <button class="grupo-tab"
+                    [class.active]="grupoActivo === g"
+                    (click)="grupoActivo = g">
+              Grupo {{ g }}
+              <span class="tab-count">
+                {{ (partidosPorGrupo.get(g) || []).length }}
+              </span>
+            </button>
+          }
+          @if (otrosPartidos.length > 0) {
+            <button class="grupo-tab"
+                    [class.active]="grupoActivo === 'OTRAS'"
+                    (click)="grupoActivo = 'OTRAS'">
+              Otras fases
+              <span class="tab-count">{{ otrosPartidos.length }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Partidos del grupo activo -->
+      <div class="partidos-lista">
+        @let listaActiva = grupoActivo === 'OTRAS'
+          ? otrosPartidos
+          : getPartidosGrupoActivo();
+
+        @for (item of listaActiva; track item.partido.id) {
+          <div class="partido-card"
+               [class.bloqueado]="isBloqueado(item)"
+               [class.finalizado]="item.partido.estado === 'FINALIZADO'">
+
+            <!-- Strip: fecha · estado · badges -->
+            <div class="partido-strip">
+              <span class="partido-fecha">{{ item.partido.fechaHora | date:'dd MMM · HH:mm' }}</span>
+              <span class="partido-estado {{ item.partido.estado.toLowerCase() }}">
+                {{ item.partido.estado === 'PENDIENTE' ? 'Pendiente'
+                 : item.partido.estado === 'EN_CURSO'  ? '⚽ En curso'
+                 : 'Finalizado' }}
+              </span>
+              @if (isBloqueado(item) && item.partido.estado === 'PENDIENTE') {
+                <span class="locked-chip"><mat-icon>lock</mat-icon>Cerrado</span>
+              }
+              <span class="strip-spacer"></span>
+              @if (item.prediccion?.puntajeObtenido !== null && item.prediccion?.puntajeObtenido !== undefined) {
+                <span class="puntaje-badge {{ getPuntajeClass(item.prediccion!.puntajeObtenido) }}">
+                  {{ getPuntajeLabel(item.prediccion!.puntajeObtenido) }}
+                </span>
+              }
+              @if (item.partido.estadio) {
+                <span class="estadio-chip"><mat-icon>stadium</mat-icon>{{ item.partido.estadio }}</span>
+              }
+            </div>
+
+            <!-- Body: local | marcador | visitante | acción -->
+            <div class="partido-body">
+
+              <div class="equipo local">
+                <img class="equipo-flag" [src]="getFlagUrl(item.partido.equipoLocalCodigo)"
+                     [alt]="item.partido.equipoLocalNombre" loading="lazy">
+                <span class="equipo-nombre">{{ item.partido.equipoLocalNombre }}</span>
+              </div>
+
+              <div class="marcador-center">
+                @if (item.partido.estado === 'FINALIZADO' && item.partido.golLocal !== null) {
+                  <div class="resultado-real">
+                    <span class="real-score">{{ item.partido.golLocal }}–{{ item.partido.golVisitante }}</span>
+                    <span class="real-label">Resultado</span>
+                  </div>
+                }
+                @if (!isBloqueado(item)) {
+                  <div class="pred-inputs">
+                    <div class="score-stepper">
+                      <button class="step-btn" (click)="cambiarGol(item, 'local', -1)"
+                              [disabled]="item.guardando || (item.golLocalEdit ?? 0) <= 0">−</button>
+                      <span class="score-display">{{ item.golLocalEdit ?? '–' }}</span>
+                      <button class="step-btn" (click)="cambiarGol(item, 'local', 1)"
+                              [disabled]="item.guardando">+</button>
+                    </div>
+                    <span class="vs-sep">–</span>
+                    <div class="score-stepper">
+                      <button class="step-btn" (click)="cambiarGol(item, 'visitante', -1)"
+                              [disabled]="item.guardando || (item.golVisitanteEdit ?? 0) <= 0">−</button>
+                      <span class="score-display">{{ item.golVisitanteEdit ?? '–' }}</span>
+                      <button class="step-btn" (click)="cambiarGol(item, 'visitante', 1)"
+                              [disabled]="item.guardando">+</button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="pred-locked">
+                    @if (item.prediccion?.golLocalPred !== null && item.prediccion?.golLocalPred !== undefined) {
+                      <span class="locked-score">{{ item.prediccion?.golLocalPred }}–{{ item.prediccion?.golVisitantePred }}</span>
+                      <span class="locked-label">Tu predicción</span>
+                    } @else {
+                      <span class="no-pred-label">Sin predicción</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="equipo visitante">
+                <span class="equipo-nombre">{{ item.partido.equipoVisitanteNombre }}</span>
+                <img class="equipo-flag" [src]="getFlagUrl(item.partido.equipoVisitanteCodigo)"
+                     [alt]="item.partido.equipoVisitanteNombre" loading="lazy">
+              </div>
+
+              <div class="partido-accion">
+                @if (!isBloqueado(item)) {
+                  <button class="btn-guardar"
+                          [class.modified]="isModificado(item)"
+                          [class.saving]="item.guardando"
+                          [class.saved]="item.guardado"
+                          [disabled]="item.guardando || item.golLocalEdit === null || item.golVisitanteEdit === null"
+                          (click)="guardar(item)">
+                    @if (item.guardando) {
+                      <mat-spinner diameter="14"></mat-spinner>
+                    } @else if (item.guardado) {
+                      <mat-icon>check_circle</mat-icon>
+                    } @else if (item.prediccion) {
+                      <mat-icon>save</mat-icon> Actualizar
+                    } @else {
+                      <mat-icon>add</mat-icon> Predecir
+                    }
+                  </button>
+                  @if (item.error) {
+                    <span class="inline-error">{{ item.error }}</span>
+                  }
+                }
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  }
+
+</div>

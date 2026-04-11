@@ -1,0 +1,78 @@
+<div class="favoritos-section">
+
+  <div class="favoritos-header">
+    <h3>Mis Equipos Favoritos</h3>
+    <p class="favoritos-desc">
+      Elegí hasta 5 selecciones para todo el torneo. Solo sobre estos equipos podrás armar convocatorias.
+    </p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">Cargando...</div>
+  } @else {
+
+    <!-- Lista de favoritos elegidos -->
+    <div class="favoritos-list">
+      @for (fav of favoritos; track fav.paisId) {
+        <div class="favorito-item">
+          <span class="fav-estrella">⭐</span>
+          <span class="fi" [class]="'fi-' + (fav.paisCodigo | fifaToFlag)" class="fav-flag"></span>
+          <span class="fav-nombre">{{ fav.paisNombre }}</span>
+          <button class="btn-quitar" (click)="quitarFavorito(fav)" [disabled]="guardando" title="Quitar">
+            ✕
+          </button>
+        </div>
+      }
+
+      @if (favoritos.length === 0) {
+        <p class="empty-msg">Todavía no elegiste ningún equipo favorito.</p>
+      }
+    </div>
+
+    <!-- Contador -->
+    <div class="favoritos-counter">
+      <span [class.limite]="favoritos.length === 5">
+        {{ favoritos.length }}/5 equipos elegidos
+      </span>
+    </div>
+
+    <!-- Botón para abrir selector -->
+    @if (puedeAgregarMas) {
+      <button class="btn-agregar" (click)="mostrandoSelector = !mostrandoSelector" [disabled]="guardando">
+        {{ mostrandoSelector ? '✕ Cancelar' : '+ Agregar equipo' }}
+      </button>
+    }
+
+    <!-- Selector de país -->
+    @if (mostrandoSelector) {
+      <div class="selector-pais">
+        <input
+          type="text"
+          class="buscador-pais"
+          [(ngModel)]="filtro"
+          placeholder="Buscar selección..."
+          autofocus
+        />
+        <div class="paises-grid">
+          @for (pais of paisesFiltrados; track pais.internalId) {
+            <button class="pais-opcion" (click)="agregarFavorito(pais)" [disabled]="guardando">
+              <span class="fi" [class]="'fi-' + (pais.codigo | fifaToFlag)" class="pais-flag"></span>
+              <span class="pais-nombre">{{ pais.nombre }}</span>
+            </button>
+          }
+          @if (paisesFiltrados.length === 0) {
+            <p class="no-resultados">Sin resultados</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Mensajes -->
+    @if (msg) {
+      <div class="msg success">{{ msg }}</div>
+    }
+    @if (error) {
+      <div class="msg error">{{ error }}</div>
+    }
+  }
+</div>

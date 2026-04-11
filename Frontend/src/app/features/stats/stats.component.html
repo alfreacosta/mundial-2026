@@ -1,0 +1,104 @@
+<!-- Clasificación – Ranking de usuarios reales -->
+<div class="stats-page">
+
+  <!-- Hero header -->
+  <header class="stats-header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-text">
+          <h1>
+            <mat-icon>emoji_events</mat-icon>
+            Clasificación General
+          </h1>
+          <p>Ranking de participantes del Mundial 2026</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <section class="stats-content">
+    <div class="container">
+
+      <!-- Loading -->
+      @if (loading) {
+        <div class="state-container">
+          <mat-spinner diameter="48"></mat-spinner>
+          <p>Cargando ranking...</p>
+        </div>
+      }
+
+      <!-- Error -->
+      @if (!loading && error) {
+        <div class="state-container error">
+          <mat-icon class="state-icon">error_outline</mat-icon>
+          <p>{{ error }}</p>
+        </div>
+      }
+
+      <!-- Tabla ranking -->
+      @if (!loading && !error) {
+        <mat-card class="ranking-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>leaderboard</mat-icon>
+              Tabla de posiciones
+            </mat-card-title>
+            <mat-card-subtitle>{{ ranking.length }} participante{{ ranking.length !== 1 ? 's' : '' }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (ranking.length === 0) {
+              <div class="empty-state">
+                <mat-icon>group_off</mat-icon>
+                <p>Aún no hay participantes registrados.</p>
+              </div>
+            } @else {
+              <div class="ranking-table-wrapper">
+                <table class="ranking-table">
+                  <thead>
+                    <tr>
+                      <th class="col-pos">#</th>
+                      <th class="col-user">Usuario</th>
+                      <th class="col-pts">Puntos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (u of ranking; track u.internalId; let i = $index) {
+                      <tr [class.top-row]="i < 3">
+                        <td class="col-pos">
+                          <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                            @if (i < 3) { {{ getRankMedal(i + 1) }} }
+                            @if (i >= 3) { {{ i + 1 }} }
+                          </span>
+                        </td>
+                        <td class="col-user">
+                          <div class="user-info">
+                            <div class="avatar-circle">
+                              <app-avatar-icon [avatarId]="u.urlAvatar" [nombre]="u.nombre" [apellido]="u.apellido" [size]="36"></app-avatar-icon>
+                            </div>
+                            <div class="user-names">
+                              <span class="display-name">{{ getDisplayName(u) }}</span>
+                              <span class="username">&#64;{{ u.user }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="col-pts">
+                          <span class="points-badge">{{ u.puntaje }}</span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+    </div>
+  </section>
+
+</div>
+
+

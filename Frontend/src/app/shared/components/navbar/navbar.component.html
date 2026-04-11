@@ -1,0 +1,124 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo (badge FIFA) -->
+    <div class="navbar-logo">
+      <a routerLink="/dashboard" class="logo-link">
+        <div class="fifa-badge">
+          <span class="fifa-top">FIFA WORLD CUP™</span>
+          <span class="fifa-divider"></span>
+          <span class="fifa-year">2026</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Countdown (separado para poder ordenar en mobile) -->
+    <div class="navbar-countdown">
+      <span class="cd-label">Faltan</span>
+      <span class="cd-item"><strong>{{ countdown.days }}</strong><small>d</small></span>
+      <span class="cd-sep">:</span>
+      <span class="cd-item"><strong>{{ countdown.hours }}</strong><small>h</small></span>
+      <span class="cd-sep">:</span>
+      <span class="cd-item"><strong>{{ countdown.minutes }}</strong><small>m</small></span>
+      <span class="cd-sep">:</span>
+      <span class="cd-item"><strong>{{ countdown.seconds }}</strong><small>s</small></span>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="navbar-links" [class.active]="isMenuOpen()">
+      <!-- Partículas animadas del sidebar -->
+      <div class="sidebar-particles">
+        @for (p of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]; track p) {
+          <span class="particle" [attr.data-i]="p"></span>
+        }
+      </div>
+      @if (isAuthenticated()) {
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Inicio</span>
+        </a>
+        <a routerLink="/mis-grupos" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-users"></i>
+          <span>Competencias</span>
+        </a>
+        <a routerLink="/predicciones" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-trophy"></i>
+          <span>Predicciones</span>
+        </a>
+        <a routerLink="/countries" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-flag"></i>
+          <span>Países</span>
+        </a>
+        <a routerLink="/fixtures" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Partidos</span>
+        </a>
+        <a routerLink="/groups" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-th-large"></i>
+          <span>Grupos</span>
+        </a>
+        <a routerLink="/stats" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-chart-bar"></i>
+          <span>Clasificación</span>
+        </a>
+        <a routerLink="/buscar-usuarios" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-search"></i>
+          <span>Buscar</span>
+        </a>
+        <a routerLink="/reglas" routerLinkActive="active" (click)="closeMenu()" class="nav-link">
+          <i class="fas fa-book"></i>
+          <span>Reglas</span>
+        </a>
+
+        <!-- User section inside mobile menu -->
+        <div class="mobile-user-section">
+          <a routerLink="/perfil" (click)="closeMenu()" class="nav-link user-link">
+            <i class="fas fa-user-circle"></i>
+            <span>{{ (user | async)?.nombre || 'Usuario' }}</span>
+          </a>
+          <button (click)="logout()" class="nav-link logout-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- User Menu / Auth (Desktop only, hidden on mobile) -->
+    <div class="navbar-actions desktop-only">
+      @if (isAuthenticated()) {
+        <div class="user-menu">
+          <a routerLink="/perfil" class="user-info">
+            <div class="user-avatar">
+              <app-avatar-icon [avatarId]="(user | async)?.urlAvatar" [nombre]="(user | async)?.nombre" [size]="32"></app-avatar-icon>
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ (user | async)?.nombre || 'Usuario' }}</span>
+              <span class="user-points">{{ (user | async)?.puntaje || 0 }} pts</span>
+            </div>
+          </a>
+          <button class="btn-logout" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Salir</span>
+          </button>
+        </div>
+      } @else {
+        <div class="auth-buttons">
+          <a routerLink="/register" [queryParams]="{mode: 'login'}" class="btn btn-outline">Iniciar Sesión</a>
+          <a routerLink="/register" class="btn btn-outline">Registrarse</a>
+        </div>
+      }
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu Overlay -->
+@if (isMenuOpen()) {
+  <div class="mobile-overlay" (click)="closeMenu()"></div>
+}

@@ -1,0 +1,176 @@
+<div class="perfil-publico-page">
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="center-state">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Cargando perfil...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="center-state error-state">
+      <mat-icon>person_off</mat-icon>
+      <h2>{{ error }}</h2>
+      <p>Este perfil es privado o no existe.</p>
+      <a routerLink="/buscar-usuarios" class="btn-back">
+        <mat-icon>arrow_back</mat-icon> Volver a buscar
+      </a>
+    </div>
+  }
+
+  <!-- Perfil -->
+  @if (!loading && perfil) {
+
+    <a routerLink="/buscar-usuarios" class="back-link">
+      <mat-icon>arrow_back</mat-icon> Volver a buscar
+    </a>
+
+    <!-- ── Cabecera ── -->
+    <div class="perfil-card">
+      <div class="perfil-avatar">
+        <app-avatar-icon [avatarId]="perfil.urlAvatar" [nombre]="perfil.nombre" [apellido]="perfil.apellido" [size]="80"></app-avatar-icon>
+      </div>
+      <div class="perfil-info">
+        <h1 class="perfil-nombre">{{ perfil.nombre }} {{ perfil.apellido }}</h1>
+        <p class="perfil-user">&#64;{{ perfil.user }}</p>
+        <div class="perfil-puntaje">
+          <mat-icon>military_tech</mat-icon>
+          <span class="puntaje-num">{{ perfil.puntaje }}</span>
+          <span class="puntaje-label">puntos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Mi Juego ── -->
+    @if (juego) {
+
+      <!-- Predicción -->
+      <section class="pub-section">
+        <h2 class="pub-section-title">
+          <mat-icon>emoji_events</mat-icon> Predicción
+        </h2>
+
+        @if (juego.prediccion) {
+          <div class="pred-pub-card">
+            <div class="pred-pub-row">
+              <span class="pred-pub-label">Campeón</span>
+              <span class="pred-pub-value">
+                <img class="flag-xs" [src]="getFlagUrl(juego.prediccion.paisCampeonCodigo)"
+                     [alt]="juego.prediccion.paisCampeonNombre" loading="lazy">
+                {{ juego.prediccion.paisCampeonNombre }}
+              </span>
+            </div>
+            <div class="pred-pub-row">
+              <span class="pred-pub-label">Goleador</span>
+              <span class="pred-pub-value">
+                @if (juego.prediccion.jugadorGoleadorUrlFoto) {
+                  <img class="player-xs"
+                       [src]="proxyFoto(juego.prediccion.jugadorGoleadorUrlFoto) ?? ''"
+                       alt="" loading="lazy">
+                }
+                <img class="flag-xs"
+                     [src]="getFlagUrl(juego.prediccion.jugadorGoleadorPaisCodigo)"
+                     alt="" loading="lazy">
+                {{ juego.prediccion.jugadorGoleadorNombre }}
+              </span>
+            </div>
+            @if (juego.prediccion.confirmada) {
+              <span class="confirmed-badge">✓ Confirmada</span>
+            }
+          </div>
+        } @else {
+          <p class="pub-empty">Sin predicción todavía.</p>
+        }
+      </section>
+
+      <!-- Favoritos + Convocados -->
+      <section class="pub-section">
+        <h2 class="pub-section-title">
+          <mat-icon>star</mat-icon> Equipos Favoritos
+        </h2>
+
+        @if (juego.favoritos.length === 0 && extraConvocatoriaPaisIds.length === 0) {
+          <p class="pub-empty">Sin equipos favoritos.</p>
+        } @else {
+          <div class="favoritos-juego-list">
+            @for (fav of juego.favoritos; track fav.paisId) {
+              <div class="fav-juego-item">
+                <div class="fav-juego-header">
+                  <img class="fav-flag-img" [src]="getFlagUrl(fav.paisCodigo)"
+                       [alt]="fav.paisNombre" loading="lazy">
+                  <span class="fav-nombre">{{ fav.paisNombre }}</span>
+                  <span class="fav-conv-badge">
+                    {{ getConvocados(fav.paisId).length }}/26
+                  </span>
+                  @if (getConvocados(fav.paisId).length > 0) {
+                    <button class="btn-ver-convocados"
+                            [class.open]="convocadosExpandidos.has(fav.paisId)"
+                            (click)="toggleConvocados(fav.paisId)">
+                      {{ convocadosExpandidos.has(fav.paisId) ? '▲ Ocultar' : '▼ Ver convocados' }}
+                    </button>
+                  }
+                </div>
+
+                @if (convocadosExpandidos.has(fav.paisId)) {
+                  <div class="convocados-lista">
+                    <div class="convocados-grid">
+                      @for (j of getConvocados(fav.paisId); track j.id) {
+                        <div class="conv-row">
+                          <span class="conv-num">{{ j.numeroCamiseta ?? '–' }}</span>
+                          <span class="conv-pos" [attr.data-pos]="j.posicionAbr">{{ j.posicionAbr }}</span>
+                          <span class="conv-nombre">{{ j.nombre }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Convocatorias de países no favoritos -->
+            @for (paisId of extraConvocatoriaPaisIds; track paisId) {
+              @if (getConvocatoria(paisId); as conv) {
+                <div class="fav-juego-item">
+                  <div class="fav-juego-header">
+                    <img class="fav-flag-img" [src]="getFlagUrl(conv.paisCodigo)"
+                         [alt]="conv.paisNombre" loading="lazy">
+                    <span class="fav-nombre">{{ conv.paisNombre }}</span>
+                    <span class="fav-conv-badge">
+                      {{ conv.jugadores.length }}/26
+                    </span>
+                    <button class="btn-ver-convocados"
+                            [class.open]="convocadosExpandidos.has(paisId)"
+                            (click)="toggleConvocados(paisId)">
+                      {{ convocadosExpandidos.has(paisId) ? '▲ Ocultar' : '▼ Ver convocados' }}
+                    </button>
+                  </div>
+
+                  @if (convocadosExpandidos.has(paisId)) {
+                    <div class="convocados-lista">
+                      <div class="convocados-grid">
+                        @for (j of conv.jugadores; track j.id) {
+                          <div class="conv-row">
+                            <span class="conv-num">{{ j.numeroCamiseta ?? '–' }}</span>
+                            <span class="conv-pos" [attr.data-pos]="j.posicionAbr">{{ j.posicionAbr }}</span>
+                            <span class="conv-nombre">{{ j.nombre }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        }
+      </section>
+
+    } @else {
+      <p class="pub-empty pub-empty-juego">No hay datos de juego disponibles.</p>
+    }
+
+  }
+
+</div>
