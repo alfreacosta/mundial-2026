@@ -180,14 +180,14 @@
           <div class="miembro-predicciones">
             <div class="prediccion-item">
               <span class="pred-label">Campeón</span>
-              <div class="pred-valor">
+              <div class="pred-valor" *ngIf="row.paisCampeonCodigo; else sinPredMobile">
                 <span class="fi" [class]="'fi-' + (row.paisCampeonCodigo | fifaToFlag)"></span>
                 {{ row.paisCampeonNombre }}
               </div>
             </div>
             <div class="prediccion-item">
               <span class="pred-label">Goleador</span>
-              <div class="pred-valor">
+              <div class="pred-valor" *ngIf="row.goleadorApellido; else sinPredMobile">
                 <img *ngIf="row.goleadorFoto" [src]="row.goleadorFoto" class="jugador-mini-foto" [alt]="row.goleadorApellido">
                 <mat-icon *ngIf="!row.goleadorFoto" class="jugador-icon">person</mat-icon>
                 {{ row.goleadorApellido }}, {{ row.goleadorNombre }}
@@ -233,6 +233,9 @@
     </ng-template>
     <ng-template #sinPrediccion>
       <span class="sin-pred-cell">—</span>
+    </ng-template>
+    <ng-template #sinPredMobile>
+      <div class="pred-valor"><span class="sin-pred-cell">Sin definir</span></div>
     </ng-template>
     <ng-template #sinFavTd>
       <span class="sin-pred-cell">—</span>

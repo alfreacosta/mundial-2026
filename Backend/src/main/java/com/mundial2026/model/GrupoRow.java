@@ -43,14 +43,14 @@ public class GrupoRow {
     @Builder.Default
     private String rol = "MIEMBRO";
 
-    /** Predicción obligatoria: país campeón del torneo */
+    /** Predicción opcional: país campeón del torneo (se completa si el usuario ya la configuró) */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pais_campeon_id", nullable = false)
+    @JoinColumn(name = "pais_campeon_id")
     private Pais paisCampeon;
 
-    /** Predicción obligatoria: goleador del torneo */
+    /** Predicción opcional: goleador del torneo (se completa si el usuario ya la configuró) */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goleador_id", nullable = false)
+    @JoinColumn(name = "goleador_id")
     private Jugador goleador;
 
     @Column(name = "fecha_union", nullable = false)

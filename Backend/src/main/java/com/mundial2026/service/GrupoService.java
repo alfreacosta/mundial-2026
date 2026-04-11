@@ -82,24 +82,22 @@ public class GrupoService {
             throw new IllegalStateException("Ya eres miembro de este grupo");
         }
 
-        // Usar la predicción de torneo que el usuario ya configuró en su perfil
-        PrediccionTorneo prediccion = prediccionTorneoRepository.findByUsuarioId(usuario.getInternalId())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Debes configurar tu predicción de campeón y goleador antes de unirte a un grupo"));
-
-        Pais campeon = prediccion.getPaisCampeon();
-        Jugador goleador = prediccion.getJugadorGoleador();
-
-        // Determinar rol: si el usuario es el creador del grupo → CREADOR, si no → MIEMBRO
+        // Determinar rol
         String rol = grupo.getCreador().getInternalId().equals(usuario.getInternalId()) ? "CREADOR" : "MIEMBRO";
 
-        GrupoRow row = GrupoRow.builder()
+        // Si el usuario ya configuró campeón/goleador, se asignan; si no, quedan null
+        GrupoRow.GrupoRowBuilder rowBuilder = GrupoRow.builder()
                 .grupo(grupo)
                 .usuario(usuario)
-                .rol(rol)
-                .paisCampeon(campeon)
-                .goleador(goleador)
-                .build();
+                .rol(rol);
+
+        prediccionTorneoRepository.findByUsuarioId(usuario.getInternalId())
+                .ifPresent(pred -> {
+                    rowBuilder.paisCampeon(pred.getPaisCampeon());
+                    rowBuilder.goleador(pred.getJugadorGoleador());
+                });
+
+        GrupoRow row = rowBuilder.build();
 
         grupoRowRepository.save(row);
 
@@ -237,6 +235,9 @@ public class GrupoService {
     }
 
     private GrupoRowDTO toGrupoRowDTO(GrupoRow r, List<EquipoFavorito> favs) {
+        Pais campeon = r.getPaisCampeon();
+        Jugador goleador = r.getGoleador();
+
         return GrupoRowDTO.builder()
                 .internalId(r.getInternalId())
                 .grupoId(r.getGrupo().getInternalId())
@@ -245,13 +246,13 @@ public class GrupoService {
                 .usuarioApellido(r.getUsuario().getApellido())
                 .urlAvatar(r.getUsuario().getUrlAvatar())
                 .rol(r.getRol())
-                .paisCampeonId(r.getPaisCampeon().getInternalId())
-                .paisCampeonNombre(r.getPaisCampeon().getNombre())
-                .paisCampeonCodigo(r.getPaisCampeon().getCodigo())
-                .goleadorId(r.getGoleador().getInternalId())
-                .goleadorNombre(r.getGoleador().getNombre())
-                .goleadorApellido(r.getGoleador().getApellido())
-                .goleadorFoto(r.getGoleador().getUrlFoto())
+                .paisCampeonId(campeon != null ? campeon.getInternalId() : null)
+                .paisCampeonNombre(campeon != null ? campeon.getNombre() : null)
+                .paisCampeonCodigo(campeon != null ? campeon.getCodigo() : null)
+                .goleadorId(goleador != null ? goleador.getInternalId() : null)
+                .goleadorNombre(goleador != null ? goleador.getNombre() : null)
+                .goleadorApellido(goleador != null ? goleador.getApellido() : null)
+                .goleadorFoto(goleador != null ? goleador.getUrlFoto() : null)
                 .fechaUnion(r.getFechaUnion())
                 .equiposFavoritos(favs.stream().map(this::toEquipoFavoritoDTO).collect(Collectors.toList()))
                 .puntaje(r.getUsuario().getPuntaje())

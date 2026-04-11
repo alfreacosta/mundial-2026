@@ -372,8 +372,8 @@ CREATE TABLE grupo_row (
     master_id       BIGINT          NOT NULL REFERENCES grupo(internal_id) ON DELETE CASCADE,
     usuario_id      BIGINT          NOT NULL REFERENCES usuario(internal_id) ON DELETE RESTRICT,
     rol             VARCHAR(20)     NOT NULL DEFAULT 'MIEMBRO',
-    pais_campeon_id BIGINT          NOT NULL REFERENCES pais(internal_id) ON DELETE RESTRICT,
-    goleador_id     BIGINT          NOT NULL REFERENCES jugador(internal_id) ON DELETE RESTRICT,
+    pais_campeon_id BIGINT          REFERENCES pais(internal_id) ON DELETE RESTRICT,
+    goleador_id     BIGINT          REFERENCES jugador(internal_id) ON DELETE RESTRICT,
     fecha_union     TIMESTAMP       NOT NULL DEFAULT NOW(),
 
     CONSTRAINT uq_grupo_row_usuario UNIQUE (master_id, usuario_id),
