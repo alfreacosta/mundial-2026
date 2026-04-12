@@ -57,11 +57,7 @@
           <a class="btn-icon" [href]="getWhatsAppLink(grupo)" target="_blank" title="Invitar por WhatsApp">
             <mat-icon>share</mat-icon>
           </a>
-          <button *ngIf="esCreador(grupo)" class="btn-icon btn-icon-danger"
-                  (click)="eliminarGrupo(grupo.internalId)" title="Eliminar grupo">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button *ngIf="!esCreador(grupo)" class="btn-icon btn-icon-danger"
+          <button class="btn-icon btn-icon-danger"
                   (click)="salirDeGrupo(grupo.internalId)" title="Salir del grupo">
             <mat-icon>logout</mat-icon>
           </button>

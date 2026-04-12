@@ -53,10 +53,6 @@ export class MisGruposComponent implements OnInit {
     }
   }
 
-  esCreador(grupo: Grupo): boolean {
-    return grupo.creadorId === this.currentUserId;
-  }
-
   salirDeGrupo(id: number): void {
     if (!confirm('¿Querés salir de este grupo?')) return;
     this.grupoService.salirDeGrupo(id).subscribe({
@@ -88,16 +84,6 @@ export class MisGruposComponent implements OnInit {
   onGrupoUnido(_row: GrupoRow): void {
     this.showUnirseModal = false;
     this.cargarGrupos();
-  }
-
-  eliminarGrupo(id: number): void {
-    if (!confirm('¿Estás seguro de que querés eliminar este grupo?')) return;
-    this.grupoService.eliminarGrupo(id).subscribe({
-      next: () => {
-        this.grupos = this.grupos.filter(g => g.internalId !== id);
-      },
-      error: () => alert('No se pudo eliminar el grupo')
-    });
   }
 
   getWhatsAppLink(grupo: Grupo): string {

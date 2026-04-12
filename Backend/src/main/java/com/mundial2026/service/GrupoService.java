@@ -185,10 +185,6 @@ public class GrupoService {
         GrupoRow row = grupoRowRepository.findByGrupo_InternalIdAndUsuario_InternalId(grupoId, usuario.getInternalId())
                 .orElseThrow(() -> new RuntimeException("No eres miembro de este grupo"));
 
-        if ("CREADOR".equals(row.getRol())) {
-            throw new IllegalStateException("El creador no puede salir del grupo. Podés eliminarlo.");
-        }
-
         grupoRowRepository.delete(row);
     }
 
@@ -205,6 +201,13 @@ public class GrupoService {
             throw new SecurityException("Solo el creador puede eliminar el grupo");
         }
 
+        long miembros = grupoRowRepository.countByGrupo_InternalIdAndRolNot(grupoId, "CREADOR");
+        if (miembros > 0) {
+            throw new IllegalStateException(
+                    "No se puede eliminar el grupo porque tiene " + miembros + " miembro(s). Primero deben salir todos.");
+        }
+
+        grupoRowRepository.deleteByGrupo_InternalId(grupoId);
         grupoRepository.delete(grupo);
     }
 

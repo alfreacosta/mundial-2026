@@ -35,4 +35,8 @@ public interface GrupoRowRepository extends JpaRepository<GrupoRow, Long> {
         ORDER BY gr.rol DESC, gr.fechaUnion ASC
         """)
     List<GrupoRow> findMiembrosDelGrupo(@Param("grupoId") Long grupoId);
+
+    long countByGrupo_InternalIdAndRolNot(Long grupoId, String rol);
+
+    void deleteByGrupo_InternalId(Long grupoId);
 }

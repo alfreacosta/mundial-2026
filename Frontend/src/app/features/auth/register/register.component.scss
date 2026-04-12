@@ -152,12 +152,16 @@ $border:    rgba(255,255,255,0.1);
 .hero-section {
   position: relative;
   z-index: 1;
-  min-height: 100vh;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px 60px;
+  padding: 80px 24px 32px;
   text-align: center;
+
+  @media (max-width: 700px) {
+    padding: 70px 16px 20px;
+  }
 }
 
 .hero-container {
@@ -171,87 +175,87 @@ $border:    rgba(255,255,255,0.1);
   background: linear-gradient(135deg, rgba($gold, 0.15), rgba($gold, 0.05));
   border: 1px solid rgba($gold, 0.25);
   border-radius: 24px;
-  padding: 6px 20px;
-  font-size: 0.85rem;
+  padding: 5px 16px;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 2px;
   color: $gold;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 
   .badge-icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
   }
 }
 
 .hero-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-size: clamp(2rem, 5vw, 3.5rem);
   color: $white;
-  line-height: 1.15;
-  margin-bottom: 24px;
+  line-height: 1.1;
+  margin-bottom: 12px;
   letter-spacing: 1px;
 }
 
 .hero-subtitle {
   color: $white55;
-  font-size: 1.08rem;
-  line-height: 1.75;
-  margin-bottom: 40px;
-  max-width: 560px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  max-width: 520px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .hero-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 }
 
 .hero-cta {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: linear-gradient(135deg, $cyan, $red-dark);
   color: #0a0e17;
   border: none;
-  border-radius: 14px;
-  padding: 14px 32px;
-  font-size: 1rem;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   @include transition-smooth;
 
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba($cyan, 0.35); }
 
   &.small {
-    padding: 12px 24px;
-    font-size: 0.95rem;
-    border-radius: 12px;
+    padding: 9px 20px;
+    font-size: 0.85rem;
+    border-radius: 10px;
   }
 }
 
 .hero-cta-secondary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: transparent;
   color: $white85;
   border: 1px solid $white25;
-  border-radius: 14px;
-  padding: 14px 28px;
-  font-size: 1rem;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   @include transition-smooth;
 
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { background: $white10; border-color: $white50; }
 }
