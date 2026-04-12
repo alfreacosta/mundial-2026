@@ -724,4 +724,85 @@ $ease:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
   color: $red;
 }
 
+// ── Búsqueda jugadores mejorada ──
+.btn-limpiar {
+  margin-left: auto;
+  background: rgba($red, 0.15);
+  border: 1px solid rgba($red, 0.25);
+  color: $red;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover { background: rgba($red, 0.3); }
+}
+
+.sin-definir {
+  color: v.$gray-400;
+  font-style: italic;
+}
+
+.search-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  color: v.$gray-400;
+  font-size: 0.8rem;
+}
+
+.no-results {
+  padding: 8px 10px;
+  color: v.$gray-400;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.jugadores-list {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: v.$radius-sm;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.jugador-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba($cyan, 0.06); }
+  &.selected { background: rgba($cyan, 0.12); border-left: 3px solid $cyan; }
+
+  .jugador-nombre {
+    font-size: 0.82rem;
+    color: v.$white;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    .fi { font-size: 0.9rem; }
+  }
+
+  .jugador-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+}
+
 

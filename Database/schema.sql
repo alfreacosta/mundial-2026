@@ -297,8 +297,8 @@ CREATE INDEX idx_prediccion_aprobada ON prediccion(aprobada);
 CREATE TABLE prediccion_torneo (
     internal_id           BIGSERIAL      PRIMARY KEY,
     usuario_id            BIGINT         NOT NULL REFERENCES usuario(internal_id),
-    pais_campeon_id       BIGINT         NOT NULL REFERENCES pais(internal_id),
-    jugador_goleador_id   BIGINT         NOT NULL REFERENCES jugador(internal_id),
+    pais_campeon_id       BIGINT         REFERENCES pais(internal_id),
+    jugador_goleador_id   BIGINT         REFERENCES jugador(internal_id),
     trans_date            TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion   TIMESTAMP,
     end_date              TIMESTAMP,

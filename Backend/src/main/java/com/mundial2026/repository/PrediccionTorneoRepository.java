@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface PrediccionTorneoRepository extends JpaRepository<PrediccionTorneo, Long> {
 
     @Query("SELECT pt FROM PrediccionTorneo pt " +
-           "JOIN FETCH pt.paisCampeon " +
-           "JOIN FETCH pt.jugadorGoleador " +
+           "LEFT JOIN FETCH pt.paisCampeon " +
+           "LEFT JOIN FETCH pt.jugadorGoleador " +
            "WHERE pt.usuario.internalId = :usuarioId")
     Optional<PrediccionTorneo> findByUsuarioId(@Param("usuarioId") Long usuarioId);
 

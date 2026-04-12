@@ -35,8 +35,12 @@
             <div class="pred-info">
               <span class="pred-label">Campeón</span>
               <div class="pred-value">
-                <span class="fi fi-{{ prediccion.paisCampeonCodigo | fifaToFlag }}"></span>
-                {{ prediccion.paisCampeonNombre }}
+                @if (prediccion.paisCampeonCodigo) {
+                  <span class="fi fi-{{ prediccion.paisCampeonCodigo | fifaToFlag }}"></span>
+                  {{ prediccion.paisCampeonNombre }}
+                } @else {
+                  <span class="sin-definir">Sin definir</span>
+                }
               </div>
             </div>
           </div>
@@ -47,10 +51,14 @@
             <div class="pred-info">
               <span class="pred-label">Goleador</span>
               <div class="pred-value">
-                @if (prediccion.jugadorGoleadorPaisCodigo) {
-                  <span class="fi fi-{{ prediccion.jugadorGoleadorPaisCodigo | fifaToFlag }}"></span>
+                @if (prediccion.jugadorGoleadorNombre) {
+                  @if (prediccion.jugadorGoleadorPaisCodigo) {
+                    <span class="fi fi-{{ prediccion.jugadorGoleadorPaisCodigo | fifaToFlag }}"></span>
+                  }
+                  {{ prediccion.jugadorGoleadorNombre }}
+                } @else {
+                  <span class="sin-definir">Sin definir</span>
                 }
-                {{ prediccion.jugadorGoleadorNombre }}
               </div>
             </div>
           </div>
@@ -75,7 +83,7 @@
             <i class="fas fa-trophy gold-icon"></i> ¿Quién será el campeón?
           </label>
           <select id="paisCampeon" [(ngModel)]="paisCampeonId" class="select-field">
-            <option [ngValue]="null" disabled>Seleccioná un país...</option>
+            <option [ngValue]="null">— Sin seleccionar —</option>
             @for (pais of paises; track pais.internalId) {
               <option [ngValue]="pais.internalId">
                 {{ pais.nombre }} ({{ pais.codigo }})
@@ -87,6 +95,9 @@
               <span class="fi fi-{{ paisSeleccionado.codigo | fifaToFlag }}"></span>
               <strong>{{ paisSeleccionado.nombre }}</strong>
               <span class="conf-tag">{{ paisSeleccionado.confederacion?.abreviatura }}</span>
+              <button class="btn-limpiar" (click)="limpiarCampeon()" title="Quitar selección">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
           }
         </div>
@@ -96,30 +107,59 @@
           <label for="busquedaJugador">
             <i class="fas fa-futbol gold-icon"></i> ¿Quién será el goleador?
           </label>
+          @if (jugadorSeleccionadoCache) {
+            <div class="seleccion-preview">
+              @if (jugadorSeleccionadoCache.paisCodigo) {
+                <span class="fi fi-{{ jugadorSeleccionadoCache.paisCodigo | fifaToFlag }}"></span>
+              }
+              <strong>{{ jugadorSeleccionadoCache.nombreCompleto }}</strong>
+              @if (jugadorSeleccionadoCache.posicionCodigo) {
+                <span class="pos-tag">{{ jugadorSeleccionadoCache.posicionCodigo }}</span>
+              }
+              @if (jugadorSeleccionadoCache.clubNombre) {
+                <span class="club-tag">{{ jugadorSeleccionadoCache.clubNombre }}</span>
+              }
+              <button class="btn-limpiar" (click)="limpiarJugador()" title="Quitar selección">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          }
           <input
             id="busquedaJugador"
             type="text"
             [(ngModel)]="busquedaJugador"
-            (ngModelChange)="filtrarJugadores()"
-            placeholder="Buscá por nombre o país..."
+            (ngModelChange)="onBusquedaChange()"
+            placeholder="Escribí al menos 3 letras (ej: ceci domi)..."
             class="search-field"
           >
-          <select id="jugadorGoleador" [(ngModel)]="jugadorGoleadorId" class="select-field" size="8">
-            @for (j of jugadoresFiltrados; track j.internalId) {
-              <option [ngValue]="j.internalId">
-                {{ j.apellido }}, {{ j.nombre }} — {{ j.pais.nombre }} ({{ j.posicion.codigo }})
-              </option>
-            }
-          </select>
-          @if (jugadorSeleccionado) {
-            <div class="seleccion-preview">
-              <span class="fi fi-{{ jugadorSeleccionado.pais.codigo | fifaToFlag }}"></span>
-              <strong>{{ jugadorSeleccionado.nombreCompleto }}</strong>
-              <span class="pos-tag">{{ jugadorSeleccionado.posicion.codigo }}</span>
-              @if (jugadorSeleccionado.club) {
-                <span class="club-tag">{{ jugadorSeleccionado.club.nombre }}</span>
+          @if (buscandoJugadores) {
+            <div class="search-loading">
+              <i class="fas fa-spinner fa-spin"></i> Buscando...
+            </div>
+          }
+          @if (jugadoresFiltrados.length > 0) {
+            <div class="jugadores-list">
+              @for (j of jugadoresFiltrados; track j.internalId) {
+                <div class="jugador-item"
+                     [class.selected]="j.internalId === jugadorGoleadorId"
+                     (click)="seleccionarJugador(j)">
+                  <span class="jugador-nombre">
+                    @if (j.paisCodigo) {
+                      <span class="fi fi-{{ j.paisCodigo | fifaToFlag }}"></span>
+                    }
+                    {{ j.apellido }}, {{ j.nombre }}
+                  </span>
+                  <span class="jugador-info">
+                    <span class="pos-tag">{{ j.posicionCodigo }}</span>
+                    @if (j.clubNombre) {
+                      <span class="club-tag">{{ j.clubNombre }}</span>
+                    }
+                  </span>
+                </div>
               }
             </div>
+          } @else if (busquedaJugador.trim().length >= 3 && !buscandoJugadores) {
+            <div class="no-results">No se encontraron jugadores</div>
           }
         </div>
 
@@ -134,7 +174,7 @@
         <!-- Botón Guardar -->
         <button
           class="btn-primary"
-          [disabled]="!formularioValido || saving"
+          [disabled]="saving"
           (click)="guardar()">
           @if (saving) {
             <i class="fas fa-spinner fa-spin"></i> Guardando...

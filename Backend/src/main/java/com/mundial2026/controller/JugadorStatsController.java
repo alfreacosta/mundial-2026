@@ -1,6 +1,7 @@
 package com.mundial2026.controller;
 
 import com.mundial2026.model.Jugador;
+import com.mundial2026.dto.JugadorBusquedaDTO;
 import com.mundial2026.repository.JugadorRepository;
 import com.mundial2026.config.ApiFootballConfig;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Endpoint de estadísticas de jugador con cache-aside en BD.
@@ -121,5 +124,46 @@ public class JugadorStatsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error al obtener estadísticas"));
         }
+    }
+
+    /**
+     * Búsqueda de jugadores por nombre (palabras separadas, con unaccent).
+     * GET /api/jugadores/buscar?q=ceci domi&limit=50
+     */
+    @GetMapping("/buscar")
+    public ResponseEntity<List<JugadorBusquedaDTO>> buscar(
+            @RequestParam("q") String q,
+            @RequestParam(value = "limit", defaultValue = "50") int limit) {
+
+        if (q == null || q.trim().length() < 3) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // Limitar a un máximo de 100
+        int lim = Math.min(Math.max(limit, 1), 100);
+
+        // Separar en palabras y armar los patrones %word%
+        String[] words = q.trim().toLowerCase().split("\\s+");
+        String word1 = words.length >= 1 ? "%" + words[0] + "%" : null;
+        String word2 = words.length >= 2 ? "%" + words[1] + "%" : null;
+        String word3 = words.length >= 3 ? "%" + words[2] + "%" : null;
+
+        List<Object[]> rows = jugadorRepository.buscarPorPalabras(word1, word2, word3, lim);
+
+        List<JugadorBusquedaDTO> result = rows.stream().map(r ->
+            JugadorBusquedaDTO.builder()
+                .internalId(((Number) r[0]).longValue())
+                .nombre((String) r[1])
+                .apellido((String) r[2])
+                .nombreCompleto((String) r[3])
+                .urlFoto((String) r[4])
+                .posicionCodigo((String) r[5])
+                .paisNombre((String) r[6])
+                .paisCodigo((String) r[7])
+                .clubNombre((String) r[8])
+                .build()
+        ).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 }

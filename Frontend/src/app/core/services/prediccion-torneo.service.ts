@@ -8,12 +8,12 @@ import { SKIP_AUTH_REDIRECT } from '../interceptors/auth.interceptor';
 
 export interface PrediccionTorneo {
   internalId: number;
-  paisCampeonId: number;
-  paisCampeonNombre: string;
-  paisCampeonCodigo: string;
-  jugadorGoleadorId: number;
-  jugadorGoleadorNombre: string;
-  jugadorGoleadorPaisCodigo: string;
+  paisCampeonId: number | null;
+  paisCampeonNombre: string | null;
+  paisCampeonCodigo: string | null;
+  jugadorGoleadorId: number | null;
+  jugadorGoleadorNombre: string | null;
+  jugadorGoleadorPaisCodigo: string | null;
   jugadorGoleadorUrlFoto: string | null;
   confirmada: boolean;
   transDate: string;
@@ -21,8 +21,8 @@ export interface PrediccionTorneo {
 }
 
 export interface GuardarPrediccionRequest {
-  paisCampeonId: number;
-  jugadorGoleadorId: number;
+  paisCampeonId: number | null;
+  jugadorGoleadorId: number | null;
 }
 
 @Injectable({ providedIn: 'root' })

@@ -330,6 +330,92 @@ $ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 .pos-tag { background: rgba($accent, 0.15); color: $accent; }
 .club-tag { background: rgba(255, 255, 255, 0.08); color: $text-muted; }
 
+// ── BOTÓN LIMPIAR ──
+.btn-limpiar {
+  margin-left: auto;
+  background: rgba($red, 0.15);
+  border: 1px solid rgba($red, 0.25);
+  color: $red;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: $ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba($red, 0.3);
+  }
+}
+
+// ── SIN DEFINIR ──
+.sin-definir {
+  color: $text-muted;
+  font-style: italic;
+}
+
+// ── BÚSQUEDA LOADING ──
+.search-loading {
+  padding: 8px 14px;
+  color: $text-muted;
+  font-size: 0.85rem;
+
+  i { margin-right: 6px; }
+}
+
+.no-results {
+  padding: 12px 14px;
+  color: $text-muted;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+// ── LISTA DE JUGADORES ──
+.jugadores-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid $border;
+  border-radius: 10px;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.jugador-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: $ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba($accent, 0.08); }
+  &.selected { background: rgba($accent, 0.15); border-left: 3px solid $accent; }
+
+  .jugador-nombre {
+    font-size: 0.9rem;
+    color: $text;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .fi { font-size: 1.1rem; }
+  }
+
+  .jugador-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+}
+
 // ── MENSAJES ──
 .msg {
   padding: 12px 16px;

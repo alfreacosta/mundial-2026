@@ -39,11 +39,15 @@ public class PrediccionTorneoService {
     public PrediccionTorneoDTO guardar(String username, GuardarPrediccionTorneoRequest req) {
         Usuario usuario = findUsuario(username);
 
-        Pais paisCampeon = paisRepository.findById(req.getPaisCampeonId())
-                .orElseThrow(() -> new RuntimeException("País no encontrado: " + req.getPaisCampeonId()));
+        Pais paisCampeon = req.getPaisCampeonId() != null
+                ? paisRepository.findById(req.getPaisCampeonId())
+                    .orElseThrow(() -> new RuntimeException("País no encontrado: " + req.getPaisCampeonId()))
+                : null;
 
-        Jugador goleador = jugadorRepository.findById(req.getJugadorGoleadorId())
-                .orElseThrow(() -> new RuntimeException("Jugador no encontrado: " + req.getJugadorGoleadorId()));
+        Jugador goleador = req.getJugadorGoleadorId() != null
+                ? jugadorRepository.findById(req.getJugadorGoleadorId())
+                    .orElseThrow(() -> new RuntimeException("Jugador no encontrado: " + req.getJugadorGoleadorId()))
+                : null;
 
         PrediccionTorneo prediccion = prediccionTorneoRepository
                 .findByUsuarioId(usuario.getInternalId())
@@ -82,18 +86,25 @@ public class PrediccionTorneoService {
         Pais pais = pt.getPaisCampeon();
         Jugador jugador = pt.getJugadorGoleador();
 
-        return PrediccionTorneoDTO.builder()
+        PrediccionTorneoDTO.PrediccionTorneoDTOBuilder builder = PrediccionTorneoDTO.builder()
                 .internalId(pt.getInternalId())
-                .paisCampeonId(pais.getInternalId())
-                .paisCampeonNombre(pais.getNombre())
-                .paisCampeonCodigo(pais.getCodigo())
-                .jugadorGoleadorId(jugador.getInternalId())
-                .jugadorGoleadorNombre(jugador.getNombre() + " " + jugador.getApellido())
-                .jugadorGoleadorPaisCodigo(jugador.getPais() != null ? jugador.getPais().getCodigo() : null)
-                .jugadorGoleadorUrlFoto(jugador.getUrlFoto())
                 .confirmada(pt.getConfirmada())
                 .transDate(pt.getTransDate())
-                .fechaActualizacion(pt.getFechaActualizacion())
-                .build();
+                .fechaActualizacion(pt.getFechaActualizacion());
+
+        if (pais != null) {
+            builder.paisCampeonId(pais.getInternalId())
+                   .paisCampeonNombre(pais.getNombre())
+                   .paisCampeonCodigo(pais.getCodigo());
+        }
+
+        if (jugador != null) {
+            builder.jugadorGoleadorId(jugador.getInternalId())
+                   .jugadorGoleadorNombre(jugador.getNombre() + " " + jugador.getApellido())
+                   .jugadorGoleadorPaisCodigo(jugador.getPais() != null ? jugador.getPais().getCodigo() : null)
+                   .jugadorGoleadorUrlFoto(jugador.getUrlFoto());
+        }
+
+        return builder.build();
     }
 }

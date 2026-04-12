@@ -5,6 +5,18 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CountriesService } from './countries.service';
 
+export interface JugadorBusqueda {
+  internalId: number;
+  nombre: string;
+  apellido: string;
+  nombreCompleto: string;
+  posicionCodigo: string;
+  paisNombre: string;
+  paisCodigo: string;
+  clubNombre: string | null;
+  urlFoto: string | null;
+}
+
 export interface Jugador {
   internalId: number;
   nombre: string;
@@ -74,5 +86,12 @@ export class PlayersService {
     return this.http
       .post<{ data: { jugadoresPorPosicion: Jugador[] } }>(this.gql, { query, variables: { codigo } })
       .pipe(map(r => this.proxyJugadores(r.data?.jugadoresPorPosicion ?? [])));
+  }
+
+  buscarJugadores(q: string, limit = 50): Observable<JugadorBusqueda[]> {
+    return this.http.get<JugadorBusqueda[]>(
+      `${environment.apiUrl}/jugadores/buscar`,
+      { params: { q, limit: limit.toString() } }
+    );
   }
 }

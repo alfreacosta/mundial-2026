@@ -3,7 +3,6 @@ package com.mundial2026.controller;
 import com.mundial2026.dto.prediccion.GuardarPrediccionTorneoRequest;
 import com.mundial2026.dto.prediccion.PrediccionTorneoDTO;
 import com.mundial2026.service.PrediccionTorneoService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +32,7 @@ public class PrediccionTorneoController {
     @PostMapping
     public ResponseEntity<PrediccionTorneoDTO> guardar(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody GuardarPrediccionTorneoRequest req) {
+            @RequestBody GuardarPrediccionTorneoRequest req) {
         PrediccionTorneoDTO dto = prediccionTorneoService.guardar(userDetails.getUsername(), req);
         return ResponseEntity.ok(dto);
     }

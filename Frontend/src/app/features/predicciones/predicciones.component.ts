@@ -1,12 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { normalize } from '../../shared/utils/normalize';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin, of, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 
 import {
   PrediccionPartidoService,
@@ -14,7 +13,7 @@ import {
 } from '../../core/services/prediccion-partido.service';
 import { FixturesService, Fixture } from '../../core/services/fixtures.service';
 import { CountriesService, Pais } from '../../core/services/countries.service';
-import { PlayersService, Jugador } from '../../core/services/players.service';
+import { PlayersService, JugadorBusqueda } from '../../core/services/players.service';
 import {
   PrediccionTorneoService,
   PrediccionTorneo
@@ -41,7 +40,7 @@ interface PartidoConPrediccion {
   styleUrls: ['./predicciones.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PrediccionesComponent implements OnInit {
+export class PrediccionesComponent implements OnInit, OnDestroy {
 
   getFlagUrl = getFlagUrl;
 
@@ -62,16 +61,20 @@ export class PrediccionesComponent implements OnInit {
 
   // ── Torneo ─────────────────────────────────────────────────────────────────
   paises: Pais[] = [];
-  jugadores: Jugador[] = [];
-  jugadoresFiltrados: Jugador[] = [];
+  jugadoresFiltrados: JugadorBusqueda[] = [];
   prediccionTorneo: PrediccionTorneo | null = null;
   paisCampeonId: number | null = null;
   jugadorGoleadorId: number | null = null;
   busquedaJugador = '';
+  buscandoJugadores = false;
+  jugadorSeleccionadoCache: JugadorBusqueda | null = null;
   savingTorneo  = false;
   msgTorneo     = '';
   errorTorneo   = '';
   mostrarFormTorneo = false;
+
+  private searchSubject = new Subject<string>();
+  private searchSub!: Subscription;
 
   constructor(
     private prediccionPartidoService: PrediccionPartidoService,
@@ -85,6 +88,25 @@ export class PrediccionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Debounce para búsqueda de jugadores
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(800),
+      distinctUntilChanged(),
+      tap(() => { this.buscandoJugadores = true; this.cd.markForCheck(); }),
+      switchMap(term => this.playersService.buscarJugadores(term))
+    ).subscribe({
+      next: (jugadores) => {
+        this.jugadoresFiltrados = jugadores;
+        this.buscandoJugadores = false;
+        this.cd.markForCheck();
+      },
+      error: () => {
+        this.jugadoresFiltrados = [];
+        this.buscandoJugadores = false;
+        this.cd.markForCheck();
+      }
+    });
+
     // Partidos
     forkJoin({
       partidos:     this.fixturesService.getAllFixtures(),
@@ -106,20 +128,29 @@ export class PrediccionesComponent implements OnInit {
     // Torneo
     forkJoin({
       paises:    this.countriesService.getPaises(),
-      jugadores: this.playersService.getJugadores(),
       prediccion: this.prediccionTorneoService.getMiPrediccion().pipe(catchError(() => of(null)))
     }).subscribe({
-      next: ({ paises, jugadores, prediccion }) => {
+      next: ({ paises, prediccion }) => {
         this.paises = paises
           .filter(p => p.activo)
           .sort((a, b) => a.nombre.localeCompare(b.nombre));
-        this.jugadores = jugadores.sort((a, b) => a.apellido.localeCompare(b.apellido));
-        this.jugadoresFiltrados = this.jugadores;
 
         if (prediccion) {
           this.prediccionTorneo  = prediccion;
           this.paisCampeonId     = prediccion.paisCampeonId;
           this.jugadorGoleadorId = prediccion.jugadorGoleadorId;
+          if (prediccion.jugadorGoleadorId) {
+            this.jugadorSeleccionadoCache = {
+              internalId: prediccion.jugadorGoleadorId,
+              nombre: '', apellido: '',
+              nombreCompleto: prediccion.jugadorGoleadorNombre || '',
+              posicionCodigo: '',
+              paisNombre: '',
+              paisCodigo: prediccion.jugadorGoleadorPaisCodigo || '',
+              clubNombre: null,
+              urlFoto: prediccion.jugadorGoleadorUrlFoto
+            };
+          }
           this.mostrarFormTorneo = false;
         } else {
           this.mostrarFormTorneo = true;
@@ -132,6 +163,10 @@ export class PrediccionesComponent implements OnInit {
         this.cd.markForCheck();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
   }
 
   // ── Construir vista de partidos ────────────────────────────────────────────
@@ -292,29 +327,37 @@ export class PrediccionesComponent implements OnInit {
   }
 
   // ── Torneo ─────────────────────────────────────────────────────────────────
-  filtrarJugadores(): void {
-    const term = normalize(this.busquedaJugador.trim());
-    if (!term) {
-      this.jugadoresFiltrados = this.jugadores;
+  onBusquedaJugadorChange(): void {
+    const term = this.busquedaJugador.trim();
+    if (term.length < 3) {
+      this.jugadoresFiltrados = [];
+      this.cd.markForCheck();
       return;
     }
-    this.jugadoresFiltrados = this.jugadores.filter(j =>
-      normalize(j.nombreCompleto).includes(term) ||
-      normalize(j.pais.nombre).includes(term)    ||
-      normalize(j.pais.codigo).includes(term)
-    );
+    this.searchSubject.next(term);
+  }
+
+  seleccionarJugador(j: JugadorBusqueda): void {
+    this.jugadorGoleadorId = j.internalId;
+    this.jugadorSeleccionadoCache = j;
+    this.cd.markForCheck();
+  }
+
+  limpiarJugador(): void {
+    this.jugadorGoleadorId = null;
+    this.jugadorSeleccionadoCache = null;
+    this.busquedaJugador = '';
+    this.jugadoresFiltrados = [];
+    this.cd.markForCheck();
+  }
+
+  limpiarCampeon(): void {
+    this.paisCampeonId = null;
+    this.cd.markForCheck();
   }
 
   get paisSeleccionado(): Pais | null {
     return this.paises.find(p => p.internalId === this.paisCampeonId) || null;
-  }
-
-  get jugadorSeleccionado(): Jugador | null {
-    return this.jugadores.find(j => j.internalId === this.jugadorGoleadorId) || null;
-  }
-
-  get formularioTorneoValido(): boolean {
-    return this.paisCampeonId !== null && this.jugadorGoleadorId !== null;
   }
 
   get torneoConfirmado(): boolean {
@@ -322,7 +365,7 @@ export class PrediccionesComponent implements OnInit {
   }
 
   guardarTorneo(): void {
-    if (!this.formularioTorneoValido || this.torneoConfirmado) return;
+    if (this.torneoConfirmado) return;
 
     if (!this.authService.getToken()) {
       this.router.navigate(['/register']);
@@ -334,8 +377,8 @@ export class PrediccionesComponent implements OnInit {
     this.errorTorneo  = '';
 
     this.prediccionTorneoService.guardar({
-      paisCampeonId:     this.paisCampeonId!,
-      jugadorGoleadorId: this.jugadorGoleadorId!
+      paisCampeonId:     this.paisCampeonId,
+      jugadorGoleadorId: this.jugadorGoleadorId
     }).subscribe({
       next: (result) => {
         this.prediccionTorneo  = result;

@@ -27,11 +27,11 @@ public class PrediccionTorneo {
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pais_campeon_id", nullable = false)
+    @JoinColumn(name = "pais_campeon_id")
     private Pais paisCampeon;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "jugador_goleador_id", nullable = false)
+    @JoinColumn(name = "jugador_goleador_id")
     private Jugador jugadorGoleador;
 
     @Column(name = "trans_date", nullable = false)
