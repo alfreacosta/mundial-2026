@@ -319,50 +319,6 @@
 
     </main>
 
-    <!-- ═══ SIDEBAR DERECHO: JUGADORES SELECCIONADOS ═══ -->
-    <aside class="selected-sidebar" *ngIf="activeTab() !== 'nova' && activeTab() !== 'titulares'">
-      <div class="sidebar-header">
-        <h3>Convocados</h3>
-        <span class="selected-count" [style.background-color]="confColor">{{ totalSel() }}/{{ MAX_CONVOCADOS }}</span>
-      </div>
-
-      <!-- Lista de seleccionados -->
-      <div class="selected-list" *ngIf="totalSel() > 0">
-        <div *ngFor="let player of jugadoresSeleccionados" class="selected-item" [style.border-left-color]="confColor">
-          <div class="item-header">
-            <span class="player-pos-badge" [style.background-color]="getPosColor(player.posicion?.codigo)">
-              {{ player.posicion?.abreviatura || '?' }}
-            </span>
-            <span class="player-name">{{ player.apellido }}</span>
-            <button
-              mat-icon-button
-              (click)="togglePlayer(player)"
-              class="remove-btn"
-              matTooltip="Quitar">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-          <p class="item-club" *ngIf="player.club">{{ player.club.nombre }}</p>
-        </div>
-      </div>
-
-      <!-- Vacío -->
-      <div class="sidebar-empty" *ngIf="totalSel() === 0">
-        <mat-icon>people</mat-icon>
-        <p>Seleccioná jugadores para verlos aquí</p>
-      </div>
-
-      <!-- Resumen por posición -->
-      <div class="sidebar-summary">
-        <div *ngFor="let pg of positionGroups" class="summary-row">
-          <span class="summary-label">{{ pg.label | slice:0:3 }}</span>
-          <span class="summary-count" [style.color]="pg.color">
-            {{ posCounts()[pg.codigo] || 0 }}/{{ pg.recommended }}
-          </span>
-        </div>
-      </div>
-    </aside>
-
   </div>
 
   <!-- ═══ STICKY BOTTOM BAR ═══ -->
