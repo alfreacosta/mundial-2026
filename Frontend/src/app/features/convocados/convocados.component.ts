@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,10 +10,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
+import { CdkDrag } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
 import { normalize } from '../../shared/utils/normalize';
+import html2canvas from 'html2canvas';
 
 export interface JugadorSeleccionable extends JugadorPais {
   seleccionado: boolean;
@@ -43,7 +45,8 @@ interface PosicionGroup {
     MatSnackBarModule,
     MatTooltipModule,
     MatBadgeModule,
-    RouterLink
+    RouterLink,
+    CdkDrag
   ],
   templateUrl: './convocados.component.html',
   styleUrls: ['./convocados.component.scss']
@@ -422,5 +425,64 @@ export class ConvocadosComponent implements OnInit {
     } else {
       this.router.navigate(['/countries']);
     }
+  }
+
+  // ═══ DRAG & DROP CANCHA ═══
+  @ViewChild('pitchFieldRef') pitchFieldRef!: ElementRef<HTMLDivElement>;
+
+  /** Calcula posición inicial (%) para cada titular en la cancha */
+  getInitialPosition(player: JugadorSeleccionable): { x: string; y: string } {
+    const pos = player.posicion?.codigo || 'MED';
+    const titulares = this.players().filter(p => p.titular && p.posicion?.codigo === pos);
+    const idx = titulares.findIndex(p => p.internalId === player.internalId);
+    const count = titulares.length;
+
+    // Distribución horizontal: centrado, espaciado uniforme
+    const hSpacing = count > 1 ? 70 / (count - 1) : 0;
+    const hStart = count > 1 ? 15 : 50;
+    const x = count > 1 ? hStart + idx * hSpacing : hStart;
+
+    // Distribución vertical por posición
+    const yMap: Record<string, number> = { 'DEL': 12, 'MED': 38, 'DEF': 64, 'ARQ': 88 };
+    const y = yMap[pos] ?? 50;
+
+    return { x: `calc(${x}% - 28px)`, y: `calc(${y}% - 30px)` };
+  }
+
+  /** Exportar cancha como imagen PNG */
+  exportingPitch = false;
+
+  exportPitchAsPng(): void {
+    const el = this.pitchFieldRef?.nativeElement;
+    if (!el) return;
+    this.exportingPitch = true;
+
+    html2canvas(el, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+      allowTaint: true
+    }).then(canvas => {
+      // Intentar compartir si el navegador lo soporta
+      canvas.toBlob(blob => {
+        if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
+          const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
+          navigator.share({ files: [file], title: `Mi XI Titular - ${this.pais?.nombre}` }).catch(() => this.downloadCanvas(canvas));
+        } else {
+          this.downloadCanvas(canvas);
+        }
+        this.exportingPitch = false;
+      }, 'image/png');
+    }).catch(() => {
+      this.exportingPitch = false;
+      this.snackBar.open('Error al exportar la imagen', '', { duration: 3000 });
+    });
+  }
+
+  private downloadCanvas(canvas: HTMLCanvasElement): void {
+    const link = document.createElement('a');
+    link.download = `XI-${this.pais?.nombre ?? 'titular'}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 }

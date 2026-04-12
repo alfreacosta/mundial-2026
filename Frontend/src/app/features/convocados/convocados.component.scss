@@ -1288,6 +1288,14 @@ $save-bar-height: 72px;
   margin-top: 24px;
 }
 
+.pitch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
 .pitch-title {
   display: flex;
   align-items: center;
@@ -1295,11 +1303,42 @@ $save-bar-height: 72px;
   font-size: 16px;
   font-weight: 700;
   color: $text-primary;
-  margin-bottom: 16px;
+  margin: 0;
 
   mat-icon {
     color: #10b981;
   }
+}
+
+.pitch-hint {
+  font-size: 11px;
+  color: $text-muted;
+  font-style: italic;
+}
+
+.pitch-export-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  background: #10b981;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover { background: #059669; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .pitch {
@@ -1315,11 +1354,6 @@ $save-bar-height: 72px;
   background: linear-gradient(180deg, #0d4a1c 0%, #10641f 15%, #0d4a1c 30%, #10641f 45%, #0d4a1c 60%, #10641f 75%, #0d4a1c 90%, #10641f 100%);
   border: 3px solid rgba(255,255,255,0.35);
   border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 12px;
   overflow: hidden;
 
   // Línea de media cancha
@@ -1347,34 +1381,47 @@ $save-bar-height: 72px;
   }
 }
 
-// Arco de abajo (arquero)
-.pitch-field .pitch-gk::before {
-  content: '';
+// Áreas de arco (HTML divs)
+.pitch-field-goal-top,
+.pitch-field-goal-bottom {
   position: absolute;
-  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
   width: 120px;
   height: 40px;
   border: 1px solid rgba(255,255,255,0.25);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
   pointer-events: none;
 }
-
-// Arco de arriba (delanteros)
-.pitch-field .pitch-fwd::after {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 40px;
-  border: 1px solid rgba(255,255,255,0.25);
+.pitch-field-goal-top {
+  top: 0;
   border-top: none;
   border-radius: 0 0 4px 4px;
-  pointer-events: none;
+}
+.pitch-field-goal-bottom {
+  bottom: 0;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+// Jugador con posición absoluta + drag
+.pitch-player-abs {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: grab;
+  z-index: 2;
+  touch-action: none;
+  user-select: none;
+  width: 56px;
+
+  &:active { cursor: grabbing; }
+
+  &.cdk-drag-dragging {
+    z-index: 10;
+    opacity: 0.9;
+  }
 }
 
 .pitch-row {
@@ -1449,7 +1496,6 @@ $save-bar-height: 72px;
 @media (max-width: 480px) {
   .pitch-field {
     aspect-ratio: 2.5 / 4;
-    padding: 16px 4px;
   }
   .pitch-avatar, .pitch-avatar-placeholder {
     width: 32px;
@@ -1457,9 +1503,10 @@ $save-bar-height: 72px;
   }
   .pitch-name { font-size: 8px; max-width: 48px; }
   .pitch-player { min-width: 40px; }
+  .pitch-player-abs { width: 44px; }
   .pitch-row { gap: 6px; }
-  .pitch-field .pitch-gk::before,
-  .pitch-field .pitch-fwd::after {
+  .pitch-field-goal-top,
+  .pitch-field-goal-bottom {
     width: 90px;
     height: 30px;
   }

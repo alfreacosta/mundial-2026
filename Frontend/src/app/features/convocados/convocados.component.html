@@ -255,52 +255,30 @@
         </div>
 
         <section class="pitch-section">
-          <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
+          <div class="pitch-toolbar">
+            <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
+            <span class="pitch-hint">Arrastrá los jugadores para ubicarlos</span>
+            <button class="pitch-export-btn" (click)="exportPitchAsPng()" [disabled]="exportingPitch">
+              <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
+              {{ exportingPitch ? 'Exportando…' : 'Compartir PNG' }}
+            </button>
+          </div>
           <div class="pitch">
-            <div class="pitch-field">
-              <!-- Delanteros (arriba, arco rival) -->
-              <div class="pitch-row pitch-fwd">
-                <div *ngFor="let p of getTitularesByPos('DEL')" class="pitch-player">
-                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
-                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
-                    <mat-icon>person</mat-icon>
-                  </div>
-                  <span class="pitch-name">{{ p.apellido }}</span>
-                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+            <div class="pitch-field" #pitchFieldRef>
+              <!-- Áreas de arco -->
+              <div class="pitch-field-goal-top"></div>
+              <div class="pitch-field-goal-bottom"></div>
+              <!-- Todos los titulares con drag libre -->
+              <div *ngFor="let p of jugadoresTitulares" class="pitch-player-abs"
+                cdkDrag [cdkDragBoundary]="'.pitch-field'"
+                [style.left]="getInitialPosition(p).x"
+                [style.top]="getInitialPosition(p).y">
+                <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
+                <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
+                  <mat-icon>person</mat-icon>
                 </div>
-              </div>
-              <!-- Mediocampistas -->
-              <div class="pitch-row pitch-mid">
-                <div *ngFor="let p of getTitularesByPos('MED')" class="pitch-player">
-                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
-                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
-                    <mat-icon>person</mat-icon>
-                  </div>
-                  <span class="pitch-name">{{ p.apellido }}</span>
-                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
-                </div>
-              </div>
-              <!-- Defensores -->
-              <div class="pitch-row pitch-def">
-                <div *ngFor="let p of getTitularesByPos('DEF')" class="pitch-player">
-                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
-                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
-                    <mat-icon>person</mat-icon>
-                  </div>
-                  <span class="pitch-name">{{ p.apellido }}</span>
-                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
-                </div>
-              </div>
-              <!-- Arquero (abajo, arco propio) -->
-              <div class="pitch-row pitch-gk">
-                <div *ngFor="let p of getTitularesByPos('ARQ')" class="pitch-player">
-                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
-                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
-                    <mat-icon>person</mat-icon>
-                  </div>
-                  <span class="pitch-name">{{ p.apellido }}</span>
-                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
-                </div>
+                <span class="pitch-name">{{ p.apellido }}</span>
+                <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
               </div>
             </div>
           </div>
