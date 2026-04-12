@@ -10,14 +10,14 @@ import time
 import requests
 import psycopg2
 
-API_KEY = os.getenv("API_FOOTBALL_KEY", "2d7706c9ebeef5a9a897c496f34b3cf7")
+API_KEY = os.environ["API_FOOTBALL_KEY"]
 API_BASE = "https://v3.football.api-sports.io"
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "mundial")
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASS = os.getenv("DB_PASS", "soloDios10*")
+DB_PASS = os.environ["DB_PASS"]
 
 HEADERS = {"x-apisports-key": API_KEY}
 

@@ -16,7 +16,7 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "mundial")
 DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASS = os.getenv("DB_PASS", "soloDios10*")
+DB_PASS = os.environ["DB_PASS"]
 
 THUMB_SIZE = 300  # px
 
@@ -137,7 +137,7 @@ def main():
         db_port = "32738"
         db_name = "railway"
         db_user = "postgres"
-        db_pass = os.getenv("RAILWAY_DB_PASS", "epZZYVYmkhRcvuKaAoBSqZCHTEHmJaij")
+        db_pass = os.environ["RAILWAY_DB_PASS"]
         print("=== Conectando a Railway ===\n")
     else:
         db_host, db_port, db_name, db_user, db_pass = DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS

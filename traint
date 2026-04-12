@@ -1,5 +1,0 @@
-            conname            |                                                                            pg_get_constraintdef                                                                            
--------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- convocatoria_row_estado_check | CHECK (((estado)::text = ANY ((ARRAY['PENDIENTE'::character varying, 'CONVOCADO'::character varying, 'NO_VA'::character varying, 'TITULAR'::character varying])::text[])))
-(1 row)
-
