@@ -282,7 +282,7 @@
                 @if (!isBloqueado(item)) {
                   <div class="pred-inputs">
                     <div class="score-stepper">
-                      <span class="score-display">{{ item.golLocalEdit ?? '–' }}</span>
+                      <span class="score-display">{{ item.golLocalEdit }}</span>
                       <div class="stepper-btns">
                         <button class="step-btn" (click)="cambiarGol(item, 'local', -1)"
                                 [disabled]="item.guardando || (item.golLocalEdit ?? 0) <= 0">−</button>
@@ -290,9 +290,9 @@
                                 [disabled]="item.guardando">+</button>
                       </div>
                     </div>
-                    <span class="vs-sep">–</span>
+
                     <div class="score-stepper">
-                      <span class="score-display">{{ item.golVisitanteEdit ?? '–' }}</span>
+                      <span class="score-display">{{ item.golVisitanteEdit }}</span>
                       <div class="stepper-btns">
                         <button class="step-btn" (click)="cambiarGol(item, 'visitante', -1)"
                                 [disabled]="item.guardando || (item.golVisitanteEdit ?? 0) <= 0">−</button>
@@ -306,16 +306,14 @@
                           [class.modified]="isModificado(item)"
                           [class.saving]="item.guardando"
                           [class.saved]="item.guardado"
-                          [disabled]="item.guardando || item.golLocalEdit === null || item.golVisitanteEdit === null"
+                          [disabled]="item.guardando"
                           (click)="guardarPartido(item)">
                     @if (item.guardando) {
                       <mat-spinner diameter="12"></mat-spinner>
                     } @else if (item.guardado) {
                       <mat-icon>check_circle</mat-icon>
-                    } @else if (item.prediccion) {
-                      <mat-icon>save</mat-icon>
                     } @else {
-                      <mat-icon>add</mat-icon>
+                      <mat-icon>save</mat-icon>
                     }
                   </button>
 

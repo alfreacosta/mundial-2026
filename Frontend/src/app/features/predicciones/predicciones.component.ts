@@ -20,6 +20,7 @@ import {
 } from '../../core/services/prediccion-torneo.service';
 import { FifaToFlagPipe } from '../../shared/pipes/fifa-to-flag.pipe';
 import { getFlagUrl } from '../../core/utils/flag.utils';
+import { toLocalIso } from '../../core/utils/date.utils';
 import { AuthService } from '../../core/services/auth.service';
 
 interface PartidoConPrediccion {
@@ -175,11 +176,12 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
     const gruposMap = new Map<string, PartidoConPrediccion[]>();
 
     for (const p of partidos) {
+      const pred = predMap.get(p.id) ?? null;
       const item: PartidoConPrediccion = {
-        partido:          p,
-        prediccion:       predMap.get(p.id) ?? null,
-        golLocalEdit:     predMap.get(p.id)?.golLocalPred     ?? null,
-        golVisitanteEdit: predMap.get(p.id)?.golVisitantePred ?? null,
+        partido:          { ...p, fechaHora: toLocalIso(p.fechaHora) },
+        prediccion:       pred,
+        golLocalEdit:     pred?.golLocalPred     ?? 0,
+        golVisitanteEdit: pred?.golVisitantePred ?? 0,
         guardando:        false,
         guardado:         false,
         error:            ''
