@@ -228,6 +228,10 @@ $transition: 0.2s ease;
       color: var(--header-color);
       border-bottom-color: var(--header-color);
     }
+
+    &.tab-nova {
+      &:hover { color: #f87171; }
+    }
   }
 }
 

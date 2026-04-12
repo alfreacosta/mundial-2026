@@ -224,9 +224,12 @@ export class SeleccionDetailComponent implements OnInit {
     this.router.navigate(['/countries']);
   }
 
-  irAConvocatoria(): void {
+  irAConvocatoria(tab?: string): void {
     const s = this.seleccion();
-    if (s) this.router.navigate(['/convocados', s.id]);
+    if (s) {
+      const extras = tab ? { queryParams: { tab } } : {};
+      this.router.navigate(['/convocados', s.id], extras);
+    }
   }
 
   retry(): void {

@@ -108,6 +108,10 @@ export class ConvocadosComponent implements OnInit {
 
   ngOnInit(): void {
     this.paisId = Number(this.route.snapshot.paramMap.get('paisId'));
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab === 'titulares' || tab === 'nova') {
+      this.activeTab.set(tab);
+    }
     this.loadData();
   }
 
