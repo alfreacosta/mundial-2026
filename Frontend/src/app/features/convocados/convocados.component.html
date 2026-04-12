@@ -274,17 +274,11 @@
                 <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
                   <mat-icon>person</mat-icon>
                 </div>
-                <span class="pitch-name">{{ p.nombreCompleto || (p.nombre + ' ' + p.apellido) }}</span>
-                <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+                <span class="pitch-name">{{ p.nombre + ' ' + (p.apellido?.split(' ')?.[0] ?? '') }}</span>
               </div>
             </div>
           </div>
-          <div class="pitch-actions">
-            <button class="pitch-save-btn" (click)="guardarPosiciones()" [disabled]="savingPositions || draggedPositions.size === 0">
-              <mat-icon>{{ savingPositions ? 'hourglass_empty' : 'save' }}</mat-icon>
-              {{ savingPositions ? 'Guardando…' : 'Guardar posiciones' }}
-            </button>
-          </div>
+
         </section>
       </ng-container>
 

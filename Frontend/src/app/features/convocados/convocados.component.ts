@@ -414,17 +414,38 @@ export class ConvocadosComponent implements OnInit {
 
     this.countriesService.guardarConvocatoria(this.paisId, jugadorIds, noVaIds, titularesIds).subscribe({
       next: (resp) => {
-        this.saving = false;
         this.convocatoriaEstado = resp.estado;
         const tab = this.activeTab();
-        const msg = tab === 'titulares'
-          ? `✅ Titulares guardados: ${titulares.length} jugadores`
-          : tab === 'nova'
-            ? `✅ Convocatoria guardada (${noVa.length} descartados)`
-            : `✅ Convocatoria guardada: ${resp.totalJugadores} jugadores`;
-        this.snackBar.open(msg, 'Cerrar',
-          { duration: 5000, panelClass: 'snack-success' }
-        );
+
+        // Si estamos en titulares y hay posiciones arrastradas, guardarlas también
+        if (tab === 'titulares' && this.draggedPositions.size > 0) {
+          const posiciones = Array.from(this.draggedPositions.entries()).map(([jugadorId, pos]) => ({
+            jugadorId, x: Math.round(pos.x * 100) / 100, y: Math.round(pos.y * 100) / 100
+          }));
+          this.countriesService.guardarPosicionesTitulares(this.paisId, posiciones).subscribe({
+            next: () => {
+              this.saving = false;
+              this.draggedPositions.clear();
+              this.snackBar.open(`✅ Titulares y posiciones guardados: ${titulares.length} jugadores`, 'Cerrar',
+                { duration: 5000, panelClass: 'snack-success' });
+            },
+            error: () => {
+              this.saving = false;
+              this.snackBar.open('Convocatoria guardada, pero hubo un error al guardar posiciones.', 'Cerrar',
+                { duration: 5000, panelClass: 'snack-error' });
+            }
+          });
+        } else {
+          this.saving = false;
+          const msg = tab === 'titulares'
+            ? `✅ Titulares guardados: ${titulares.length} jugadores`
+            : tab === 'nova'
+              ? `✅ Convocatoria guardada (${noVa.length} descartados)`
+              : `✅ Convocatoria guardada: ${resp.totalJugadores} jugadores`;
+          this.snackBar.open(msg, 'Cerrar',
+            { duration: 5000, panelClass: 'snack-success' }
+          );
+        }
       },
       error: () => {
         this.saving = false;
