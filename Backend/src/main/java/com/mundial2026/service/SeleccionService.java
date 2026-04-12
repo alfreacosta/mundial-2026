@@ -177,29 +177,20 @@ public class SeleccionService {
 
     /**
      * Obtiene la lista de DTs de los 48 equipos para usarlos como avatares.
-     * Llama a la API-Football con cache de 24h por equipo.
+     * Lee directamente de la BD (columnas dt_nombre y dt_foto_url en pais).
      */
     public List<DtAvatarDTO> getDtAvatars() {
-        List<Pais> paises = paisRepository.findAllWithConfederacion();
-        List<DtAvatarDTO> result = new ArrayList<>();
-        for (Pais p : paises) {
-            if (!p.getActivo()) continue;
-            Long apiTeamId = getApiTeamId(p);
-            if (apiTeamId == null) continue;
-            Optional<Map<String, String>> coachOpt = apiService.getCoach(apiTeamId);
-            if (coachOpt.isPresent()) {
-                Map<String, String> coach = coachOpt.get();
-                result.add(DtAvatarDTO.builder()
+        return paisRepository.findAllWithConfederacion().stream()
+                .filter(p -> p.getActivo() && p.getDtNombre() != null && !p.getDtNombre().isBlank())
+                .map(p -> DtAvatarDTO.builder()
                         .codigo(p.getCodigo())
                         .pais(p.getNombre())
-                        .dtNombre(coach.get("nombre"))
-                        .dtFotoUrl(coach.get("fotoUrl"))
+                        .dtNombre(p.getDtNombre())
+                        .dtFotoUrl(p.getDtFotoUrl())
                         .logoUrl(p.getLogoUrl())
-                        .build());
-            }
-        }
-        result.sort(Comparator.comparing(DtAvatarDTO::getPais));
-        return result;
+                        .build())
+                .sorted(Comparator.comparing(DtAvatarDTO::getPais))
+                .collect(Collectors.toList());
     }
 
     /**

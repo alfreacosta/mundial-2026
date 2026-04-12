@@ -67,4 +67,10 @@ public class Pais {
 
     @Column(name = "ultimo_sync")
     private java.time.LocalDateTime ultimoSync;
+
+    @Column(name = "dt_nombre", length = 150)
+    private String dtNombre;
+
+    @Column(name = "dt_foto_url", length = 300)
+    private String dtFotoUrl;
 }
