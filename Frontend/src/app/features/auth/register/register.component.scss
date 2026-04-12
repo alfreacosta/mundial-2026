@@ -146,6 +146,15 @@ $border:    rgba(255,255,255,0.1);
   .nav-login-text {
     @media (max-width: 400px) { display: none; }
   }
+
+  .nav-login-mobile {
+    display: none;
+    @media (max-width: 400px) { display: inline; }
+  }
+
+  .nav-login-icon {
+    @media (max-width: 400px) { display: none; }
+  }
 }
 
 // ── Hero ──────────────────────────────────────────────────
