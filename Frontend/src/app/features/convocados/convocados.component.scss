@@ -601,11 +601,10 @@ $save-bar-height: 72px;
 // Players Grid
 .players-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: $dark-border;
 
-  @media (min-width: 480px)  { grid-template-columns: repeat(3, 1fr); }
   @media (min-width: 720px)  { grid-template-columns: repeat(4, 1fr); }
   @media (min-width: 960px)  { grid-template-columns: repeat(5, 1fr); }
   @media (min-width: 1200px) { grid-template-columns: repeat(6, 1fr); }
@@ -681,6 +680,13 @@ $save-bar-height: 72px;
     gap: 2px;
     line-height: 1.2;
 
+    @media (max-width: 480px) {
+      top: 4px;
+      left: 4px;
+      font-size: 8px;
+      padding: 1px 5px;
+    }
+
     .rating-star { font-size: 9px; }
   }
 
@@ -690,12 +696,22 @@ $save-bar-height: 72px;
     display: flex;
     justify-content: center;
 
+    @media (max-width: 480px) {
+      padding: 10px 8px 4px;
+    }
+
     .avatar-img {
       width: 72px;
       height: 72px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid $dark-border-light;
+
+      @media (max-width: 480px) {
+        width: 56px;
+        height: 56px;
+        border-width: 2px;
+      }
     }
 
     .avatar-placeholder {
@@ -707,10 +723,22 @@ $save-bar-height: 72px;
       justify-content: center;
       border: 3px solid $dark-border-light;
 
+      @media (max-width: 480px) {
+        width: 56px;
+        height: 56px;
+        border-width: 2px;
+      }
+
       mat-icon {
         font-size: 36px;
         width: 36px;
         height: 36px;
+
+        @media (max-width: 480px) {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
       }
     }
 
@@ -724,6 +752,12 @@ $save-bar-height: 72px;
       font-weight: 700;
       padding: 1px 5px;
       border-radius: $radius-full;
+
+      @media (max-width: 480px) {
+        right: calc(50% - 36px);
+        font-size: 9px;
+        padding: 1px 4px;
+      }
     }
   }
 
@@ -732,12 +766,21 @@ $save-bar-height: 72px;
     text-align: center;
     flex: 1;
 
+    @media (max-width: 480px) {
+      padding: 0 4px 2px;
+    }
+
     .player-name {
       font-size: 12px;
       font-weight: 700;
       color: $text-primary;
       margin: 0 0 4px;
       line-height: 1.3;
+
+      @media (max-width: 480px) {
+        font-size: 10px;
+        margin: 0 0 2px;
+      }
     }
 
     .player-club {
@@ -748,6 +791,10 @@ $save-bar-height: 72px;
       font-size: 11px;
       color: $text-secondary;
       margin: 0;
+
+      @media (max-width: 480px) {
+        font-size: 9px;
+      }
 
       mat-icon {
         font-size: 12px;
@@ -764,6 +811,10 @@ $save-bar-height: 72px;
     display: flex;
     gap: 1px;
 
+    @media (max-width: 480px) {
+      margin-top: 4px;
+    }
+
     .footer-btn {
       flex: 1;
       padding: 7px 0;
@@ -774,6 +825,11 @@ $save-bar-height: 72px;
       letter-spacing: 0.3px;
       transition: all $transition;
       font-family: inherit;
+
+      @media (max-width: 480px) {
+        padding: 5px 0;
+        font-size: 9px;
+      }
     }
 
     .btn-convocar {
@@ -1427,20 +1483,20 @@ $save-bar-height: 72px;
 /* ═══ RESPONSIVE PITCH ═══ */
 @media (max-width: 480px) {
   .pitch-field {
-    aspect-ratio: 2.5 / 4;
+    aspect-ratio: 2 / 3;
   }
   .pitch-avatar, .pitch-avatar-placeholder {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
-  .pitch-name { font-size: 6px; max-width: 60px; }
-  .pitch-player { min-width: 40px; }
-  .pitch-player-abs { width: 44px; }
-  .pitch-row { gap: 6px; }
+  .pitch-name { font-size: 6px; max-width: 55px; }
+  .pitch-player { min-width: 38px; }
+  .pitch-player-abs { width: 42px; }
+  .pitch-row { gap: 4px; }
   .pitch-field-goal-top,
   .pitch-field-goal-bottom {
-    width: 90px;
-    height: 30px;
+    width: 80px;
+    height: 26px;
   }
 }
 
