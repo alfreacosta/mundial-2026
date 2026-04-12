@@ -141,10 +141,7 @@ public class GrupoService {
         }
 
         List<GrupoRow> miembros = grupoRowRepository.findMiembrosDelGrupo(grupoId);
-        List<GrupoRowDTO> miembrosDTO = miembros.stream().map(r -> {
-            List<EquipoFavorito> favs = equipoFavoritoRepository.findByUsuarioId(r.getUsuario().getInternalId());
-            return toGrupoRowDTO(r, favs);
-        }).collect(Collectors.toList());
+        List<GrupoRowDTO> miembrosDTO = buildMiembrosDTO(miembros);
 
         GrupoDTO dto = toGrupoDTO(grupo, false);
         dto.setMiembros(miembrosDTO);
@@ -162,10 +159,7 @@ public class GrupoService {
                 .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
 
         List<GrupoRow> miembros = grupoRowRepository.findMiembrosDelGrupo(grupo.getInternalId());
-        List<GrupoRowDTO> miembrosDTO = miembros.stream().map(r -> {
-            List<EquipoFavorito> favs = equipoFavoritoRepository.findByUsuarioId(r.getUsuario().getInternalId());
-            return toGrupoRowDTO(r, favs);
-        }).collect(Collectors.toList());
+        List<GrupoRowDTO> miembrosDTO = buildMiembrosDTO(miembros);
 
         GrupoDTO dto = toGrupoDTO(grupo, false);
         dto.setMiembros(miembrosDTO);
@@ -221,6 +215,44 @@ public class GrupoService {
             codigo = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
         } while (grupoRepository.findByCodigoInvitacion(codigo).isPresent());
         return codigo;
+    }
+
+    /**
+     * Construye la lista de DTOs de miembros leyendo siempre la predicción
+     * desde prediccion_torneo (fuente de verdad), no desde grupo_row.
+     */
+    private List<GrupoRowDTO> buildMiembrosDTO(List<GrupoRow> miembros) {
+        return miembros.stream().map(r -> {
+            Long uid = r.getUsuario().getInternalId();
+            List<EquipoFavorito> favs = equipoFavoritoRepository.findByUsuarioId(uid);
+
+            // Siempre leer la predicción fresca desde prediccion_torneo
+            PrediccionTorneo pred = prediccionTorneoRepository.findByUsuarioId(uid).orElse(null);
+
+            Pais campeon   = pred != null ? pred.getPaisCampeon()      : null;
+            Jugador goleador = pred != null ? pred.getJugadorGoleador() : null;
+
+            return GrupoRowDTO.builder()
+                    .internalId(r.getInternalId())
+                    .grupoId(r.getGrupo().getInternalId())
+                    .usuarioId(uid)
+                    .usuarioNombre(r.getUsuario().getNombre())
+                    .usuarioApellido(r.getUsuario().getApellido())
+                    .urlAvatar(r.getUsuario().getUrlAvatar())
+                    .rol(r.getRol())
+                    .paisCampeonId(campeon != null ? campeon.getInternalId() : null)
+                    .paisCampeonNombre(campeon != null ? campeon.getNombre() : null)
+                    .paisCampeonCodigo(campeon != null ? campeon.getCodigo() : null)
+                    .goleadorId(goleador != null ? goleador.getInternalId() : null)
+                    .goleadorNombre(goleador != null ? goleador.getNombre() : null)
+                    .goleadorApellido(goleador != null ? goleador.getApellido() : null)
+                    .goleadorFoto(goleador != null ? goleador.getUrlFoto() : null)
+                    .fechaUnion(r.getFechaUnion())
+                    .equiposFavoritos(favs.stream().map(this::toEquipoFavoritoDTO).collect(Collectors.toList()))
+                    .puntaje(r.getUsuario().getPuntaje())
+                    .perfilPublico(r.getUsuario().getPerfilPublico())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     private GrupoDTO toGrupoDTO(Grupo g, boolean conMiembros) {

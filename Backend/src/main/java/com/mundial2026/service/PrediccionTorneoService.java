@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class PrediccionTorneoService {
     private final UsuarioRepository          usuarioRepository;
     private final PaisRepository             paisRepository;
     private final JugadorRepository          jugadorRepository;
+    private final GrupoRowRepository         grupoRowRepository;
 
     /**
      * Obtener la predicción de torneo del usuario autenticado.
@@ -72,6 +74,15 @@ public class PrediccionTorneoService {
         }
 
         prediccionTorneoRepository.save(prediccion);
+
+        // Sincronizar a todos los grupo_row del usuario
+        List<GrupoRow> rows = grupoRowRepository.findByUsuario_InternalId(usuario.getInternalId());
+        for (GrupoRow row : rows) {
+            row.setPaisCampeon(paisCampeon);
+            row.setGoleador(goleador);
+        }
+        grupoRowRepository.saveAll(rows);
+
         return toDTO(prediccion);
     }
 
