@@ -330,7 +330,7 @@
     </main>
 
     <!-- ═══ SIDEBAR DERECHO: JUGADORES SELECCIONADOS ═══ -->
-    <aside class="selected-sidebar" *ngIf="activeTab() !== 'nova'">
+    <aside class="selected-sidebar" *ngIf="activeTab() !== 'nova' && activeTab() !== 'titulares'">
       <div class="sidebar-header">
         <h3>Convocados</h3>
         <span class="selected-count" [style.background-color]="confColor">{{ totalSel() }}/{{ MAX_CONVOCADOS }}</span>
