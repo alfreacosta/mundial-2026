@@ -60,6 +60,9 @@ export class SeleccionDetailComponent implements OnInit {
   protected statsError = signal('');
   protected searchQuery = signal('');
 
+  /** Cache de ratings ya consultados: playerId → rating string */
+  ratingCache = new Map<number, string>();
+
   // Position groups for display
   protected readonly positionGroups = [
     { codigo: 'ARQ', label: 'Porteros', icon: 'sports_handball', color: '#f59e0b' },
@@ -210,6 +213,9 @@ export class SeleccionDetailComponent implements OnInit {
           this.statsError.set('Sin estadísticas disponibles para esta temporada.');
         } else {
           this.playerStats.set(s as PlayerStats);
+          if (s.rating) {
+            this.ratingCache.set(playerId, s.rating);
+          }
         }
         this.statsLoading.set(false);
       },

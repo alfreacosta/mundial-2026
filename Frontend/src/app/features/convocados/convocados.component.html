@@ -183,8 +183,13 @@
             <mat-icon>check</mat-icon>
           </div>
 
+          <!-- Rating badge -->
+          <span class="rating-badge" *ngIf="ratingCache.get(player.internalId) as r">
+            {{ (+r).toFixed(1) }} <span class="rating-star">⭐</span>
+          </span>
+
           <!-- Avatar -->
-          <div class="player-avatar">
+          <div class="player-avatar" (click)="selectPlayer(player)" style="cursor:pointer">
             <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
             <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
               <mat-icon [style.color]="pg.color">person</mat-icon>
@@ -195,7 +200,7 @@
           </div>
 
           <!-- Info del jugador -->
-          <div class="player-info">
+          <div class="player-info" (click)="selectPlayer(player)" style="cursor:pointer">
             <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
             <p class="player-club" *ngIf="player.club">
               <mat-icon>apartment</mat-icon>
@@ -403,3 +408,103 @@
   </div>
 
 </div>
+
+<!-- ═══ STATS PANEL (slide-up) ═══ -->
+<ng-container *ngIf="selectedPlayer() as player">
+  <div class="stats-backdrop" (click)="closeStatsPanel()"></div>
+  <div class="stats-panel" role="dialog" [attr.aria-label]="'Estadísticas de ' + (player.nombreCompleto || player.nombre)">
+    <div class="stats-handle" (click)="closeStatsPanel()">
+      <span class="handle-bar"></span>
+    </div>
+
+    <div class="stats-header">
+      <div class="stats-player-identity">
+        <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="stats-avatar">
+        <div *ngIf="!player.urlFoto" class="stats-avatar-placeholder">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="stats-player-name-block">
+          <h3>{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</h3>
+          <span class="stats-club" *ngIf="player.club">
+            {{ player.club.nombre }}
+          </span>
+        </div>
+      </div>
+      <button class="stats-close" (click)="closeStatsPanel()" aria-label="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="stats-loading" *ngIf="statsLoading()">
+      <mat-spinner diameter="32"></mat-spinner>
+      <p>Cargando estadísticas…</p>
+    </div>
+
+    <!-- Error -->
+    <div class="stats-empty" *ngIf="statsError() && !statsLoading()">
+      <mat-icon>info_outline</mat-icon>
+      <p>{{ statsError() }}</p>
+    </div>
+
+    <!-- Stats content -->
+    <ng-container *ngIf="playerStats() as st">
+      <div class="stats-body" *ngIf="!statsLoading()">
+        <div class="stats-bio">
+          <span class="bio-item" *ngIf="st.nacimiento"><mat-icon>cake</mat-icon>{{ st.nacimiento }}</span>
+          <span class="bio-item" *ngIf="st.lugar_nacimiento"><mat-icon>place</mat-icon>{{ st.lugar_nacimiento }}</span>
+          <span class="bio-item" *ngIf="st.altura"><mat-icon>height</mat-icon>{{ st.altura }}</span>
+          <span class="bio-item" *ngIf="st.peso"><mat-icon>monitor_weight</mat-icon>{{ st.peso }}</span>
+        </div>
+
+        <p class="stats-season-label" *ngIf="st.liga">
+          {{ st.liga }}
+          <ng-container *ngIf="st.temporada"> · Temporada {{ st.temporada }}</ng-container>
+        </p>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-val">{{ st.partidos }}</span>
+            <span class="stat-lbl">Partidos</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val">{{ st.minutos }}</span>
+            <span class="stat-lbl">Minutos</span>
+          </div>
+          <div class="stat-box highlight">
+            <span class="stat-val">{{ st.goles }}</span>
+            <span class="stat-lbl">⚽ Goles</span>
+          </div>
+          <div class="stat-box highlight">
+            <span class="stat-val">{{ st.asistencias }}</span>
+            <span class="stat-lbl">🅺️ Asistencias</span>
+          </div>
+          <div class="stat-box rating-box" *ngIf="st.rating">
+            <span class="stat-val">{{ (+st.rating).toFixed(1) }}</span>
+            <span class="stat-lbl">⭐ Rating</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val">{{ st.pases_clave }}</span>
+            <span class="stat-lbl">🎯 P. Clave</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val">{{ st.disparos_arco }}/{{ st.disparos }}</span>
+            <span class="stat-lbl">Disparos</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-val">{{ st.regates_ok }}/{{ st.regates_int }}</span>
+            <span class="stat-lbl">🏃 Regates</span>
+          </div>
+          <div class="stat-box card-box">
+            <span class="stat-val yellow-card">{{ st.amarillas }}</span>
+            <span class="stat-lbl">🟨 Amarillas</span>
+          </div>
+          <div class="stat-box card-box">
+            <span class="stat-val red-card">{{ st.rojas }}</span>
+            <span class="stat-lbl">🟥 Rojas</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

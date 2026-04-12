@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@ang
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,7 +16,32 @@ import { forkJoin } from 'rxjs';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
 import { normalize } from '../../shared/utils/normalize';
+import { environment } from '../../../environments/environment';
 import html2canvas from 'html2canvas';
+
+export interface PlayerStats {
+  altura: string;
+  peso: string;
+  nacimiento: string;
+  lugar_nacimiento: string;
+  nacionalidad: string;
+  club: string;
+  club_logo: string;
+  liga: string;
+  temporada: string;
+  partidos: number;
+  minutos: number;
+  rating: string;
+  goles: number;
+  asistencias: number;
+  disparos: number;
+  disparos_arco: number;
+  pases_clave: number;
+  regates_ok: number;
+  regates_int: number;
+  amarillas: number;
+  rojas: number;
+}
 
 export interface JugadorSeleccionable extends JugadorPais {
   seleccionado: boolean;
@@ -72,6 +98,9 @@ export class ConvocadosComponent implements OnInit {
   private _dragPxCache = new Map<number, { x: number; y: number }>();
   private static readonly ZERO_POS: { x: number; y: number } = { x: -999, y: -999 };
 
+  /** Cache de ratings ya consultados: internalId → rating string */
+  ratingCache = new Map<number, string>();
+
   // Computed signals — se actualizan AUTOMATICAMENTE cuando players cambia
   readonly totalSel = computed(() => this.players().filter(p => p.seleccionado).length);
   readonly totalNoVa = computed(() => this.players().filter(p => p.noVa).length);
@@ -110,12 +139,19 @@ export class ConvocadosComponent implements OnInit {
     CAF: '#065f46', AFC: '#6d28d9', OFC: '#0e7490'
   };
 
+  // Stats panel
+  selectedPlayer = signal<JugadorSeleccionable | null>(null);
+  playerStats = signal<PlayerStats | null>(null);
+  statsLoading = signal(false);
+  statsError = signal('');
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private countriesService: CountriesService,
     private grupoService: GrupoService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -467,6 +503,51 @@ export class ConvocadosComponent implements OnInit {
     } else {
       this.router.navigate(['/countries']);
     }
+  }
+
+  // ═══ STATS PANEL ═══
+
+  selectPlayer(player: JugadorSeleccionable): void {
+    if (this.selectedPlayer()?.internalId === player.internalId) {
+      this.selectedPlayer.set(null);
+      this.playerStats.set(null);
+      this.statsError.set('');
+      return;
+    }
+    this.selectedPlayer.set(player);
+    this.playerStats.set(null);
+    this.statsError.set('');
+    this.loadPlayerStats(player.internalId);
+  }
+
+  closeStatsPanel(): void {
+    this.selectedPlayer.set(null);
+    this.playerStats.set(null);
+    this.statsError.set('');
+  }
+
+  private loadPlayerStats(playerId: number): void {
+    this.statsLoading.set(true);
+    this.http.get<{ stats: PlayerStats; cached: boolean; syncDate?: string; message?: string }>(
+      `${environment.apiUrl}/jugadores/${playerId}/stats`
+    ).subscribe({
+      next: (res) => {
+        const s = res.stats as any;
+        if (!s || Object.keys(s).length === 0 || (!s.club && !s.goles && !s.nacimiento)) {
+          this.statsError.set('Sin estadísticas disponibles para esta temporada.');
+        } else {
+          this.playerStats.set(s as PlayerStats);
+          if (s.rating) {
+            this.ratingCache.set(playerId, s.rating);
+          }
+        }
+        this.statsLoading.set(false);
+      },
+      error: () => {
+        this.statsError.set('No se pudieron cargar las estadísticas.');
+        this.statsLoading.set(false);
+      }
+    });
   }
 
   // ═══ DRAG & DROP CANCHA ═══
