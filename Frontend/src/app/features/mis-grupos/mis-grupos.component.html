@@ -68,6 +68,7 @@
         <h3 class="grupo-nombre">{{ grupo.nombre }}</h3>
         <p class="grupo-creador">Creado por {{ grupo.creadorNombre }}</p>
         <p class="grupo-premio" *ngIf="grupo.premio">Premio: {{ grupo.premio }}</p>
+        <p class="grupo-paises-qty"><mat-icon>flag</mat-icon> {{ grupo.cantidadPaises }} {{ grupo.cantidadPaises === 1 ? 'país' : 'países' }} por jugador</p>
       </div>
     </div>
   </div>

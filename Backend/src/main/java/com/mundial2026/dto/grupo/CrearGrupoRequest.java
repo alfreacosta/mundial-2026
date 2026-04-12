@@ -1,5 +1,7 @@
 package com.mundial2026.dto.grupo;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -13,4 +15,8 @@ public class CrearGrupoRequest {
 
     @Size(max = 255, message = "El premio no puede superar los 255 caracteres")
     private String premio;
+
+    @Min(value = 1, message = "La cantidad mínima de países es 1")
+    @Max(value = 5, message = "La cantidad máxima de países es 5")
+    private Integer cantidadPaises;
 }

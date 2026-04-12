@@ -263,6 +263,7 @@ classDiagram
         +String premio
         +String codigoInvitacion
         +Usuario creador
+        +Integer cantidadPaises
         +LocalDateTime transDate
         +Boolean activo
         --
@@ -271,7 +272,7 @@ classDiagram
         +esActivo()
     }
 
-    note for Grupo "codigoInvitacion: UNIQUE — puntaje calculado dinamicamente como SUM de puntajes de miembros"
+    note for Grupo "codigoInvitacion: UNIQUE — cantidadPaises: 1..5, define cuántos países elige cada miembro — puntaje calculado dinamicamente como SUM de puntajes de miembros"
 
     class GrupoRow {
         +Long internalId

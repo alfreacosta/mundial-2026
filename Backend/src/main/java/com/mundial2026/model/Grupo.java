@@ -49,4 +49,8 @@ public class Grupo {
     @Column(name = "activo", nullable = false)
     @Builder.Default
     private Boolean activo = true;
+
+    @Column(name = "cantidad_paises", nullable = false)
+    @Builder.Default
+    private Integer cantidadPaises = 5;
 }

@@ -20,6 +20,7 @@ export class CrearGrupoComponent {
 
   nombre = '';
   premio = '';
+  cantidadPaises = 5;
   loading = false;
   error = '';
   grupoNuevo: Grupo | null = null;
@@ -34,7 +35,8 @@ export class CrearGrupoComponent {
 
     this.grupoService.crearGrupo({
       nombre: this.nombre.trim(),
-      premio: this.premio.trim() || undefined
+      premio: this.premio.trim() || undefined,
+      cantidadPaises: this.cantidadPaises
     }).subscribe({
       next: (grupo) => {
         this.grupoNuevo = grupo;

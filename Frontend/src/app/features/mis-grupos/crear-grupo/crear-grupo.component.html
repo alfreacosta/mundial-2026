@@ -59,6 +59,20 @@
                placeholder="" maxlength="255"
                class="form-control">
       </div>
+
+      <div class="form-group">
+        <label for="cantidadPaises">Cantidad de países por jugador</label>
+        <div class="qty-selector">
+          <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises > 1 ? cantidadPaises - 1 : 1" [disabled]="cantidadPaises <= 1">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="qty-value">{{ cantidadPaises }}</span>
+          <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises < 5 ? cantidadPaises + 1 : 5" [disabled]="cantidadPaises >= 5">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <p class="form-hint">Cada miembro elegirá {{ cantidadPaises }} {{ cantidadPaises === 1 ? 'país' : 'países' }} para competir.</p>
+      </div>
     </div>
 
     <div class="modal-footer">

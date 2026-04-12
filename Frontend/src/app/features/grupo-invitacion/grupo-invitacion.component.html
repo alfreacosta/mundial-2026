@@ -39,6 +39,11 @@
           <span class="i-stat-num">#{{ grupo.numero }}</span>
           <span class="i-stat-label">número de grupo</span>
         </div>
+        <div class="i-stat-divider"></div>
+        <div class="i-stat">
+          <span class="i-stat-num">{{ grupo.cantidadPaises }}</span>
+          <span class="i-stat-label">{{ grupo.cantidadPaises === 1 ? 'país' : 'países' }}</span>
+        </div>
         <ng-container *ngIf="grupo.premio">
           <div class="i-stat-divider"></div>
           <div class="i-stat">

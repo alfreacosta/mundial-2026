@@ -42,6 +42,7 @@ export interface Grupo {
   creadorNombre: string;
   transDate: string;
   activo: boolean;
+  cantidadPaises: number;
   cantidadMiembros: number | null;
   miembros: GrupoRow[] | null;
 }
@@ -51,6 +52,7 @@ export interface Grupo {
 export interface CrearGrupoRequest {
   nombre: string;
   premio?: string;
+  cantidadPaises?: number;
 }
 
 export interface UnirseGrupoRequest {

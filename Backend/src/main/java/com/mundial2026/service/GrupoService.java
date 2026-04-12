@@ -38,6 +38,7 @@ public class GrupoService {
                 .numero(totalGrupos + 1)
                 .nombre(req.getNombre())
                 .premio(req.getPremio())
+                .cantidadPaises(req.getCantidadPaises() != null ? req.getCantidadPaises() : 5)
                 .codigoInvitacion(codigo)
                 .creador(creador)
                 .activo(true)
@@ -266,6 +267,7 @@ public class GrupoService {
                 .creadorNombre(g.getCreador().getNombre() + " " + g.getCreador().getApellido())
                 .transDate(g.getTransDate())
                 .activo(g.getActivo())
+                .cantidadPaises(g.getCantidadPaises())
                 .build();
     }
 

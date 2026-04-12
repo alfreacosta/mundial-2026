@@ -76,6 +76,53 @@
         background: rgba(0, 212, 255, 0.04);
       }
     }
+
+    .qty-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: v.$white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+      &:hover:not(:disabled) {
+        background: rgba(0, 212, 255, 0.15);
+        border-color: v.$fantasy-cyan;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+    }
+
+    .qty-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: v.$fantasy-cyan;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: v.$gray-500;
+      margin-top: 6px;
+    }
   }
 
   .modal-footer {

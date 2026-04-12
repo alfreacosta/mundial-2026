@@ -104,6 +104,16 @@
     margin: 0;
     mat-icon { font-size: 1.1rem; }
   }
+
+  .grupo-paises-qty {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: v.$gray-400;
+    margin: 4px 0 0;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
 }
 
 .grupo-codigo-box {

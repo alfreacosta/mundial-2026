@@ -23,6 +23,7 @@ public class GrupoDTO {
     private String creadorNombre;
     private LocalDateTime transDate;
     private Boolean activo;
+    private Integer cantidadPaises;
     private Integer cantidadMiembros;
     private List<GrupoRowDTO> miembros;
 }

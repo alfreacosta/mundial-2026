@@ -355,10 +355,12 @@ CREATE TABLE grupo (
     premio            VARCHAR(255),
     codigo_invitacion VARCHAR(20)     NOT NULL,
     creador_id        BIGINT          NOT NULL REFERENCES usuario(internal_id) ON DELETE RESTRICT,
+    cantidad_paises   INTEGER         NOT NULL DEFAULT 5,
     trans_date        TIMESTAMP       NOT NULL DEFAULT NOW(),
     activo            BOOLEAN         NOT NULL DEFAULT TRUE,
 
-    CONSTRAINT uq_grupo_codigo UNIQUE (codigo_invitacion)
+    CONSTRAINT uq_grupo_codigo UNIQUE (codigo_invitacion),
+    CONSTRAINT chk_grupo_cantidad_paises CHECK (cantidad_paises BETWEEN 1 AND 5)
 );
 
 CREATE INDEX idx_grupo_creador ON grupo(creador_id);
