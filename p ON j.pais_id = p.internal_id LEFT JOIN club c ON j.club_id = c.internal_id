@@ -1,0 +1,6 @@
+ internal_id | api_player_id |     nombre     |     apellido     |         nombre_completo         | fecha_nacimiento | edad | numero_camiseta |   pais   | pais_code |     club      | convocado_eliminatoria 
+-------------+---------------+----------------+------------------+---------------------------------+------------------+------+-----------------+----------+-----------+---------------+------------------------
+       17546 |          2497 | Roberto Júnior | Fernández Torres | Roberto Júnior Fernández Torres | 1988-03-29       |   37 |              12 | Paraguay | PAR       | Cerro Porteno | t
+        2439 |        535737 | R.             | Fernandez        | R. Fernandez                    |                  |   37 |              12 | Paraguay | PAR       |               | t
+(2 rows)
+

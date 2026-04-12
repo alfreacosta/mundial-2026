@@ -5,9 +5,9 @@
     <div class="header-content">
       <h1 class="page-title">
         <mat-icon>group</mat-icon>
-        Mis Grupos
+        Mis Competencias
       </h1>
-      <p class="page-subtitle">Creá o unite a grupos con amigos y competí eligiendo tus equipos favoritos</p>
+      <p class="page-subtitle">Creá o unite a una competencia y desafia a tus amigos</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-secondary" (click)="showUnirseModal = true">
@@ -43,10 +43,10 @@
 
   <!-- Lista de grupos -->
   <div class="grupos-grid" *ngIf="!loading && grupos.length > 0">
-    <div class="grupo-card" *ngFor="let grupo of grupos">
+    <div class="grupo-card" *ngFor="let grupo of grupos" [routerLink]="['/mis-grupos', grupo.internalId]" style="cursor: pointer;">
       <div class="grupo-card-header">
         <div class="grupo-codigo">#{{ grupo.codigoInvitacion }}</div>
-        <div class="grupo-actions">
+        <div class="grupo-actions" (click)="$event.stopPropagation()">
           <a class="btn-icon" [routerLink]="['/mis-grupos', grupo.internalId]" title="Ver grupo">
             <mat-icon>visibility</mat-icon>
           </a>
