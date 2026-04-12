@@ -1271,14 +1271,14 @@ $save-bar-height: 72px;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255,255,255,0.1);
-    color: $text-primary;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
   }
 
   &.active {
-    background: rgba(var(--btn-color-r, 59), var(--btn-color-g, 130), var(--btn-color-b, 246), 0.15);
-    color: var(--btn-color);
-    border-color: var(--btn-color);
+    background: rgba(16, 185, 129, 0.18);
+    color: #10b981;
+    border-color: #10b981;
   }
 }
 
