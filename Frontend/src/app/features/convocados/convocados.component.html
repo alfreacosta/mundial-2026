@@ -274,7 +274,7 @@
                 <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
                   <mat-icon>person</mat-icon>
                 </div>
-                <span class="pitch-name">{{ p.apellido }}</span>
+                <span class="pitch-name">{{ p.nombreCompleto || (p.nombre + ' ' + p.apellido) }}</span>
                 <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
               </div>
             </div>

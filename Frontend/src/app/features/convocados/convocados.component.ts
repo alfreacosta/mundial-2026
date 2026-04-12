@@ -416,9 +416,13 @@ export class ConvocadosComponent implements OnInit {
       next: (resp) => {
         this.saving = false;
         this.convocatoriaEstado = resp.estado;
-        this.snackBar.open(
-          `✅ Convocatoria guardada: ${resp.totalJugadores} jugadores`,
-          'Cerrar',
+        const tab = this.activeTab();
+        const msg = tab === 'titulares'
+          ? `✅ Titulares guardados: ${titulares.length} jugadores`
+          : tab === 'nova'
+            ? `✅ Convocatoria guardada (${noVa.length} descartados)`
+            : `✅ Convocatoria guardada: ${resp.totalJugadores} jugadores`;
+        this.snackBar.open(msg, 'Cerrar',
           { duration: 5000, panelClass: 'snack-success' }
         );
       },
@@ -540,16 +544,23 @@ export class ConvocadosComponent implements OnInit {
     overlay.style.cssText = 'position:absolute;top:8px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10;pointer-events:none;';
 
     const left = document.createElement('span');
-    left.textContent = 'DT26';
-    left.style.cssText = 'font-size:18px;font-weight:900;color:rgba(255,255,255,0.85);text-shadow:0 2px 6px rgba(0,0,0,0.7);letter-spacing:1px;';
+    left.textContent = 'dt26.win';
+    left.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
 
     const right = document.createElement('span');
     const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     right.textContent = `${this.pais?.nombre ?? ''} · ${fecha}`;
-    right.style.cssText = 'font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 6px rgba(0,0,0,0.7);';
+    right.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
 
     overlay.appendChild(left);
     overlay.appendChild(right);
+
+    // Marca de agua central diagonal
+    const watermark = document.createElement('div');
+    watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:28px;font-weight:800;color:rgba(255,255,255,0.07);letter-spacing:3px;white-space:nowrap;pointer-events:none;z-index:10;';
+    watermark.textContent = 'dt26.win';
+    el.appendChild(watermark);
+
     el.appendChild(overlay);
 
     html2canvas(el, {
@@ -558,8 +569,9 @@ export class ConvocadosComponent implements OnInit {
       useCORS: true,
       allowTaint: true
     }).then(canvas => {
-      // Quitar overlay temporal
+      // Quitar overlays temporales
       overlay.remove();
+      watermark.remove();
       canvas.toBlob(blob => {
         if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
           const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
@@ -571,6 +583,7 @@ export class ConvocadosComponent implements OnInit {
       }, 'image/png');
     }).catch(() => {
       overlay.remove();
+      watermark.remove();
       this.exportingPitch = false;
       this.snackBar.open('Error al exportar la imagen', '', { duration: 3000 });
     });
