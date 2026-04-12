@@ -153,7 +153,6 @@ classDiagram
         +Pais equipoLocal
         +Pais equipoVisitante
         +Fase fase
-        +Estadio estadioRef
         +LocalDateTime transDate
         +String estadio
         +Integer golLocal
@@ -167,7 +166,7 @@ classDiagram
         +obtenerLimiteHorario()
     }
     
-    note for Partido "estado: PENDIENTE | EN_CURSO | FINALIZADO — estadio_id FK a Estadio + estadio String redundante por compatibilidad"
+    note for Partido "estado: PENDIENTE | EN_CURSO | FINALIZADO — estadio es String (nombre), no FK a Estadio"
 
     class ConvocatoriaRow {
         +Long internalId
@@ -302,6 +301,20 @@ classDiagram
 
     note for EquipoFavorito "UNIQUE (usuarioId, paisId) y (usuarioId, orden) — max 5 por usuario"
 
+    class PasswordResetToken {
+        +Long internalId
+        +Usuario usuario
+        +String token
+        +LocalDateTime expiryDate
+        +Boolean used
+        +LocalDateTime createdAt
+        --
+        +esValido()
+        +marcarUsado()
+    }
+
+    note for PasswordResetToken "token: UNIQUE — usado para recuperar contraseña via email"
+
     %% ==================== RELACIONES ====================
     
     Usuario "1" --> "*" Convocatoria : crea
@@ -312,6 +325,7 @@ classDiagram
     Usuario "1" --> "*" Grupo : crea
     Usuario "1" --> "*" GrupoRow : participaEn
     Usuario "1" --> "*" EquipoFavorito : tieneFavoritos
+    Usuario "1" --> "*" PasswordResetToken : tieneTokensReset
     
     Convocatoria "*" --> "1" Pais : representa
     Convocatoria "1" --> "*" ConvocatoriaRow : tieneFilas
@@ -334,7 +348,6 @@ classDiagram
     Partido "*" --> "1" Pais : equipoLocal
     Partido "*" --> "1" Pais : equipoVisitante
     Partido "*" --> "1" Fase : perteneceAFase
-    Partido "*" --> "0..1" Estadio : seJuegaEn
     
     Alineacion "*" --> "1" Usuario : creadaPor
     Alineacion "*" --> "1" Partido : paraPartido
