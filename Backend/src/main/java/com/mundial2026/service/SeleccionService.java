@@ -180,7 +180,11 @@ public class SeleccionService {
      * Lee directamente de la BD (columnas dt_nombre y dt_foto_url en pais).
      */
     public List<DtAvatarDTO> getDtAvatars() {
-        return paisRepository.findAllWithConfederacion().stream()
+        List<Pais> todos = paisRepository.findAllWithConfederacion();
+        log.info("getDtAvatars: total paises={}, activos con DT={}",
+                todos.size(),
+                todos.stream().filter(p -> p.getActivo() && p.getDtNombre() != null).count());
+        return todos.stream()
                 .filter(p -> p.getActivo() && p.getDtNombre() != null && !p.getDtNombre().isBlank())
                 .map(p -> DtAvatarDTO.builder()
                         .codigo(p.getCodigo())
