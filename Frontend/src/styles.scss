@@ -26,15 +26,10 @@ html {
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
+  color-scheme: dark;
 
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
+  // Fondo oscuro unificado para toda la app
+  background-color: #0a0e17;
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
 
@@ -56,7 +51,7 @@ html {
 html, body {
   height: 100%;
   font-family: 'Inter', 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a0e27;
+  background: #0a0e17;
   background-attachment: fixed;
   color: rgba(255, 255, 255, 0.87);
   -webkit-font-smoothing: antialiased;
