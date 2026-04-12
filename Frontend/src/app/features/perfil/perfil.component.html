@@ -79,6 +79,9 @@
       <p class="email">{{ user?.email }}</p>
       <div class="puntaje-badge">{{ user?.puntaje || 0 }} pts</div>
     </div>
+    <button class="btn-logout-perfil" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </button>
   </div>
 
   <!-- ── TABS ── -->

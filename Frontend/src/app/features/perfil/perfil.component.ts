@@ -75,6 +75,10 @@ export class PerfilComponent implements OnInit {
     private countriesService: CountriesService
   ) {}
 
+  logout(): void {
+    this.auth.logout();
+  }
+
   ngOnInit(): void {
     this.user = this.auth.getCurrentUser();
     this.perfilPublico = (this.user as any)?.perfilPublico ?? true;

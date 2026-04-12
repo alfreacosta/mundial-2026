@@ -92,10 +92,6 @@
               <span class="user-points">{{ (user | async)?.puntaje || 0 }} pts</span>
             </div>
           </a>
-          <button class="btn-logout" (click)="logout()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Salir</span>
-          </button>
         </div>
       } @else {
         <div class="auth-buttons">

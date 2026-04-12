@@ -118,6 +118,31 @@ $ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+.btn-logout-perfil {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  i { font-size: 14px; }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+  }
+}
+
 // ── FORM SECTIONS ──
 .form-section {
   background: $bg-card;
