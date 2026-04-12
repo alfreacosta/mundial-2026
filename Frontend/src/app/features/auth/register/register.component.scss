@@ -1280,7 +1280,7 @@ $border:    rgba(255,255,255,0.1);
   gap: 20px;
   margin-bottom: 40px;
 
-  @media (max-width: 700px) { grid-template-columns: 1fr; }
+  @media (max-width: 700px) { gap: 10px; }
 }
 
 .score-card {
@@ -1289,6 +1289,11 @@ $border:    rgba(255,255,255,0.1);
   border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(8px);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+
+  @media (max-width: 700px) {
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
 
   &:hover {
     transform: translateY(-4px);
@@ -1301,6 +1306,11 @@ $border:    rgba(255,255,255,0.1);
     gap: 14px;
     margin-bottom: 20px;
 
+    @media (max-width: 700px) {
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
     .sc-emoji { font-size: 1.6rem; }
     .sc-icon {
       display: flex;
@@ -1311,6 +1321,13 @@ $border:    rgba(255,255,255,0.1);
       border-radius: 12px;
       flex-shrink: 0;
       svg { width: 24px; height: 24px; }
+
+      @media (max-width: 700px) {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        svg { width: 18px; height: 18px; }
+      }
       &.sc-icon-green  { background: rgba(76,175,80,0.15); color: #66bb6a; box-shadow: 0 0 20px rgba(76,175,80,0.1); }
       &.sc-icon-blue   { background: rgba(33,150,243,0.15); color: #42a5f5; box-shadow: 0 0 20px rgba(33,150,243,0.1); }
       &.sc-icon-cyan   { background: rgba(6,182,212,0.15); color: #06b6d4; box-shadow: 0 0 20px rgba(6,182,212,0.1); }
@@ -1323,10 +1340,16 @@ $border:    rgba(255,255,255,0.1);
       color: #fff;
       margin: 0;
       letter-spacing: 0.3px;
+
+      @media (max-width: 700px) {
+        font-size: 0.85rem;
+      }
     }
   }
 
-  .sc-rules { display: flex; flex-direction: column; gap: 10px; }
+  .sc-rules { display: flex; flex-direction: column; gap: 10px;
+    @media (max-width: 700px) { gap: 6px; }
+  }
 
   .sc-rule {
     display: flex;
@@ -1334,6 +1357,11 @@ $border:    rgba(255,255,255,0.1);
     gap: 12px;
     color: rgba(255, 255, 255, 0.75);
     font-size: 0.9rem;
+
+    @media (max-width: 700px) {
+      gap: 6px;
+      font-size: 0.72rem;
+    }
   }
 
   .sc-pts {
@@ -1345,6 +1373,13 @@ $border:    rgba(255,255,255,0.1);
     padding: 4px 10px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.06);
+
+    @media (max-width: 700px) {
+      min-width: 36px;
+      font-size: 0.72rem;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
   }
 
   &.sc-green {
