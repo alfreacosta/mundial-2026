@@ -264,7 +264,7 @@ export class ConvocadosComponent implements OnInit {
       const nombre = normalize(j.nombreCompleto || `${j.nombre} ${j.apellido}`);
       const club = normalize(j.club?.nombre || '');
       return nombre.includes(q) || club.includes(q);
-    });
+    }).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
   }
 
   get filteredCount(): number {

@@ -908,12 +908,22 @@ $transition: 0.2s ease;
   }
 
   .detail-tabs .tab-btn {
-    padding: 8px 10px;
-    font-size: 12px;
+    padding: 8px 6px;
+    font-size: 11px;
+    flex: 1;
+    justify-content: center;
   }
 
   .players-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .player-card .player-info {
+    padding: 6px 8px;
+
+    .player-name { font-size: 11px; }
+    .player-club { font-size: 10px; }
+    .player-age, .player-apps { font-size: 9px; }
   }
 
   .search-bar-wrap {

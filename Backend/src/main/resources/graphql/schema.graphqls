@@ -80,6 +80,7 @@ type Jugador {
     ultimaStatsSync: String
     partidosTemporada: Int
     convocadoEliminatoria: Boolean
+    rating: Float
 }
 
 type Partido {

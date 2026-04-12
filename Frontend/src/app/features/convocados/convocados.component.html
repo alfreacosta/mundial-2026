@@ -184,8 +184,8 @@
           </div>
 
           <!-- Rating badge -->
-          <span class="rating-badge" *ngIf="ratingCache.get(player.internalId) as r">
-            {{ (+r).toFixed(1) }} <span class="rating-star">⭐</span>
+          <span class="rating-badge" *ngIf="player.rating">
+            {{ player.rating.toFixed(1) }} <span class="rating-star">⭐</span>
           </span>
 
           <!-- Avatar -->

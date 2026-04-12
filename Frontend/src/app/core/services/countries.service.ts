@@ -43,6 +43,7 @@ export interface JugadorPais {
   urlFoto: string | null;
   partidosTemporada: number | null;
   convocadoEliminatoria: boolean;
+  rating: number | null;
   posicion: {
     internalId: number;
     codigo: string;
@@ -106,7 +107,7 @@ export class CountriesService {
 
   getJugadoresPorPais(paisId: number): Observable<JugadorPais[]> {
     const query = `{ jugadoresPorPais(paisId: ${paisId}) {
-      internalId nombre apellido nombreCompleto numeroCamiseta edad urlFoto convocadoEliminatoria
+      internalId nombre apellido nombreCompleto numeroCamiseta edad urlFoto convocadoEliminatoria rating
       posicion { internalId codigo nombre abreviatura }
       club { internalId nombre }
     } }`;

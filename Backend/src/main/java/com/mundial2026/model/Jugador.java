@@ -78,4 +78,7 @@ public class Jugador {
 
     @Column(name = "convocado_eliminatoria")
     private Boolean convocadoEliminatoria = false;
+
+    @Column(name = "rating", precision = 4, scale = 2)
+    private java.math.BigDecimal rating;
 }

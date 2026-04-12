@@ -22,6 +22,7 @@ export interface JugadorSeleccion {
   clubLogoUrl: string | null;
   partidosTemporada: number | null;
   convocadoEliminatoria: boolean;
+  rating: number | null;
 }
 
 export interface Seleccion {

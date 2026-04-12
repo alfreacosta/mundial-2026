@@ -27,4 +27,5 @@ public class JugadorSeleccionDTO {
 
     private Integer partidosTemporada;
     private Boolean convocadoEliminatoria;
+    private Double rating;
 }

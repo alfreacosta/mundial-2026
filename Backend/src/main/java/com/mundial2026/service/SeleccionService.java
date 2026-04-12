@@ -243,6 +243,7 @@ public class SeleccionService {
                         .clubNombre(j.getClub() != null ? j.getClub().getNombre() : null)
                         .partidosTemporada(j.getPartidosTemporada())
                         .convocadoEliminatoria(j.getConvocadoEliminatoria())
+                        .rating(j.getRating() != null ? j.getRating().doubleValue() : null)
                         .build())
                 .collect(Collectors.toList());
     }
