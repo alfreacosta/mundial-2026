@@ -71,6 +71,6 @@ public class Pais {
     @Column(name = "dt_nombre", length = 150)
     private String dtNombre;
 
-    @Column(name = "dt_foto_url", length = 300)
+    @Column(name = "dt_foto_url", length = 500)
     private String dtFotoUrl;
 }
