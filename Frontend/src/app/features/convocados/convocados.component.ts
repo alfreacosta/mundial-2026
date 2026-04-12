@@ -654,38 +654,35 @@ export class ConvocadosComponent implements OnInit {
     if (!el) return;
     this.exportingPitch = true;
 
-    // Agregar marcas de agua temporales para la captura (4 posiciones)
+    // Agregar marcas de agua temporales para la captura
     const username = this.authService.getCurrentUser()?.user;
     const tmpEls: HTMLElement[] = [];
 
-    const createWatermark = (top: string, left: string, align: string): HTMLElement => {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = `position:absolute;top:${top};left:${left};transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:${align};gap:1px;z-index:10;pointer-events:none;`;
-      const s = document.createElement('span');
-      s.textContent = 'dt26.win';
-      s.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
-      wrap.appendChild(s);
-      if (username) {
-        const u = document.createElement('span');
-        u.textContent = `@${username}`;
-        u.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
-        wrap.appendChild(u);
-      }
-      return wrap;
-    };
-
-    // 4 marcas: arriba-izq, arriba-centro, abajo-izq, abajo-centro
-    const positions: [string, string, string][] = [
-      ['6%', '12%', 'flex-start'],
-      ['6%', '50%', 'center'],
-      ['94%', '12%', 'flex-start'],
-      ['94%', '50%', 'center'],
-    ];
-    for (const [t, l, a] of positions) {
-      const wm = createWatermark(t, l, a);
-      el.appendChild(wm);
-      tmpEls.push(wm);
+    // 1) Arriba izquierda: dt26.win + usuario
+    const topLeft = document.createElement('div');
+    topLeft.style.cssText = 'position:absolute;top:8px;left:12px;display:flex;flex-direction:column;gap:1px;z-index:10;pointer-events:none;';
+    const siteName = document.createElement('span');
+    siteName.textContent = 'dt26.win';
+    siteName.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
+    topLeft.appendChild(siteName);
+    if (username) {
+      const userTag = document.createElement('span');
+      userTag.textContent = `usuario: @${username}`;
+      userTag.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
+      topLeft.appendChild(userTag);
     }
+    el.appendChild(topLeft);
+    tmpEls.push(topLeft);
+
+    // 2) Centro de la cancha: dt26.win horizontal sobre la línea central
+    const center = document.createElement('div');
+    center.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none;';
+    const centerText = document.createElement('span');
+    centerText.textContent = 'dt26.win';
+    centerText.style.cssText = 'font-size:22px;font-weight:800;color:rgba(255,255,255,0.08);letter-spacing:2px;white-space:nowrap;';
+    center.appendChild(centerText);
+    el.appendChild(center);
+    tmpEls.push(center);
 
     // Info país + fecha arriba derecha
     const infoEl = document.createElement('div');

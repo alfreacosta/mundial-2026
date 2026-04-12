@@ -10,8 +10,10 @@
 
   <!-- ── TARJETA DE USUARIO ── -->
   <div class="user-card">
-    <div class="avatar-display" [class]="selectedAvatar || ''">
-      @if (selectedAvatar) {
+    <div class="avatar-display" [class]="selectedAvatar?.startsWith('http') ? '' : (selectedAvatar || '')">
+      @if (selectedAvatar?.startsWith('http')) {
+        <img [src]="selectedAvatar" alt="Avatar DT" class="avatar-photo-big">
+      } @else if (selectedAvatar) {
         <div class="avatar-icon">
           <svg viewBox="0 0 80 80" class="avatar-svg">
             @switch (selectedAvatar) {
@@ -363,6 +365,41 @@
               </button>
             }
           </div>
+        </div>
+
+        <!-- ── DT AVATARS SECTION ── -->
+        <div class="avatar-section dt-section">
+          <button type="button" class="dt-toggle-btn" (click)="toggleDtAvatars()">
+            <span>⚽ Elegí un DT como avatar</span>
+            <span class="dt-toggle-icon">{{ showDtAvatars ? '▲' : '▼' }}</span>
+          </button>
+
+          @if (showDtAvatars) {
+            @if (dtAvatarsLoading) {
+              <div class="dt-loading">Cargando directores técnicos...</div>
+            } @else if (dtAvatars.length > 0) {
+              <div class="dt-avatar-grid">
+                @for (dt of dtAvatars; track dt.codigo) {
+                  <button type="button"
+                          class="dt-avatar-option"
+                          [class.selected]="selectedAvatar === dt.dtFotoUrl"
+                          (click)="selectAvatar(dt.dtFotoUrl)">
+                    <img [src]="dt.dtFotoUrl" [alt]="dt.dtNombre" class="dt-photo"
+                         (error)="$any($event.target).style.display='none'">
+                    <div class="dt-info">
+                      <span class="dt-name">{{ dt.dtNombre }}</span>
+                      <span class="dt-pais">
+                        <img [src]="dt.logoUrl" class="dt-flag" *ngIf="dt.logoUrl">
+                        {{ dt.pais }}
+                      </span>
+                    </div>
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="dt-loading">No se pudieron cargar los DTs. Intentá más tarde.</div>
+            }
+          }
         </div>
 
         @if (profileMsg) {

@@ -6,7 +6,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (avatarId) {
+    @if (isPhotoUrl) {
+      <img [src]="avatarId" [alt]="nombre || 'Avatar'" class="avatar-photo" [style.width.px]="size" [style.height.px]="size">
+    } @else if (avatarId) {
       <svg [attr.viewBox]="'0 0 80 80'" class="avatar-svg" [style.width.px]="size" [style.height.px]="size">
         @switch (avatarId) {
           @case ('avatar-goalkeeper') {
@@ -88,6 +90,9 @@ import { CommonModule } from '@angular/common';
       display: inline-flex; align-items: center; justify-content: center;
       border-radius: 50%; background: rgba(100,116,139,.2); color: #64748b;
     }
+    .avatar-photo {
+      border-radius: 50%; object-fit: cover; background: rgba(30,41,59,.6);
+    }
   `]
 })
 export class AvatarIconComponent {
@@ -95,6 +100,10 @@ export class AvatarIconComponent {
   @Input() nombre: string | null | undefined = null;
   @Input() apellido: string | null | undefined = null;
   @Input() size = 32;
+
+  get isPhotoUrl(): boolean {
+    return !!this.avatarId && this.avatarId.startsWith('http');
+  }
 
   get initials(): string {
     const n = (this.nombre || '').trim();

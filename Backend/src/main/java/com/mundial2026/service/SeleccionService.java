@@ -176,6 +176,33 @@ public class SeleccionService {
     }
 
     /**
+     * Obtiene la lista de DTs de los 48 equipos para usarlos como avatares.
+     * Llama a la API-Football con cache de 24h por equipo.
+     */
+    public List<DtAvatarDTO> getDtAvatars() {
+        List<Pais> paises = paisRepository.findAllWithConfederacion();
+        List<DtAvatarDTO> result = new ArrayList<>();
+        for (Pais p : paises) {
+            if (!p.getActivo()) continue;
+            Long apiTeamId = getApiTeamId(p);
+            if (apiTeamId == null) continue;
+            Optional<Map<String, String>> coachOpt = apiService.getCoach(apiTeamId);
+            if (coachOpt.isPresent()) {
+                Map<String, String> coach = coachOpt.get();
+                result.add(DtAvatarDTO.builder()
+                        .codigo(p.getCodigo())
+                        .pais(p.getNombre())
+                        .dtNombre(coach.get("nombre"))
+                        .dtFotoUrl(coach.get("fotoUrl"))
+                        .logoUrl(p.getLogoUrl())
+                        .build());
+            }
+        }
+        result.sort(Comparator.comparing(DtAvatarDTO::getPais));
+        return result;
+    }
+
+    /**
      * Busca un venue/estadio del Mundial por nombre.
      */
     public Optional<VenueDTO> getVenueByName(String name) {

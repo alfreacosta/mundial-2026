@@ -76,6 +76,13 @@ $ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 1.3rem;
     font-weight: 700;
   }
+
+  .avatar-photo-big {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
 
 .avatar-icon {
@@ -272,6 +279,127 @@ $ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: .65rem;
     color: $text-muted;
     text-transform: capitalize;
+  }
+}
+
+// ── DT AVATARS SECTION ──
+.dt-section {
+  margin-top: 8px;
+}
+
+.dt-toggle-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 10px 16px;
+  cursor: pointer;
+  color: $text;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: all $ease;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($accent, 0.3);
+  }
+
+  .dt-toggle-icon {
+    font-size: .75rem;
+    color: $text-muted;
+  }
+}
+
+.dt-loading {
+  text-align: center;
+  padding: 20px;
+  color: $text-muted;
+  font-size: .85rem;
+}
+
+.dt-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
+}
+
+.dt-avatar-option {
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid $border;
+  border-radius: $radius;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all $ease;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($accent, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &.selected {
+    border-color: $accent;
+    background: rgba($accent, 0.1);
+    box-shadow: 0 0 0 2px rgba($accent, .25);
+  }
+
+  .dt-photo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(30,41,59,.6);
+    flex-shrink: 0;
+  }
+
+  .dt-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .dt-name {
+    font-size: .72rem;
+    font-weight: 600;
+    color: $text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dt-pais {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .65rem;
+    color: $text-muted;
+  }
+
+  .dt-flag {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+  }
+}
+
+@media (max-width: 600px) {
+  .dt-avatar-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

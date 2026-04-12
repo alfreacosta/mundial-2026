@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { GrupoService } from '../../core/services/grupo.service';
@@ -11,6 +12,15 @@ import { CountriesService, ConvocatoriaResponse } from '../../core/services/coun
 import { MisFavoritosComponent } from './mis-favoritos/mis-favoritos.component';
 import { Usuario } from '../../core/models/auth.models';
 import { getFlagUrl } from '../../core/utils/flag.utils';
+import { environment } from '../../../environments/environment';
+
+export interface DtAvatar {
+  codigo: string;
+  pais: string;
+  dtNombre: string;
+  dtFotoUrl: string;
+  logoUrl: string;
+}
 
 const AVATARS: string[] = [
   'avatar-goalkeeper',
@@ -67,12 +77,18 @@ export class PerfilComponent implements OnInit {
   jugadoresPorEquipo = new Map<number, any[]>();
   loadingConvocados = new Set<number>();
 
+  // DT Avatars
+  dtAvatars: DtAvatar[] = [];
+  dtAvatarsLoading = false;
+  showDtAvatars = false;
+
   constructor(
     private auth: AuthService,
     private fb: FormBuilder,
     private grupoService: GrupoService,
     private prediccionService: PrediccionTorneoService,
-    private countriesService: CountriesService
+    private countriesService: CountriesService,
+    private http: HttpClient
   ) {}
 
   logout(): void {
@@ -150,6 +166,26 @@ export class PerfilComponent implements OnInit {
 
   selectAvatar(avatar: string): void {
     this.selectedAvatar = avatar;
+  }
+
+  toggleDtAvatars(): void {
+    this.showDtAvatars = !this.showDtAvatars;
+    if (this.showDtAvatars && this.dtAvatars.length === 0) {
+      this.loadDtAvatars();
+    }
+  }
+
+  private loadDtAvatars(): void {
+    this.dtAvatarsLoading = true;
+    this.http.get<DtAvatar[]>(`${environment.apiUrl}/selecciones/dt-avatars`).subscribe({
+      next: (data) => {
+        this.dtAvatars = data;
+        this.dtAvatarsLoading = false;
+      },
+      error: () => {
+        this.dtAvatarsLoading = false;
+      }
+    });
   }
 
   get avatarInitials(): string {

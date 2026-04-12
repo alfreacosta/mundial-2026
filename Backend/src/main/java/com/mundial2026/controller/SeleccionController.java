@@ -47,6 +47,12 @@ public class SeleccionController {
         return ResponseEntity.ok(seleccionService.getStandings());
     }
 
+    /** Listado de DTs como opciones de avatar */
+    @GetMapping("/dt-avatars")
+    public ResponseEntity<List<DtAvatarDTO>> getDtAvatars() {
+        return ResponseEntity.ok(seleccionService.getDtAvatars());
+    }
+
     /** Buscar un estadio del Mundial por nombre */
     @GetMapping("/venues/search")
     public ResponseEntity<VenueDTO> searchVenue(@RequestParam String name) {
