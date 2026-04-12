@@ -56,9 +56,19 @@
         <mat-icon>groups</mat-icon>
         Plantel
       </button>
-      <button class="tab-btn active">
+      <button class="tab-btn" [class.active]="activeTab() === 'convocatoria'" (click)="activeTab.set('convocatoria')">
         <mat-icon>assignment</mat-icon>
         Convocatoria
+      </button>
+      <button class="tab-btn" [class.active]="activeTab() === 'titulares'" (click)="activeTab.set('titulares')">
+        <mat-icon>star</mat-icon>
+        11 Titulares
+        <span class="tab-count" *ngIf="totalTitulares() > 0">{{ totalTitulares() }}/11</span>
+      </button>
+      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="activeTab.set('nova')">
+        <mat-icon>person_off</mat-icon>
+        No Va
+        <span class="tab-count nova-count" *ngIf="totalNoVa() > 0">{{ totalNoVa() }}</span>
       </button>
     </nav>
 
@@ -140,7 +150,8 @@
   <!-- ═══ PLAYERS POR POSICIÓN ═══ -->
   <div class="players-container" *ngIf="!loading && !error && players().length > 0">
 
-    <main class="players-main">
+    <!-- ═══ TAB: CONVOCATORIA ═══ -->
+    <main class="players-main" *ngIf="activeTab() === 'convocatoria'">
 
       <section
         *ngFor="let pg of positionGroups"
@@ -217,7 +228,144 @@
 
     </section>
 
-      <!-- ═══ SECCIÓN NO VA ═══ -->
+    </main>
+
+    <!-- ═══ TAB: 11 TITULARES ═══ -->
+    <main class="players-main titulares-main" *ngIf="activeTab() === 'titulares'">
+
+      <!-- Estado vacío: sin convocados -->
+      <div class="state-container" *ngIf="totalSel() === 0" style="padding: 3rem 1rem">
+        <mat-icon class="state-icon" style="color: #94a3b8;">group_off</mat-icon>
+        <h3>No hay convocados</h3>
+        <p>Primero seleccioná jugadores en la pestaña <strong>Convocatoria</strong>.</p>
+      </div>
+
+      <!-- Lista de convocados para marcar como titular -->
+      <ng-container *ngIf="totalSel() > 0">
+        <div class="titulares-info-bar">
+          <mat-icon>star</mat-icon>
+          <span>Seleccioná <strong>1 arquero</strong> y <strong>10 jugadores de campo</strong> para armar tu XI titular</span>
+          <span class="titulares-counter" [style.background-color]="confColor">{{ totalTitulares() }}/{{ MAX_TITULARES }}</span>
+        </div>
+
+        <section *ngFor="let pg of positionGroups" class="position-section"
+          [class.has-players]="getTitularCandidates(pg.codigo).length > 0">
+
+          <div class="position-header" [style.--pos-color]="pg.color"
+               *ngIf="getTitularCandidates(pg.codigo).length > 0">
+            <div class="pos-title">
+              <div class="pos-icon-wrap" [style.background-color]="pg.color">
+                <mat-icon>{{ pg.icon }}</mat-icon>
+              </div>
+              <div>
+                <h2>{{ pg.label }}</h2>
+                <p>{{ titularPosCounts()[pg.codigo] || 0 }} titulares de {{ getTitularCandidates(pg.codigo).length }} convocados</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="players-grid" *ngIf="getTitularCandidates(pg.codigo).length > 0">
+            <div *ngFor="let player of getTitularCandidates(pg.codigo)"
+              class="player-card"
+              [class.selected]="player.titular"
+              [style.--player-color]="pg.color">
+
+              <div class="selected-check" [style.background-color]="pg.color">
+                <mat-icon>star</mat-icon>
+              </div>
+
+              <div class="player-avatar">
+                <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
+                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
+                  <mat-icon [style.color]="pg.color">person</mat-icon>
+                </div>
+                <span class="jersey-number" *ngIf="player.numeroCamiseta">#{{ player.numeroCamiseta }}</span>
+              </div>
+
+              <div class="player-info">
+                <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
+                <p class="player-club" *ngIf="player.club">
+                  <mat-icon>apartment</mat-icon> {{ player.club.nombre }}
+                </p>
+              </div>
+
+              <div class="player-card-footer">
+                <button class="footer-btn btn-titular"
+                  [class.active]="player.titular"
+                  [style.--btn-color]="pg.color"
+                  (click)="toggleTitular(player)">
+                  {{ player.titular ? 'Titular ★' : 'Titular' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cancha visualización -->
+        <section class="pitch-section" *ngIf="totalTitulares() > 0">
+          <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
+          <div class="pitch">
+            <div class="pitch-field">
+              <!-- Arquero -->
+              <div class="pitch-row pitch-gk">
+                <div *ngFor="let p of getTitularesByPos('ARQ')" class="pitch-player">
+                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
+                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <span class="pitch-name">{{ p.apellido }}</span>
+                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+                </div>
+              </div>
+              <!-- Defensores -->
+              <div class="pitch-row pitch-def">
+                <div *ngFor="let p of getTitularesByPos('DEF')" class="pitch-player">
+                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
+                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <span class="pitch-name">{{ p.apellido }}</span>
+                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+                </div>
+              </div>
+              <!-- Mediocampistas -->
+              <div class="pitch-row pitch-mid">
+                <div *ngFor="let p of getTitularesByPos('MED')" class="pitch-player">
+                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
+                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <span class="pitch-name">{{ p.apellido }}</span>
+                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+                </div>
+              </div>
+              <!-- Delanteros -->
+              <div class="pitch-row pitch-fwd">
+                <div *ngFor="let p of getTitularesByPos('DEL')" class="pitch-player">
+                  <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
+                  <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <span class="pitch-name">{{ p.apellido }}</span>
+                  <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </ng-container>
+
+    </main>
+
+    <!-- ═══ TAB: NO VA ═══ -->
+    <main class="players-main nova-main" *ngIf="activeTab() === 'nova'">
+
+      <div class="state-container" *ngIf="totalNoVa() === 0" style="padding: 3rem 1rem">
+        <mat-icon class="state-icon" style="color: #94a3b8;">check_circle</mat-icon>
+        <h3>Sin descartados</h3>
+        <p>No marcaste ningún jugador como "No Va" todavía.</p>
+      </div>
+
       <section class="nova-section" *ngIf="jugadoresNoVa.length > 0">
         <div class="nova-header">
           <div class="nova-title">
@@ -250,7 +398,7 @@
     </main>
 
     <!-- ═══ SIDEBAR DERECHO: JUGADORES SELECCIONADOS ═══ -->
-    <aside class="selected-sidebar">
+    <aside class="selected-sidebar" *ngIf="activeTab() !== 'nova'">
       <div class="sidebar-header">
         <h3>Convocados</h3>
         <span class="selected-count" [style.background-color]="confColor">{{ totalSel() }}/{{ MAX_CONVOCADOS }}</span>

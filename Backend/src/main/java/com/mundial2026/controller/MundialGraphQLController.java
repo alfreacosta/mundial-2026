@@ -129,7 +129,8 @@ public class MundialGraphQLController {
     public ConvocatoriaDTO guardarConvocatoria(@Argument Long paisId,
                                                @Argument List<Long> jugadorIds,
                                                @Argument List<Long> noVaIds,
+                                               @Argument List<Long> titularesIds,
                                                Principal principal) {
-        return convocatoriaService.guardarConvocatoria(principal.getName(), paisId, jugadorIds, noVaIds);
+        return convocatoriaService.guardarConvocatoria(principal.getName(), paisId, jugadorIds, noVaIds, titularesIds);
     }
 }

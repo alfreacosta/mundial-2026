@@ -1201,3 +1201,224 @@ $save-bar-height: 72px;
     }
   }
 }
+
+/* ═══ TAB COUNT BADGES ═══ */
+.tab-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  margin-left: 4px;
+}
+
+.nova-count {
+  background: rgba($nova-red, 0.2) !important;
+  color: $nova-red !important;
+}
+
+.tab-nova {
+  &.active {
+    color: $nova-red !important;
+    border-bottom-color: $nova-red !important;
+  }
+  &:hover {
+    color: lighten($nova-red, 10%);
+  }
+}
+
+/* ═══ TITULARES INFO BAR ═══ */
+.titulares-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: $text-secondary;
+
+  mat-icon {
+    color: #f59e0b;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .titulares-counter {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: white;
+  }
+}
+
+/* ═══ TITULAR BUTTON ═══ */
+.btn-titular {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-secondary;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255,255,255,0.1);
+    color: $text-primary;
+  }
+
+  &.active {
+    background: rgba(var(--btn-color-r, 59), var(--btn-color-g, 130), var(--btn-color-b, 246), 0.15);
+    color: var(--btn-color);
+    border-color: var(--btn-color);
+  }
+}
+
+/* ═══ CANCHA / PITCH ═══ */
+.pitch-section {
+  margin-top: 24px;
+}
+
+.pitch-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 16px;
+
+  mat-icon {
+    color: #10b981;
+  }
+}
+
+.pitch {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.pitch-field {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(180deg, #0d4a1c 0%, #10641f 15%, #0d4a1c 30%, #10641f 45%, #0d4a1c 60%, #10641f 75%, #0d4a1c 90%, #10641f 100%);
+  border: 3px solid rgba(255,255,255,0.35);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 8px;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: rgba(255,255,255,0.25);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 40px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+  }
+}
+
+.pitch-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+.pitch-gk { align-self: flex-end; }
+.pitch-def { }
+.pitch-mid { }
+.pitch-fwd { align-self: flex-start; }
+
+.pitch-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+}
+
+.pitch-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.6);
+  background: rgba(0,0,0,0.3);
+}
+
+.pitch-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: rgba(255,255,255,0.5);
+  }
+}
+
+.pitch-name {
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pitch-number {
+  font-size: 8px;
+  color: rgba(255,255,255,0.7);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+/* ═══ RESPONSIVE PITCH ═══ */
+@media (max-width: 480px) {
+  .pitch-field {
+    aspect-ratio: 2.5 / 4;
+    padding: 12px 4px;
+  }
+  .pitch-avatar, .pitch-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+  }
+  .pitch-name { font-size: 8px; max-width: 48px; }
+  .pitch-player { min-width: 40px; }
+}

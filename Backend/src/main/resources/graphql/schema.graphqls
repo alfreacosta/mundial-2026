@@ -127,7 +127,7 @@ type Query {
 # ---- Mutations ----
 
 type Mutation {
-    guardarConvocatoria(paisId: ID!, jugadorIds: [ID!]!, noVaIds: [ID!]): ConvocatoriaResponse!
+    guardarConvocatoria(paisId: ID!, jugadorIds: [ID!]!, noVaIds: [ID!], titularesIds: [ID!]): ConvocatoriaResponse!
 }
 
 # ---- Tipos de respuesta ----
@@ -137,4 +137,5 @@ type ConvocatoriaResponse {
     estado: String!
     jugadoresIds: [ID!]!
     noVaIds: [ID!]!
+    titularesIds: [ID!]!
 }

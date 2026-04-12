@@ -18,6 +18,7 @@ import { normalize } from '../../shared/utils/normalize';
 export interface JugadorSeleccionable extends JugadorPais {
   seleccionado: boolean;
   noVa: boolean;
+  titular: boolean;
 }
 
 interface PosicionGroup {
@@ -57,16 +58,27 @@ export class ConvocadosComponent implements OnInit {
   convocatoriaEstado: string | null = null;
   noEsFavorito = false;
   searchQuery = '';
+  activeTab = signal<'convocatoria' | 'titulares' | 'nova'>('convocatoria');
 
   // Computed signals — se actualizan AUTOMATICAMENTE cuando players cambia
   readonly totalSel = computed(() => this.players().filter(p => p.seleccionado).length);
   readonly totalNoVa = computed(() => this.players().filter(p => p.noVa).length);
+  readonly totalTitulares = computed(() => this.players().filter(p => p.titular).length);
   readonly posCounts = computed(() => {
     const map: Record<string, number> = {};
     for (const p of this.players()) {
       if (p.seleccionado && p.posicion?.codigo) {
         const c = p.posicion.codigo;
         map[c] = (map[c] || 0) + 1;
+      }
+    }
+    return map;
+  });
+  readonly titularPosCounts = computed(() => {
+    const map: Record<string, number> = {};
+    for (const p of this.players()) {
+      if (p.titular && p.posicion?.codigo) {
+        map[p.posicion.codigo] = (map[p.posicion.codigo] || 0) + 1;
       }
     }
     return map;
@@ -130,14 +142,18 @@ export class ConvocadosComponent implements OnInit {
         const noVaIdsSet = new Set<string>(
           (convocatoria?.noVaIds ?? []).map(id => String(id))
         );
+        const titularIdsSet = new Set<string>(
+          (convocatoria?.titularesIds ?? []).map(id => String(id))
+        );
         this.convocatoriaEstado = convocatoria?.estado ?? null;
 
-        console.log('📊 Datos cargados:', { paisId: this.paisId, paisName: this.pais?.nombre, totalJugadores: jugadores.length, savedIds: Array.from(savedIds), noVaIds: Array.from(noVaIdsSet), convocatoria });
+        console.log('📊 Datos cargados:', { paisId: this.paisId, paisName: this.pais?.nombre, totalJugadores: jugadores.length, savedIds: Array.from(savedIds), noVaIds: Array.from(noVaIdsSet), titularIds: Array.from(titularIdsSet), convocatoria });
 
         this.players.set(jugadores.map(j => ({
           ...j,
           seleccionado: savedIds.has(String(j.internalId)),
-          noVa: noVaIdsSet.has(String(j.internalId))
+          noVa: noVaIdsSet.has(String(j.internalId)),
+          titular: titularIdsSet.has(String(j.internalId))
         })));
 
         this.loading = false;
@@ -156,6 +172,13 @@ export class ConvocadosComponent implements OnInit {
   get jugadoresNoVa(): JugadorSeleccionable[] {
     return this.players().filter(p => p.noVa);
   }
+
+  get jugadoresTitulares(): JugadorSeleccionable[] {
+    return this.players().filter(p => p.titular);
+  }
+
+  readonly MAX_TITULARES = 11;
+  readonly MAX_TITULARES_ARQ = 1;
 
   get canAddMore(): boolean {
     return this.totalSel() < this.MAX_CONVOCADOS;
@@ -201,6 +224,16 @@ export class ConvocadosComponent implements OnInit {
     return pg?.color ?? '#94a3b8';
   }
 
+  /** Convocados de una posición (candidatos para titular) */
+  getTitularCandidates(codigo: string): JugadorSeleccionable[] {
+    return this.players().filter(p => p.seleccionado && p.posicion?.codigo === codigo);
+  }
+
+  /** Titulares de una posición (para la cancha) */
+  getTitularesByPos(codigo: string): JugadorSeleccionable[] {
+    return this.players().filter(p => p.titular && p.posicion?.codigo === codigo);
+  }
+
   togglePlayer(player: JugadorSeleccionable): void {
     if (!player.seleccionado && !this.canAddMore) {
       this.snackBar.open(`Límite alcanzado: máximo ${this.MAX_CONVOCADOS} convocados`, '', {
@@ -209,21 +242,51 @@ export class ConvocadosComponent implements OnInit {
       });
       return;
     }
+    const wasSelected = player.seleccionado;
     this.players.update(curr =>
-      curr.map(p => p.internalId === player.internalId ? { ...p, seleccionado: !p.seleccionado } : p)
+      curr.map(p => p.internalId === player.internalId
+        ? { ...p, seleccionado: !wasSelected, titular: wasSelected ? false : p.titular }
+        : p)
     );
   }
 
   markNoVa(player: JugadorSeleccionable, event: Event): void {
     event.stopPropagation();
     this.players.update(curr =>
-      curr.map(p => p.internalId === player.internalId ? { ...p, seleccionado: false, noVa: true } : p)
+      curr.map(p => p.internalId === player.internalId ? { ...p, seleccionado: false, noVa: true, titular: false } : p)
     );
   }
 
   undoNoVa(player: JugadorSeleccionable): void {
     this.players.update(curr =>
       curr.map(p => p.internalId === player.internalId ? { ...p, noVa: false } : p)
+    );
+  }
+
+  toggleTitular(player: JugadorSeleccionable): void {
+    if (player.titular) {
+      // Quitar de titulares
+      this.players.update(curr =>
+        curr.map(p => p.internalId === player.internalId ? { ...p, titular: false } : p)
+      );
+      return;
+    }
+    // Validar máximo 11
+    if (this.totalTitulares() >= this.MAX_TITULARES) {
+      this.snackBar.open(`Máximo ${this.MAX_TITULARES} titulares (1 arquero + 10 jugadores)`, '', {
+        duration: 2500, panelClass: 'snack-warn'
+      });
+      return;
+    }
+    // Validar máximo 1 ARQ
+    if (player.posicion?.codigo === 'ARQ' && (this.titularPosCounts()['ARQ'] || 0) >= this.MAX_TITULARES_ARQ) {
+      this.snackBar.open('Solo podés tener 1 arquero titular', '', {
+        duration: 2500, panelClass: 'snack-warn'
+      });
+      return;
+    }
+    this.players.update(curr =>
+      curr.map(p => p.internalId === player.internalId ? { ...p, titular: true } : p)
     );
   }
 
@@ -258,7 +321,7 @@ export class ConvocadosComponent implements OnInit {
   }
 
   clearAll(): void {
-    this.players.update(curr => curr.map(p => ({ ...p, seleccionado: false, noVa: false })));
+    this.players.update(curr => curr.map(p => ({ ...p, seleccionado: false, noVa: false, titular: false })));
   }
 
   get confColor(): string {
@@ -311,7 +374,8 @@ export class ConvocadosComponent implements OnInit {
   guardarConvocatoria(): void {
     const seleccionados = this.players().filter(p => p.seleccionado);
     const noVa = this.players().filter(p => p.noVa);
-    if (seleccionados.length === 0 && noVa.length === 0) {
+    const titulares = this.players().filter(p => p.titular);
+    if (seleccionados.length === 0 && noVa.length === 0 && titulares.length === 0) {
       this.snackBar.open('Seleccioná al menos un jugador o marcá alguno como "No Va" antes de guardar.', '', { duration: 3000 });
       return;
     }
@@ -319,8 +383,9 @@ export class ConvocadosComponent implements OnInit {
     this.saving = true;
     const jugadorIds = seleccionados.map(p => Number(p.internalId));
     const noVaIds = noVa.map(p => Number(p.internalId));
+    const titularesIds = titulares.map(p => Number(p.internalId));
 
-    this.countriesService.guardarConvocatoria(this.paisId, jugadorIds, noVaIds).subscribe({
+    this.countriesService.guardarConvocatoria(this.paisId, jugadorIds, noVaIds, titularesIds).subscribe({
       next: (resp) => {
         this.saving = false;
         this.convocatoriaEstado = resp.estado;

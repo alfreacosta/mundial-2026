@@ -224,7 +224,7 @@ CREATE TABLE convocatoria_row (
     master_id    BIGINT         NOT NULL REFERENCES convocatoria(internal_id) ON DELETE CASCADE,
     jugador_id   BIGINT         NOT NULL REFERENCES jugador(internal_id),
     estado       VARCHAR(20)    NOT NULL DEFAULT 'PENDIENTE'
-                     CHECK (estado IN ('PENDIENTE', 'CONVOCADO', 'NO_VA')),
+                     CHECK (estado IN ('PENDIENTE', 'CONVOCADO', 'NO_VA', 'TITULAR')),
     trans_date   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uq_convocatoria_row_jugador UNIQUE (master_id, jugador_id)

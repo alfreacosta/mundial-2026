@@ -48,7 +48,7 @@ public class ConvocatoriaService {
      * Limpia las filas anteriores y persiste las nuevas.
      */
     @Transactional
-    public ConvocatoriaDTO guardarConvocatoria(String username, Long paisId, List<Long> jugadorIds, List<Long> noVaIds) {
+    public ConvocatoriaDTO guardarConvocatoria(String username, Long paisId, List<Long> jugadorIds, List<Long> noVaIds, List<Long> titularesIds) {
         System.out.println("💾 guardarConvocatoria() - username='" + username + "', paisId=" + paisId + ", jugadorIds=" + jugadorIds + ", noVaIds=" + noVaIds);
 
         Usuario usuario = usuarioRepository.findByUser(username)
@@ -102,6 +102,20 @@ public class ConvocatoriaService {
             }
         }
 
+        // Agregar filas TITULAR
+        List<Long> safeTitularesIds = titularesIds != null ? titularesIds : List.of();
+        if (!safeTitularesIds.isEmpty()) {
+            List<Jugador> titulares = jugadorRepository.findAllById(safeTitularesIds);
+            for (Jugador j : titulares) {
+                ConvocatoriaRow row = ConvocatoriaRow.builder()
+                        .convocatoria(conv)
+                        .jugador(j)
+                        .estado("TITULAR")
+                        .build();
+                conv.getRows().add(row);
+            }
+        }
+
         conv.setTotalJugadores(jugadores.size());
         conv.setEstado("EN_PROGRESO");
 
@@ -119,6 +133,10 @@ public class ConvocatoriaService {
                 .filter(r -> "NO_VA".equals(r.getEstado()))
                 .map(r -> r.getJugador().getInternalId())
                 .collect(Collectors.toList());
-        return new ConvocatoriaDTO(c.getTotalJugadores(), c.getEstado(), convocadoIds, noVaIds);
+        List<Long> titularesIds = c.getRows().stream()
+                .filter(r -> "TITULAR".equals(r.getEstado()))
+                .map(r -> r.getJugador().getInternalId())
+                .collect(Collectors.toList());
+        return new ConvocatoriaDTO(c.getTotalJugadores(), c.getEstado(), convocadoIds, noVaIds, titularesIds);
     }
 }
