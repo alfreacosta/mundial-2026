@@ -10,67 +10,9 @@
 
   <!-- ── TARJETA DE USUARIO ── -->
   <div class="user-card">
-    <div class="avatar-display" [class]="selectedAvatar?.startsWith('http') ? '' : (selectedAvatar || '')">
+    <div class="avatar-display">
       @if (selectedAvatar?.startsWith('http')) {
         <img [src]="selectedAvatar" alt="Avatar DT" class="avatar-photo-big">
-      } @else if (selectedAvatar) {
-        <div class="avatar-icon">
-          <svg viewBox="0 0 80 80" class="avatar-svg">
-            @switch (selectedAvatar) {
-              @case ('avatar-goalkeeper') {
-                <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
-                <path d="M20 70 Q40 50 60 70" fill="#22c55e"/>
-                <rect x="32" y="16" width="16" height="4" rx="2" fill="#fff"/>
-              }
-              @case ('avatar-striker') {
-                <circle cx="40" cy="28" r="14" fill="#f87171"/>
-                <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
-                <circle cx="40" cy="60" r="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
-              }
-              @case ('avatar-defender') {
-                <circle cx="40" cy="28" r="14" fill="#60a5fa"/>
-                <path d="M20 70 Q40 50 60 70" fill="#2563eb"/>
-                <path d="M33 50 L40 44 L47 50 L47 58 L33 58Z" fill="#fbbf24"/>
-              }
-              @case ('avatar-midfielder') {
-                <circle cx="40" cy="28" r="14" fill="#a78bfa"/>
-                <path d="M20 70 Q40 50 60 70" fill="#7c3aed"/>
-                <path d="M34 52 L46 52 L43 60 L37 60Z" fill="#fbbf24"/>
-              }
-              @case ('avatar-captain') {
-                <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
-                <path d="M20 70 Q40 50 60 70" fill="#1e3a5f"/>
-                <text x="40" y="32" text-anchor="middle" fill="#1e3a5f" font-size="12" font-weight="bold">C</text>
-              }
-              @case ('avatar-referee') {
-                <circle cx="40" cy="28" r="14" fill="#fde68a"/>
-                <path d="M20 70 Q40 50 60 70" fill="#111"/>
-                <rect x="36" y="48" width="8" height="12" rx="1" fill="#fbbf24"/>
-              }
-              @case ('avatar-coach') {
-                <circle cx="40" cy="28" r="14" fill="#d1d5db"/>
-                <path d="M20 70 Q40 50 60 70" fill="#374151"/>
-                <rect x="30" y="18" width="20" height="3" rx="1.5" fill="#374151"/>
-              }
-              @case ('avatar-fan-m') {
-                <circle cx="40" cy="28" r="14" fill="#fca5a5"/>
-                <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
-                <path d="M30 18 L40 10 L50 18" fill="none" stroke="#ef4444" stroke-width="2.5"/>
-              }
-              @case ('avatar-fan-f') {
-                <circle cx="40" cy="28" r="14" fill="#fbcfe8"/>
-                <path d="M20 70 Q40 50 60 70" fill="#ec4899"/>
-                <circle cx="34" cy="22" r="2" fill="#ec4899"/>
-                <circle cx="46" cy="22" r="2" fill="#ec4899"/>
-              }
-              @case ('avatar-trophy') {
-                <circle cx="40" cy="28" r="14" fill="#fef3c7"/>
-                <path d="M20 70 Q40 50 60 70" fill="#d97706"/>
-                <path d="M34 20 L34 34 Q34 38 40 38 Q46 38 46 34 L46 20 L50 20 Q48 28 46 34 L34 34 Q32 28 30 20Z" fill="#fbbf24"/>
-              }
-            }
-          </svg>
-        </div>
       } @else {
         <span class="initials">{{ avatarInitials }}</span>
       }
@@ -297,108 +239,28 @@
           <input id="telefono" formControlName="telefono" placeholder="+595 xxx xxx xxx">
         </div>
 
-        <!-- ── AVATAR SELECTOR ── -->
+        <!-- ── AVATAR SELECTOR: Solo DTs ── -->
         <div class="avatar-section">
-          <label>Elegí tu avatar</label>
-          <div class="avatar-grid">
-            @for (av of avatars; track av) {
-              <button type="button"
-                      class="avatar-option"
-                      [class.selected]="selectedAvatar === av"
-                      (click)="selectAvatar(av)">
-                <svg viewBox="0 0 80 80" class="avatar-svg-small">
-                  @switch (av) {
-                    @case ('avatar-goalkeeper') {
-                      <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#22c55e"/>
-                      <rect x="32" y="16" width="16" height="4" rx="2" fill="#fff"/>
-                    }
-                    @case ('avatar-striker') {
-                      <circle cx="40" cy="28" r="14" fill="#f87171"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
-                      <circle cx="40" cy="60" r="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
-                    }
-                    @case ('avatar-defender') {
-                      <circle cx="40" cy="28" r="14" fill="#60a5fa"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#2563eb"/>
-                      <path d="M33 50 L40 44 L47 50 L47 58 L33 58Z" fill="#fbbf24"/>
-                    }
-                    @case ('avatar-midfielder') {
-                      <circle cx="40" cy="28" r="14" fill="#a78bfa"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#7c3aed"/>
-                      <path d="M34 52 L46 52 L43 60 L37 60Z" fill="#fbbf24"/>
-                    }
-                    @case ('avatar-captain') {
-                      <circle cx="40" cy="28" r="14" fill="#fbbf24"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#1e3a5f"/>
-                      <text x="40" y="32" text-anchor="middle" fill="#1e3a5f" font-size="12" font-weight="bold">C</text>
-                    }
-                    @case ('avatar-referee') {
-                      <circle cx="40" cy="28" r="14" fill="#fde68a"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#111"/>
-                      <rect x="36" y="48" width="8" height="12" rx="1" fill="#fbbf24"/>
-                    }
-                    @case ('avatar-coach') {
-                      <circle cx="40" cy="28" r="14" fill="#d1d5db"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#374151"/>
-                      <rect x="30" y="18" width="20" height="3" rx="1.5" fill="#374151"/>
-                    }
-                    @case ('avatar-fan-m') {
-                      <circle cx="40" cy="28" r="14" fill="#fca5a5"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#ef4444"/>
-                      <path d="M30 18 L40 10 L50 18" fill="none" stroke="#ef4444" stroke-width="2.5"/>
-                    }
-                    @case ('avatar-fan-f') {
-                      <circle cx="40" cy="28" r="14" fill="#fbcfe8"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#ec4899"/>
-                      <circle cx="34" cy="22" r="2" fill="#ec4899"/>
-                      <circle cx="46" cy="22" r="2" fill="#ec4899"/>
-                    }
-                    @case ('avatar-trophy') {
-                      <circle cx="40" cy="28" r="14" fill="#fef3c7"/>
-                      <path d="M20 70 Q40 50 60 70" fill="#d97706"/>
-                      <path d="M34 20 L34 34 Q34 38 40 38 Q46 38 46 34 L46 20 L50 20 Q48 28 46 34 L34 34 Q32 28 30 20Z" fill="#fbbf24"/>
-                    }
+          <label>Elegí tu DT como avatar</label>
+          @if (dtAvatarsLoading) {
+            <div class="dt-loading">Cargando directores técnicos...</div>
+          } @else if (dtAvatars.length > 0) {
+            <div class="dt-avatar-grid">
+              @for (dt of dtAvatars; track dt.codigo) {
+                <button type="button"
+                        class="dt-avatar-option"
+                        [class.selected]="selectedAvatar === dt.dtFotoUrl"
+                        (click)="selectAvatar(dt.dtFotoUrl)">
+                  <img [src]="dt.dtFotoUrl" [alt]="dt.dtNombre" class="dt-photo"
+                       (error)="$any($event.target).style.display='none'">
+                  @if (dt.logoUrl) {
+                    <img [src]="dt.logoUrl" class="dt-flag-overlay">
                   }
-                </svg>
-                <span class="avatar-label">{{ av.replace('avatar-', '') | titlecase }}</span>
-              </button>
-            }
-          </div>
-        </div>
-
-        <!-- ── DT AVATARS SECTION ── -->
-        <div class="avatar-section dt-section">
-          <button type="button" class="dt-toggle-btn" (click)="toggleDtAvatars()">
-            <span>⚽ Elegí un DT como avatar</span>
-            <span class="dt-toggle-icon">{{ showDtAvatars ? '▲' : '▼' }}</span>
-          </button>
-
-          @if (showDtAvatars) {
-            @if (dtAvatarsLoading) {
-              <div class="dt-loading">Cargando directores técnicos...</div>
-            } @else if (dtAvatars.length > 0) {
-              <div class="dt-avatar-grid">
-                @for (dt of dtAvatars; track dt.codigo) {
-                  <button type="button"
-                          class="dt-avatar-option"
-                          [class.selected]="selectedAvatar === dt.dtFotoUrl"
-                          (click)="selectAvatar(dt.dtFotoUrl)">
-                    <img [src]="dt.dtFotoUrl" [alt]="dt.dtNombre" class="dt-photo"
-                         (error)="$any($event.target).style.display='none'">
-                    <div class="dt-info">
-                      <span class="dt-name">{{ dt.dtNombre }}</span>
-                      <span class="dt-pais">
-                        <img [src]="dt.logoUrl" class="dt-flag" *ngIf="dt.logoUrl">
-                        {{ dt.pais }}
-                      </span>
-                    </div>
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="dt-loading">No se pudieron cargar los DTs. Intentá más tarde.</div>
-            }
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="dt-loading">No se pudieron cargar los DTs.</div>
           }
         </div>
 

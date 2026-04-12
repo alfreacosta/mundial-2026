@@ -22,18 +22,7 @@ export interface DtAvatar {
   logoUrl: string;
 }
 
-const AVATARS: string[] = [
-  'avatar-goalkeeper',
-  'avatar-striker',
-  'avatar-defender',
-  'avatar-midfielder',
-  'avatar-captain',
-  'avatar-referee',
-  'avatar-coach',
-  'avatar-fan-m',
-  'avatar-fan-f',
-  'avatar-trophy'
-];
+
 
 @Component({
   selector: 'app-perfil',
@@ -48,7 +37,6 @@ export class PerfilComponent implements OnInit {
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
 
-  avatars = AVATARS;
   selectedAvatar: string | null = null;
 
   saving = false;
@@ -80,7 +68,6 @@ export class PerfilComponent implements OnInit {
   // DT Avatars
   dtAvatars: DtAvatar[] = [];
   dtAvatarsLoading = false;
-  showDtAvatars = false;
 
   constructor(
     private auth: AuthService,
@@ -113,7 +100,8 @@ export class PerfilComponent implements OnInit {
 
     this.selectedAvatar = this.user?.urlAvatar || null;
 
-    // Cargar datos del juego
+    // Cargar DT avatars y datos del juego
+    this.loadDtAvatars();
     this.cargarDatosJuego();
   }
 
@@ -166,13 +154,6 @@ export class PerfilComponent implements OnInit {
 
   selectAvatar(avatar: string): void {
     this.selectedAvatar = avatar;
-  }
-
-  toggleDtAvatars(): void {
-    this.showDtAvatars = !this.showDtAvatars;
-    if (this.showDtAvatars && this.dtAvatars.length === 0) {
-      this.loadDtAvatars();
-    }
   }
 
   private loadDtAvatars(): void {
