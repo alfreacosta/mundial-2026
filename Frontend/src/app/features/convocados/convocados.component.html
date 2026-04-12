@@ -217,9 +217,8 @@
             </button>
             <button *ngIf="player.seleccionado" class="footer-btn btn-titular"
               [class.active]="player.titular"
-              [style.--btn-color]="pg.color"
               (click)="toggleTitular(player)">
-              {{ player.titular ? 'Titular ★' : 'Titular' }}
+              Titular <span *ngIf="player.titular" class="star-yellow">★</span>
             </button>
             <button *ngIf="!player.seleccionado" class="footer-btn btn-nova"
               (click)="markNoVa(player, $event)">

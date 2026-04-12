@@ -1277,9 +1277,13 @@ $save-bar-height: 72px;
   }
 
   &.active {
-    background: rgba(16, 185, 129, 0.18);
-    color: #10b981;
+    background: #10b981;
+    color: #fff;
     border-color: #10b981;
+
+    .star-yellow {
+      color: #fbbf24;
+    }
   }
 }
 
