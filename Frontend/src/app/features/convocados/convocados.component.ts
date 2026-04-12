@@ -325,6 +325,11 @@ export class ConvocadosComponent implements OnInit {
     );
   }
 
+  getNoVaByPosition(codigo: string): JugadorSeleccionable[] {
+    return this.players().filter(j => j.noVa && j.posicion?.codigo === codigo)
+      .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  }
+
   toggleTitular(player: JugadorSeleccionable): void {
     if (player.titular) {
       // Quitar de titulares

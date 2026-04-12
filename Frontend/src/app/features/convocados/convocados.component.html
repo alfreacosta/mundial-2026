@@ -288,34 +288,65 @@
         <p>No marcaste ningún jugador como "No Va" todavía.</p>
       </div>
 
-      <section class="nova-section" *ngIf="jugadoresNoVa.length > 0">
-        <div class="nova-header">
-          <div class="nova-title">
-            <div class="nova-icon-wrap">
-              <mat-icon>person_off</mat-icon>
-            </div>
-            <div>
-              <h2>No Va</h2>
-              <p>{{ jugadoresNoVa.length }} jugadores descartados</p>
+      <ng-container *ngIf="totalNoVa() > 0">
+        <section
+          *ngFor="let pg of positionGroups"
+          class="position-section nova-pos-section"
+          [class.has-players]="getNoVaByPosition(pg.codigo).length > 0">
+
+          <div class="position-header" [style.--pos-color]="pg.color"
+               *ngIf="getNoVaByPosition(pg.codigo).length > 0">
+            <div class="pos-title">
+              <div class="pos-icon-wrap" [style.background-color]="pg.color">
+                <mat-icon>{{ pg.icon }}</mat-icon>
+              </div>
+              <div>
+                <h2>{{ pg.label }}</h2>
+                <p>{{ getNoVaByPosition(pg.codigo).length }} descartados</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="nova-grid">
-          <div *ngFor="let player of jugadoresNoVa" class="nova-card">
-            <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="nova-avatar">
-            <div *ngIf="!player.urlFoto" class="nova-avatar-placeholder">
-              <mat-icon>person</mat-icon>
+
+          <div class="players-grid" *ngIf="getNoVaByPosition(pg.codigo).length > 0">
+            <div
+              *ngFor="let player of getNoVaByPosition(pg.codigo)"
+              class="player-card nova-player-card"
+              [style.--player-color]="pg.color">
+
+              <!-- Rating badge -->
+              <span class="rating-badge" *ngIf="player.rating">
+                {{ player.rating.toFixed(1) }} <span class="rating-star">⭐</span>
+              </span>
+
+              <!-- Avatar -->
+              <div class="player-avatar" (click)="selectPlayer(player)" style="cursor:pointer">
+                <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
+                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
+                  <mat-icon [style.color]="pg.color">person</mat-icon>
+                </div>
+              </div>
+
+              <!-- Info -->
+              <div class="player-info" (click)="selectPlayer(player)" style="cursor:pointer">
+                <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
+                <p class="player-club" *ngIf="player.club">
+                  <mat-icon>apartment</mat-icon>
+                  {{ player.club.nombre }}
+                </p>
+              </div>
+
+              <!-- Footer: Restaurar -->
+              <div class="player-card-footer">
+                <button class="footer-btn btn-nova-undo" (click)="undoNoVa(player)">
+                  <mat-icon style="font-size:14px;width:14px;height:14px">undo</mat-icon> Restaurar
+                </button>
+              </div>
+
             </div>
-            <div class="nova-info">
-              <p class="nova-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
-              <p class="nova-pos">{{ player.posicion?.nombre }}</p>
-            </div>
-            <button mat-icon-button class="nova-undo" matTooltip="Restaurar" (click)="undoNoVa(player)">
-              <mat-icon>undo</mat-icon>
-            </button>
           </div>
-        </div>
-      </section>
+
+        </section>
+      </ng-container>
 
     </main>
 
