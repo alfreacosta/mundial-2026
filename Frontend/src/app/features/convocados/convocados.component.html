@@ -209,7 +209,7 @@
             </p>
           </div>
 
-          <!-- Footer del card: dos botones -->
+          <!-- Footer del card: Convocar + Titular/NoVa -->
           <div class="player-card-footer">
             <button class="footer-btn btn-convocar"
               [class.active]="player.seleccionado"
@@ -217,7 +217,13 @@
               (click)="convocarPlayer(player, $event)">
               {{ player.seleccionado ? 'Convocado ✓' : 'Convocar' }}
             </button>
-            <button class="footer-btn btn-nova"
+            <button *ngIf="player.seleccionado" class="footer-btn btn-titular"
+              [class.active]="player.titular"
+              [style.--btn-color]="pg.color"
+              (click)="toggleTitular(player)">
+              {{ player.titular ? 'Titular ★' : 'Titular' }}
+            </button>
+            <button *ngIf="!player.seleccionado" class="footer-btn btn-nova"
               (click)="markNoVa(player, $event)">
               No Va
             </button>
@@ -230,79 +236,25 @@
 
     </main>
 
-    <!-- ═══ TAB: 11 TITULARES ═══ -->
+    <!-- ═══ TAB: 11 TITULARES (solo lectura — cancha) ═══ -->
     <main class="players-main titulares-main" *ngIf="activeTab() === 'titulares'">
 
-      <!-- Estado vacío: sin convocados -->
-      <div class="state-container" *ngIf="totalSel() === 0" style="padding: 3rem 1rem">
-        <mat-icon class="state-icon" style="color: #94a3b8;">group_off</mat-icon>
-        <h3>No hay convocados</h3>
-        <p>Primero seleccioná jugadores en la pestaña <strong>Convocatoria</strong>.</p>
+      <!-- Sin titulares todavía -->
+      <div class="state-container" *ngIf="totalTitulares() === 0" style="padding: 3rem 1rem">
+        <mat-icon class="state-icon" style="color: #94a3b8;">star_border</mat-icon>
+        <h3>Sin titulares</h3>
+        <p>Seleccioná titulares desde la pestaña <strong>Convocatoria</strong> usando el botón "Titular".</p>
       </div>
 
-      <!-- Lista de convocados para marcar como titular -->
-      <ng-container *ngIf="totalSel() > 0">
+      <!-- Cancha con titulares -->
+      <ng-container *ngIf="totalTitulares() > 0">
         <div class="titulares-info-bar">
           <mat-icon>star</mat-icon>
-          <span>Seleccioná <strong>1 arquero</strong> y <strong>10 jugadores de campo</strong> para armar tu XI titular</span>
+          <span>XI Titular</span>
           <span class="titulares-counter" [style.background-color]="confColor">{{ totalTitulares() }}/{{ MAX_TITULARES }}</span>
         </div>
 
-        <section *ngFor="let pg of positionGroups" class="position-section"
-          [class.has-players]="getTitularCandidates(pg.codigo).length > 0">
-
-          <div class="position-header" [style.--pos-color]="pg.color"
-               *ngIf="getTitularCandidates(pg.codigo).length > 0">
-            <div class="pos-title">
-              <div class="pos-icon-wrap" [style.background-color]="pg.color">
-                <mat-icon>{{ pg.icon }}</mat-icon>
-              </div>
-              <div>
-                <h2>{{ pg.label }}</h2>
-                <p>{{ titularPosCounts()[pg.codigo] || 0 }} titulares de {{ getTitularCandidates(pg.codigo).length }} convocados</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="players-grid" *ngIf="getTitularCandidates(pg.codigo).length > 0">
-            <div *ngFor="let player of getTitularCandidates(pg.codigo)"
-              class="player-card"
-              [class.selected]="player.titular"
-              [style.--player-color]="pg.color">
-
-              <div class="selected-check" [style.background-color]="pg.color">
-                <mat-icon>star</mat-icon>
-              </div>
-
-              <div class="player-avatar">
-                <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
-                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
-                  <mat-icon [style.color]="pg.color">person</mat-icon>
-                </div>
-                <span class="jersey-number" *ngIf="player.numeroCamiseta">#{{ player.numeroCamiseta }}</span>
-              </div>
-
-              <div class="player-info">
-                <p class="player-name">{{ player.nombreCompleto || (player.nombre + ' ' + player.apellido) }}</p>
-                <p class="player-club" *ngIf="player.club">
-                  <mat-icon>apartment</mat-icon> {{ player.club.nombre }}
-                </p>
-              </div>
-
-              <div class="player-card-footer">
-                <button class="footer-btn btn-titular"
-                  [class.active]="player.titular"
-                  [style.--btn-color]="pg.color"
-                  (click)="toggleTitular(player)">
-                  {{ player.titular ? 'Titular ★' : 'Titular' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Cancha visualización -->
-        <section class="pitch-section" *ngIf="totalTitulares() > 0">
+        <section class="pitch-section">
           <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
           <div class="pitch">
             <div class="pitch-field">

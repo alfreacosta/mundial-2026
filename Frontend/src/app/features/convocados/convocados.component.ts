@@ -303,8 +303,11 @@ export class ConvocadosComponent implements OnInit {
       });
       return;
     }
+    const wasSelected = player.seleccionado;
     this.players.update(curr =>
-      curr.map(p => p.internalId === player.internalId ? { ...p, seleccionado: !p.seleccionado } : p)
+      curr.map(p => p.internalId === player.internalId
+        ? { ...p, seleccionado: !wasSelected, titular: wasSelected ? false : p.titular }
+        : p)
     );
   }
 
