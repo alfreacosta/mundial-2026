@@ -256,26 +256,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const titIds = new Set(conv.titularesIds ?? []);
     if (titIds.size === 0) return [];
     const posMap = new Map((conv.posicionesTitulares ?? []).map(p => [p.jugadorId, { x: p.x, y: p.y }]));
-    return todos
-      .filter(j => titIds.has(j.internalId))
-      .map(j => {
-        const pos = posMap.get(j.internalId);
-        const defaultPos = this.getDefaultPos(j.posicion.abreviatura, [...titIds], j.internalId);
-        return {
-          id: j.internalId,
-          apellido: j.apellido ?? j.nombre,
-          camiseta: j.numeroCamiseta,
-          posAbr: j.posicion.abreviatura,
-          x: pos?.x ?? defaultPos.x,
-          y: pos?.y ?? defaultPos.y
-        };
+
+    // Filtrar titulares y agrupar por posición
+    const titulares = todos.filter(j => titIds.has(j.internalId));
+    const porPos = new Map<string, typeof titulares>();
+    for (const j of titulares) {
+      const abr = j.posicion.abreviatura === 'ARQ' ? 'POR' : j.posicion.abreviatura;
+      if (!porPos.has(abr)) porPos.set(abr, []);
+      porPos.get(abr)!.push(j);
+    }
+
+    // Y por posición, X distribuido equitativamente
+    const yByPos: Record<string, number> = { POR: 90, DEF: 70, MED: 44, DEL: 18 };
+    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] = [];
+
+    for (const [abr, jugadores] of porPos) {
+      const baseY = yByPos[abr] ?? 50;
+      const n = jugadores.length;
+      jugadores.forEach((j, i) => {
+        const saved = posMap.get(j.internalId);
+        if (saved) {
+          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x: saved.x, y: saved.y });
+        } else {
+          // Distribuir horizontalmente entre 15% y 85%
+          const x = n === 1 ? 50 : 15 + (70 * i) / (n - 1);
+          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x, y: baseY });
+        }
       });
+    }
+    return results;
   }
 
   private getDefaultPos(posAbr: string, _allIds: number[], _id: number): { x: number; y: number } {
     const defaults: Record<string, { x: number; y: number }> = {
       POR: { x: 50, y: 90 }, ARQ: { x: 50, y: 90 },
-      DEF: { x: 50, y: 68 }, MED: { x: 50, y: 42 }, DEL: { x: 50, y: 15 }
+      DEF: { x: 50, y: 70 }, MED: { x: 50, y: 44 }, DEL: { x: 50, y: 18 }
     };
     return defaults[posAbr] ?? { x: 50, y: 50 };
   }
