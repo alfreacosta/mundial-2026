@@ -182,9 +182,9 @@
                           }
                         </div>
 
-                        <!-- Rating badge (shown after stats loaded) -->
-                        @if (ratingCache.get(player.id); as r) {
-                          <span class="rating-badge">{{ (+r).toFixed(1) }} <span class="rating-star">⭐</span></span>
+                        <!-- Rating badge -->
+                        @if (player.rating) {
+                          <span class="rating-badge">{{ player.rating.toFixed(1) }} <span class="rating-star">⭐</span></span>
                         } @else if (player.convocadoEliminatoria) {
                           <span class="conv-badge" title="Convocado a eliminatorias">🏅</span>
                         }
