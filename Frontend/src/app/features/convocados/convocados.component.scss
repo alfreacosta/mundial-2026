@@ -293,9 +293,14 @@ $save-bar-height: 72px;
   border-bottom: 1px solid $dark-border;
   background: transparent;
 
+  @media (max-width: 768px) {
+    padding: 0;
+  }
+
   .tab-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 6px 16px;
     font-size: 11px;
@@ -308,10 +313,23 @@ $save-bar-height: 72px;
     transition: all $transition;
     white-space: nowrap;
 
+    @media (max-width: 768px) {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 10px;
+      gap: 2px;
+    }
+
     mat-icon {
       font-size: 15px;
       width: 15px;
       height: 15px;
+
+      @media (max-width: 768px) {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
     }
 
     &:hover {
@@ -334,6 +352,10 @@ $save-bar-height: 72px;
   align-items: center;
   gap: 10px;
   padding: 4px 16px 6px;
+
+  @media (max-width: 768px) {
+    padding: 4px 8px 6px;
+  }
 }
 
 .search-bar {
@@ -427,6 +449,10 @@ $save-bar-height: 72px;
   padding: 4px 20px 6px;
   max-width: 1280px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 4px 8px 6px;
+  }
 
   .estado-badge {
     display: inline-flex;
@@ -1141,6 +1167,10 @@ $save-bar-height: 72px;
 /* ═══ CANCHA / PITCH ═══ */
 .pitch-section {
   margin-top: 24px;
+
+  @media (max-width: 768px) {
+    margin-top: 8px;
+  }
 }
 
 .pitch-toolbar {
@@ -1149,6 +1179,11 @@ $save-bar-height: 72px;
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
 }
 
 .pitch-title {
@@ -1230,6 +1265,10 @@ $save-bar-height: 72px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 }
 
 .pitch-field {
@@ -1240,6 +1279,12 @@ $save-bar-height: 72px;
   border: 3px solid rgba(255,255,255,0.35);
   border-radius: 12px;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 
   // Línea de media cancha
   &::before {
