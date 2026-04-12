@@ -73,7 +73,7 @@
     </nav>
 
     <!-- Search bar -->
-    <div class="search-bar-wrap" *ngIf="pais && !loading && !error && players().length > 0">
+    <div class="search-bar-wrap" *ngIf="pais && !loading && !error && players().length > 0 && activeTab() !== 'titulares'">
       <div class="search-bar" [class.has-value]="searchQuery">
         <mat-icon class="search-icon">search</mat-icon>
         <input
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Estado badge -->
-    <div class="estado-bar" *ngIf="convocatoriaEstado === 'EN_PROGRESO'">
+    <div class="estado-bar" *ngIf="convocatoriaEstado === 'EN_PROGRESO' && activeTab() !== 'titulares'">
       <span class="estado-badge">
         <mat-icon>edit</mat-icon> Guardada
       </span>
@@ -250,20 +250,10 @@
 
       <!-- Cancha con titulares -->
       <ng-container *ngIf="totalTitulares() > 0">
-        <div class="titulares-info-bar">
-          <mat-icon>star</mat-icon>
-          <span>XI Titular</span>
-          <span class="titulares-counter" [style.background-color]="confColor">{{ totalTitulares() }}/{{ MAX_TITULARES }}</span>
-        </div>
-
         <section class="pitch-section">
           <div class="pitch-toolbar">
             <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
             <span class="pitch-hint">Arrastrá los jugadores para ubicarlos</span>
-            <button class="pitch-export-btn" (click)="exportPitchAsPng()" [disabled]="exportingPitch">
-              <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
-              {{ exportingPitch ? 'Exportando…' : 'Compartir PNG' }}
-            </button>
           </div>
           <div class="pitch">
             <div class="pitch-field" #pitchFieldRef>
@@ -410,6 +400,14 @@
             <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block; margin-right:8px;"></mat-spinner>
             <mat-icon *ngIf="!saving">save</mat-icon>
             {{ saving ? 'Guardando…' : 'Guardar Posiciones' }}
+          </button>
+          <button
+            mat-stroked-button
+            class="export-btn"
+            [disabled]="exportingPitch"
+            (click)="exportPitchAsPng()">
+            <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
+            {{ exportingPitch ? 'Exportando…' : 'Compartir PNG' }}
           </button>
         </ng-container>
         <ng-template #convActions>

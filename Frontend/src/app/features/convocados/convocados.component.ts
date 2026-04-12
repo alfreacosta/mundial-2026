@@ -15,6 +15,7 @@ import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
+import { AuthService } from '../../core/services/auth.service';
 import { normalize } from '../../shared/utils/normalize';
 import { environment } from '../../../environments/environment';
 import html2canvas from 'html2canvas';
@@ -151,7 +152,8 @@ export class ConvocadosComponent implements OnInit {
     private countriesService: CountriesService,
     private grupoService: GrupoService,
     private snackBar: MatSnackBar,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -653,9 +655,21 @@ export class ConvocadosComponent implements OnInit {
     overlay.className = 'pitch-export-overlay';
     overlay.style.cssText = 'position:absolute;top:8px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10;pointer-events:none;';
 
-    const left = document.createElement('span');
-    left.textContent = 'dt26.win';
-    left.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
+    const left = document.createElement('div');
+    left.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+
+    const siteName = document.createElement('span');
+    siteName.textContent = 'dt26.win';
+    siteName.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
+    left.appendChild(siteName);
+
+    const username = this.authService.getCurrentUser()?.user;
+    if (username) {
+      const userTag = document.createElement('span');
+      userTag.textContent = `@${username}`;
+      userTag.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
+      left.appendChild(userTag);
+    }
 
     const right = document.createElement('span');
     const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });

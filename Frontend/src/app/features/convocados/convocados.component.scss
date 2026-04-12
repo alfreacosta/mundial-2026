@@ -864,6 +864,26 @@ $save-bar-height: 72px;
       &:disabled { opacity: 0.5; }
       &:not(:disabled):hover { filter: brightness(1.1); }
     }
+
+    .export-btn {
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: $radius-full !important;
+      color: $white !important;
+      background: #374151 !important;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:disabled { opacity: 0.5; }
+      &:not(:disabled):hover { filter: brightness(1.15); }
+    }
   }
 
   // Móvil: apilar verticalmente
