@@ -117,8 +117,9 @@ public class ConvocatoriaService {
     }
 
     private ConvocatoriaDTO toDTO(Convocatoria c) {
+        // jugadoresIds incluye CONVOCADO + TITULAR (un titular ES un convocado)
         List<Long> convocadoIds = c.getRows().stream()
-                .filter(r -> "CONVOCADO".equals(r.getEstado()))
+                .filter(r -> "CONVOCADO".equals(r.getEstado()) || "TITULAR".equals(r.getEstado()))
                 .map(r -> r.getJugador().getInternalId())
                 .collect(Collectors.toList());
         List<Long> noVaIds = c.getRows().stream()

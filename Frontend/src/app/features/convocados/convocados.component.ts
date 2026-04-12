@@ -167,7 +167,7 @@ export class ConvocadosComponent implements OnInit {
 
         this.players.set(jugadores.map(j => ({
           ...j,
-          seleccionado: savedIds.has(String(j.internalId)),
+          seleccionado: savedIds.has(String(j.internalId)) || titularIdsSet.has(String(j.internalId)),
           noVa: noVaIdsSet.has(String(j.internalId)),
           titular: titularIdsSet.has(String(j.internalId))
         })));
