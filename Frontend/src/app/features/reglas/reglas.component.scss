@@ -20,6 +20,7 @@ $border: rgba(255,255,255,0.1);
   padding: 100px 40px 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
 
   @media (max-width: 700px) { padding: 80px 16px 0; }
@@ -47,6 +48,7 @@ $border: rgba(255,255,255,0.1);
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   letter-spacing: 1px;
+  white-space: nowrap;
   margin: 0;
 }
 

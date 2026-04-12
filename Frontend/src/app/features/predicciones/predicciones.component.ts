@@ -183,7 +183,7 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
         golLocalEdit:     pred?.golLocalPred     ?? 0,
         golVisitanteEdit: pred?.golVisitantePred ?? 0,
         guardando:        false,
-        guardado:         false,
+        guardado:         !!pred,
         error:            ''
       };
 
