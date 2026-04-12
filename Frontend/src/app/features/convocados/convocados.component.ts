@@ -464,8 +464,8 @@ export class ConvocadosComponent implements OnInit {
         const tab = this.activeTab();
 
         // Si estamos en titulares y hay posiciones arrastradas, guardarlas también
-        if (tab === 'titulares' && this.draggedPositions.size > 0) {
-          const posiciones = Array.from(this.draggedPositions.entries()).map(([jugadorId, pos]) => ({
+        if (tab === 'titulares' && this.savedPositions.size > 0) {
+          const posiciones = Array.from(this.savedPositions.entries()).map(([jugadorId, pos]) => ({
             jugadorId, x: Math.round(pos.x * 100) / 100, y: Math.round(pos.y * 100) / 100
           }));
           this.countriesService.guardarPosicionesTitulares(this.paisId, posiciones).subscribe({
@@ -577,6 +577,10 @@ export class ConvocadosComponent implements OnInit {
     if (!field || !field.clientWidth) return ConvocadosComponent.ZERO_POS;
 
     const pct = this.savedPositions.get(id) ?? this.getDefaultPositionPct(player);
+    // Asegurar que todos los titulares tengan su posición en savedPositions
+    if (!this.savedPositions.has(id)) {
+      this.savedPositions.set(id, pct);
+    }
     const pos = {
       x: (pct.x / 100) * field.clientWidth - 28,
       y: (pct.y / 100) * field.clientHeight - 30
@@ -621,12 +625,12 @@ export class ConvocadosComponent implements OnInit {
 
   /** Guarda SOLO las posiciones de los titulares en la cancha */
   guardarPosiciones(): void {
-    if (this.draggedPositions.size === 0) {
-      this.snackBar.open('No hay posiciones para guardar. Arrastrá algún jugador primero.', '', { duration: 2500 });
+    if (this.savedPositions.size === 0) {
+      this.snackBar.open('No hay posiciones para guardar.', '', { duration: 2500 });
       return;
     }
     this.savingPositions = true;
-    const posiciones = Array.from(this.draggedPositions.entries()).map(([jugadorId, pos]) => ({
+    const posiciones = Array.from(this.savedPositions.entries()).map(([jugadorId, pos]) => ({
       jugadorId, x: Math.round(pos.x * 100) / 100, y: Math.round(pos.y * 100) / 100
     }));
     this.countriesService.guardarPosicionesTitulares(this.paisId, posiciones).subscribe({
@@ -650,42 +654,46 @@ export class ConvocadosComponent implements OnInit {
     if (!el) return;
     this.exportingPitch = true;
 
-    // Agregar overlays temporales para la captura
-    const overlay = document.createElement('div');
-    overlay.className = 'pitch-export-overlay';
-    overlay.style.cssText = 'position:absolute;top:8px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10;pointer-events:none;';
-
-    const left = document.createElement('div');
-    left.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
-
-    const siteName = document.createElement('span');
-    siteName.textContent = 'dt26.win';
-    siteName.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
-    left.appendChild(siteName);
-
+    // Agregar marcas de agua temporales para la captura (4 posiciones)
     const username = this.authService.getCurrentUser()?.user;
-    if (username) {
-      const userTag = document.createElement('span');
-      userTag.textContent = `@${username}`;
-      userTag.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
-      left.appendChild(userTag);
+    const tmpEls: HTMLElement[] = [];
+
+    const createWatermark = (top: string, left: string, align: string): HTMLElement => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = `position:absolute;top:${top};left:${left};transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:${align};gap:1px;z-index:10;pointer-events:none;`;
+      const s = document.createElement('span');
+      s.textContent = 'dt26.win';
+      s.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
+      wrap.appendChild(s);
+      if (username) {
+        const u = document.createElement('span');
+        u.textContent = `@${username}`;
+        u.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
+        wrap.appendChild(u);
+      }
+      return wrap;
+    };
+
+    // 4 marcas: arriba-izq, arriba-centro, abajo-izq, abajo-centro
+    const positions: [string, string, string][] = [
+      ['6%', '12%', 'flex-start'],
+      ['6%', '50%', 'center'],
+      ['94%', '12%', 'flex-start'],
+      ['94%', '50%', 'center'],
+    ];
+    for (const [t, l, a] of positions) {
+      const wm = createWatermark(t, l, a);
+      el.appendChild(wm);
+      tmpEls.push(wm);
     }
 
-    const right = document.createElement('span');
+    // Info país + fecha arriba derecha
+    const infoEl = document.createElement('div');
+    infoEl.style.cssText = 'position:absolute;top:8px;right:12px;z-index:10;pointer-events:none;';
     const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    right.textContent = `${this.pais?.nombre ?? ''} · ${fecha}`;
-    right.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
-
-    overlay.appendChild(left);
-    overlay.appendChild(right);
-
-    // Marca de agua central diagonal
-    const watermark = document.createElement('div');
-    watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:28px;font-weight:800;color:rgba(255,255,255,0.07);letter-spacing:3px;white-space:nowrap;pointer-events:none;z-index:10;';
-    watermark.textContent = 'dt26.win';
-    el.appendChild(watermark);
-
-    el.appendChild(overlay);
+    infoEl.innerHTML = `<span style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);">${this.pais?.nombre ?? ''} · ${fecha}</span>`;
+    el.appendChild(infoEl);
+    tmpEls.push(infoEl);
 
     html2canvas(el, {
       backgroundColor: null,
@@ -694,8 +702,7 @@ export class ConvocadosComponent implements OnInit {
       allowTaint: true
     }).then(canvas => {
       // Quitar overlays temporales
-      overlay.remove();
-      watermark.remove();
+      tmpEls.forEach(e => e.remove());
       canvas.toBlob(blob => {
         if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
           const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
@@ -706,8 +713,7 @@ export class ConvocadosComponent implements OnInit {
         this.exportingPitch = false;
       }, 'image/png');
     }).catch(() => {
-      overlay.remove();
-      watermark.remove();
+      tmpEls.forEach(e => e.remove());
       this.exportingPitch = false;
       this.snackBar.open('Error al exportar la imagen', '', { duration: 3000 });
     });

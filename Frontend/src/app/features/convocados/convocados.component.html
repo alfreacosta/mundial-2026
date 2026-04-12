@@ -395,7 +395,7 @@
             mat-raised-button
             class="save-btn"
             [style.background-color]="confColor"
-            [disabled]="draggedPositions.size === 0 || saving"
+            [disabled]="savedPositions.size === 0 || saving"
             (click)="guardarConvocatoria()">
             <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block; margin-right:8px;"></mat-spinner>
             <mat-icon *ngIf="!saving">save</mat-icon>
