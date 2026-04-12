@@ -326,6 +326,11 @@
   display: none;
 }
 
+// Mobile avatar — oculto en desktop
+.mobile-avatar-link {
+  display: none;
+}
+
 // Mobile user section inside slide menu
 .mobile-user-section {
   display: none;
@@ -383,20 +388,37 @@
     .cd-sep { font-size: 11px; }
   }
 
-  // 3) FIFA badge — derecha
+  // 3) FIFA badge
   .navbar-logo {
     order: 3;
     flex-shrink: 0;
     margin-right: 0;
+  }
 
-    .fifa-badge {
-      min-width: auto;
-      padding: 3px 8px 2px;
+  // 4) Avatar mobile — siempre visible a la derecha
+  .mobile-avatar-link {
+    order: 4;
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    flex-shrink: 0;
+    text-decoration: none;
+    border-radius: 50%;
+    border: 2px solid rgba(200, 169, 78, 0.5);
+    transition: border-color 0.2s;
 
-      .fifa-top { font-size: 7px; letter-spacing: 0.8px; }
-      .fifa-divider { margin: 2px 0; }
-      .fifa-year { font-size: 10px; letter-spacing: 2px; }
+    &:hover {
+      border-color: #c8a94e;
     }
+  }
+
+  .navbar-logo .fifa-badge {
+    min-width: auto;
+    padding: 3px 8px 2px;
+
+    .fifa-top { font-size: 7px; letter-spacing: 0.8px; }
+    .fifa-divider { margin: 2px 0; }
+    .fifa-year { font-size: 10px; letter-spacing: 2px; }
   }
 
   .navbar-actions.desktop-only {

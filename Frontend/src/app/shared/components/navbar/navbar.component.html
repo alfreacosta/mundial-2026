@@ -101,6 +101,13 @@
       }
     </div>
 
+    <!-- Mobile Avatar (siempre visible en mobile) -->
+    @if (isAuthenticated()) {
+      <a routerLink="/perfil" class="mobile-avatar-link">
+        <app-avatar-icon [avatarId]="(user | async)?.urlAvatar" [nombre]="(user | async)?.nombre" [size]="30"></app-avatar-icon>
+      </a>
+    }
+
     <!-- Mobile Menu Toggle -->
     <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen()">
       <span></span>
