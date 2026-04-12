@@ -1345,6 +1345,36 @@ $save-bar-height: 72px;
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
+.pitch-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.pitch-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover { background: #2563eb; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
 .pitch {
   width: 100%;
   max-width: 500px;

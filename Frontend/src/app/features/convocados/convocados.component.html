@@ -268,6 +268,7 @@
               <!-- Todos los titulares con drag libre -->
               <div *ngFor="let p of jugadoresTitulares" class="pitch-player-abs"
                 cdkDrag [cdkDragBoundary]="'.pitch-field'"
+                (cdkDragEnded)="onDragEnded($event, p)"
                 [style.left]="getInitialPosition(p).x"
                 [style.top]="getInitialPosition(p).y">
                 <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
@@ -278,6 +279,12 @@
                 <span class="pitch-number" *ngIf="p.numeroCamiseta">#{{ p.numeroCamiseta }}</span>
               </div>
             </div>
+          </div>
+          <div class="pitch-actions">
+            <button class="pitch-save-btn" (click)="guardarPosiciones()" [disabled]="savingPositions || draggedPositions.size === 0">
+              <mat-icon>{{ savingPositions ? 'hourglass_empty' : 'save' }}</mat-icon>
+              {{ savingPositions ? 'Guardando…' : 'Guardar posiciones' }}
+            </button>
           </div>
         </section>
       </ng-container>

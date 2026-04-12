@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -128,6 +129,37 @@ public class ConvocatoriaService {
                 .filter(r -> "TITULAR".equals(r.getEstado()))
                 .map(r -> r.getJugador().getInternalId())
                 .collect(Collectors.toList());
-        return new ConvocatoriaDTO(c.getTotalJugadores(), c.getEstado(), convocadoIds, noVaIds, titularesIds);
+        List<ConvocatoriaDTO.PosicionTitularDTO> posiciones = c.getRows().stream()
+                .filter(r -> "TITULAR".equals(r.getEstado()) && r.getPosicionX() != null && r.getPosicionY() != null)
+                .map(r -> new ConvocatoriaDTO.PosicionTitularDTO(r.getJugador().getInternalId(), r.getPosicionX(), r.getPosicionY()))
+                .collect(Collectors.toList());
+        return new ConvocatoriaDTO(c.getTotalJugadores(), c.getEstado(), convocadoIds, noVaIds, titularesIds, posiciones);
+    }
+
+    /**
+     * Guarda SOLO las posiciones X/Y de los titulares en la cancha.
+     * No modifica la convocatoria ni los estados.
+     */
+    @Transactional
+    public boolean guardarPosicionesTitulares(String username, Long paisId, List<Map<String, Object>> posiciones) {
+        Convocatoria conv = convocatoriaRepository.findByUsernameAndPaisId(username, paisId)
+                .orElseThrow(() -> new RuntimeException("No tenés convocatoria para este país."));
+
+        Map<Long, ConvocatoriaRow> titularesMap = conv.getRows().stream()
+                .filter(r -> "TITULAR".equals(r.getEstado()))
+                .collect(Collectors.toMap(r -> r.getJugador().getInternalId(), r -> r));
+
+        for (Map<String, Object> pos : posiciones) {
+            Long jugadorId = Long.valueOf(pos.get("jugadorId").toString());
+            Double x = Double.valueOf(pos.get("x").toString());
+            Double y = Double.valueOf(pos.get("y").toString());
+            ConvocatoriaRow row = titularesMap.get(jugadorId);
+            if (row != null) {
+                row.setPosicionX(x);
+                row.setPosicionY(y);
+            }
+        }
+        convocatoriaRepository.save(conv);
+        return true;
     }
 }

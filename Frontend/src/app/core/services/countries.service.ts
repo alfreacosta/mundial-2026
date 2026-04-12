@@ -61,6 +61,7 @@ export interface ConvocatoriaResponse {
   jugadoresIds: number[];
   noVaIds: number[];
   titularesIds: number[];
+  posicionesTitulares: { jugadorId: number; x: number; y: number }[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -120,6 +121,7 @@ export class CountriesService {
   getMiConvocatoria(paisId: number): Observable<ConvocatoriaResponse | null> {
     const query = `{ miConvocatoria(paisId: ${paisId}) {
       totalJugadores estado jugadoresIds noVaIds titularesIds
+      posicionesTitulares { jugadorId x y }
     } }`;
     return this.http
       .post<{ data: { miConvocatoria: ConvocatoriaResponse | null } }>(this.gql, { query })
@@ -133,11 +135,22 @@ export class CountriesService {
     const query = `mutation {
       guardarConvocatoria(paisId: ${paisId}, jugadorIds: ${ids}, noVaIds: ${noVa}, titularesIds: ${tit}) {
         totalJugadores estado jugadoresIds noVaIds titularesIds
+        posicionesTitulares { jugadorId x y }
       }
     }`;
     return this.http
       .post<{ data: { guardarConvocatoria: ConvocatoriaResponse } }>(this.gql, { query })
       .pipe(map(r => r.data.guardarConvocatoria));
+  }
+
+  guardarPosicionesTitulares(paisId: number, posiciones: { jugadorId: number; x: number; y: number }[]): Observable<boolean> {
+    const posArr = posiciones.map(p => `{jugadorId: ${p.jugadorId}, x: ${p.x}, y: ${p.y}}`).join(', ');
+    const query = `mutation {
+      guardarPosicionesTitulares(paisId: ${paisId}, posiciones: [${posArr}])
+    }`;
+    return this.http
+      .post<{ data: { guardarPosicionesTitulares: boolean } }>(this.gql, { query })
+      .pipe(map(r => r.data.guardarPosicionesTitulares));
   }
 }
 

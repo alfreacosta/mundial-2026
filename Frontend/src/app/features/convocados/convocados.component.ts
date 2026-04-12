@@ -10,7 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
-import { CdkDrag } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
@@ -58,10 +58,16 @@ export class ConvocadosComponent implements OnInit {
   loading = true;
   error = '';
   saving = false;
+  savingPositions = false;
   convocatoriaEstado: string | null = null;
   noEsFavorito = false;
   searchQuery = '';
   activeTab = signal<'convocatoria' | 'titulares' | 'nova'>('convocatoria');
+
+  /** Posiciones guardadas de drag: jugadorId → {x%, y%} */
+  savedPositions = new Map<number, { x: number; y: number }>();
+  /** Posiciones modificadas por drag pendientes de guardar */
+  draggedPositions = new Map<number, { x: number; y: number }>();
 
   // Computed signals — se actualizan AUTOMATICAMENTE cuando players cambia
   readonly totalSel = computed(() => this.players().filter(p => p.seleccionado).length);
@@ -162,6 +168,13 @@ export class ConvocadosComponent implements OnInit {
           noVa: noVaIdsSet.has(String(j.internalId)),
           titular: titularIdsSet.has(String(j.internalId))
         })));
+
+        // Cargar posiciones guardadas de titulares
+        this.savedPositions.clear();
+        this.draggedPositions.clear();
+        for (const pos of (convocatoria?.posicionesTitulares ?? [])) {
+          this.savedPositions.set(Number(pos.jugadorId), { x: pos.x, y: pos.y });
+        }
 
         this.loading = false;
       },
@@ -430,26 +443,70 @@ export class ConvocadosComponent implements OnInit {
   // ═══ DRAG & DROP CANCHA ═══
   @ViewChild('pitchFieldRef') pitchFieldRef!: ElementRef<HTMLDivElement>;
 
-  /** Calcula posición inicial (%) para cada titular en la cancha */
+  /** Calcula posición inicial (%) para cada titular en la cancha — usa guardada si existe */
   getInitialPosition(player: JugadorSeleccionable): { x: string; y: string } {
+    const id = Number(player.internalId);
+    const saved = this.savedPositions.get(id);
+    if (saved) {
+      return { x: `calc(${saved.x}% - 28px)`, y: `calc(${saved.y}% - 30px)` };
+    }
+
     const pos = player.posicion?.codigo || 'MED';
     const titulares = this.players().filter(p => p.titular && p.posicion?.codigo === pos);
     const idx = titulares.findIndex(p => p.internalId === player.internalId);
     const count = titulares.length;
 
-    // Distribución horizontal: centrado, espaciado uniforme
     const hSpacing = count > 1 ? 70 / (count - 1) : 0;
     const hStart = count > 1 ? 15 : 50;
     const x = count > 1 ? hStart + idx * hSpacing : hStart;
 
-    // Distribución vertical por posición
     const yMap: Record<string, number> = { 'DEL': 12, 'MED': 38, 'DEF': 64, 'ARQ': 88 };
     const y = yMap[pos] ?? 50;
 
     return { x: `calc(${x}% - 28px)`, y: `calc(${y}% - 30px)` };
   }
 
-  /** Exportar cancha como imagen PNG */
+  /** Cuando se suelta un jugador después de arrastrarlo */
+  onDragEnded(event: CdkDragEnd, player: JugadorSeleccionable): void {
+    const field = this.pitchFieldRef?.nativeElement;
+    if (!field) return;
+    const rect = field.getBoundingClientRect();
+    const el = event.source.element.nativeElement;
+    const elRect = el.getBoundingClientRect();
+    // Centro del elemento relativo al field
+    const centerX = elRect.left + elRect.width / 2 - rect.left;
+    const centerY = elRect.top + elRect.height / 2 - rect.top;
+    const xPct = (centerX / rect.width) * 100;
+    const yPct = (centerY / rect.height) * 100;
+    const id = Number(player.internalId);
+    this.draggedPositions.set(id, { x: xPct, y: yPct });
+    this.savedPositions.set(id, { x: xPct, y: yPct });
+  }
+
+  /** Guarda SOLO las posiciones de los titulares en la cancha */
+  guardarPosiciones(): void {
+    if (this.draggedPositions.size === 0) {
+      this.snackBar.open('No hay posiciones para guardar. Arrastrá algún jugador primero.', '', { duration: 2500 });
+      return;
+    }
+    this.savingPositions = true;
+    const posiciones = Array.from(this.draggedPositions.entries()).map(([jugadorId, pos]) => ({
+      jugadorId, x: Math.round(pos.x * 100) / 100, y: Math.round(pos.y * 100) / 100
+    }));
+    this.countriesService.guardarPosicionesTitulares(this.paisId, posiciones).subscribe({
+      next: () => {
+        this.savingPositions = false;
+        this.draggedPositions.clear();
+        this.snackBar.open('✅ Posiciones guardadas', '', { duration: 3000, panelClass: 'snack-success' });
+      },
+      error: () => {
+        this.savingPositions = false;
+        this.snackBar.open('Error al guardar posiciones. Intentá de nuevo.', '', { duration: 3000, panelClass: 'snack-error' });
+      }
+    });
+  }
+
+  /** Exportar cancha como imagen PNG con marca DT26 y país + fecha */
   exportingPitch = false;
 
   exportPitchAsPng(): void {
@@ -457,13 +514,32 @@ export class ConvocadosComponent implements OnInit {
     if (!el) return;
     this.exportingPitch = true;
 
+    // Agregar overlays temporales para la captura
+    const overlay = document.createElement('div');
+    overlay.className = 'pitch-export-overlay';
+    overlay.style.cssText = 'position:absolute;top:8px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10;pointer-events:none;';
+
+    const left = document.createElement('span');
+    left.textContent = 'DT26';
+    left.style.cssText = 'font-size:18px;font-weight:900;color:rgba(255,255,255,0.85);text-shadow:0 2px 6px rgba(0,0,0,0.7);letter-spacing:1px;';
+
+    const right = document.createElement('span');
+    const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    right.textContent = `${this.pais?.nombre ?? ''} · ${fecha}`;
+    right.style.cssText = 'font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 6px rgba(0,0,0,0.7);';
+
+    overlay.appendChild(left);
+    overlay.appendChild(right);
+    el.appendChild(overlay);
+
     html2canvas(el, {
       backgroundColor: null,
       scale: 2,
       useCORS: true,
       allowTaint: true
     }).then(canvas => {
-      // Intentar compartir si el navegador lo soporta
+      // Quitar overlay temporal
+      overlay.remove();
       canvas.toBlob(blob => {
         if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
           const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
@@ -474,6 +550,7 @@ export class ConvocadosComponent implements OnInit {
         this.exportingPitch = false;
       }, 'image/png');
     }).catch(() => {
+      overlay.remove();
       this.exportingPitch = false;
       this.snackBar.open('Error al exportar la imagen', '', { duration: 3000 });
     });

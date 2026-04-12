@@ -133,4 +133,12 @@ public class MundialGraphQLController {
                                                Principal principal) {
         return convocatoriaService.guardarConvocatoria(principal.getName(), paisId, jugadorIds, noVaIds, titularesIds);
     }
+
+    @MutationMapping
+    @PreAuthorize("isAuthenticated()")
+    public boolean guardarPosicionesTitulares(@Argument Long paisId,
+                                              @Argument List<java.util.Map<String, Object>> posiciones,
+                                              Principal principal) {
+        return convocatoriaService.guardarPosicionesTitulares(principal.getName(), paisId, posiciones);
+    }
 }

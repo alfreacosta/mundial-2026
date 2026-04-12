@@ -33,10 +33,16 @@ public class ConvocatoriaRow {
     @JoinColumn(name = "jugador_id", nullable = false)
     private Jugador jugador;
 
-    /** PENDIENTE | CONVOCADO | NO_VA */
+    /** PENDIENTE | CONVOCADO | NO_VA | TITULAR */
     @Column(name = "estado", nullable = false, length = 20)
     @Builder.Default
     private String estado = "PENDIENTE";
+
+    @Column(name = "posicion_x")
+    private Double posicionX;
+
+    @Column(name = "posicion_y")
+    private Double posicionY;
 
     @Column(name = "trans_date", nullable = false)
     @Builder.Default
