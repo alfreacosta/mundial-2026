@@ -258,6 +258,7 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
     } else {
       item.golVisitanteEdit = Math.max(0, Math.min(20, (item.golVisitanteEdit ?? 0) + delta));
     }
+    item.guardado = false;
     this.cd.markForCheck();
   }
 
@@ -285,7 +286,6 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
         item.guardando        = false;
         item.guardado         = true;
         this.cd.markForCheck();
-        setTimeout(() => { item.guardado = false; this.cd.markForCheck(); }, 2500);
       },
       error: (err) => {
         item.guardando = false;
