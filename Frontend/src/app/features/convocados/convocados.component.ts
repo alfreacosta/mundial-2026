@@ -387,6 +387,14 @@ export class ConvocadosComponent implements OnInit {
     this.players.update(curr => curr.map(p => ({ ...p, seleccionado: false, noVa: false, titular: false })));
   }
 
+  clearPositions(): void {
+    this.draggedPositions.clear();
+    this.savedPositions.clear();
+    this._dragPxCache.clear();
+    // Forzar re-render de las posiciones
+    this.players.update(curr => [...curr]);
+  }
+
   get confColor(): string {
     return this.CONF_COLORS[this.pais?.confederacion?.codigo ?? ''] ?? '#7c3aed';
   }
