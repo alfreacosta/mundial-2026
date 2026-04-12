@@ -1,104 +1,141 @@
-<!-- Clasificación – Ranking de usuarios reales -->
 <div class="stats-page">
 
-  <!-- Hero header -->
+  <!-- Header compacto -->
   <header class="stats-header">
-    <div class="container">
-      <div class="header-content">
-        <div class="header-text">
-          <h1>
-            <mat-icon>emoji_events</mat-icon>
-            Clasificación General
-          </h1>
-          <p>Ranking de participantes del Mundial 2026</p>
-        </div>
-      </div>
-    </div>
+    <h1><mat-icon>emoji_events</mat-icon> Clasificación General</h1>
+    <p>Ranking en tiempo real de participantes y competencias</p>
   </header>
 
-  <!-- Contenido -->
-  <section class="stats-content">
-    <div class="container">
+  <!-- Tabs -->
+  <nav class="tabs">
+    <button class="tab" [class.active]="activeTab === 'usuarios'" (click)="activeTab = 'usuarios'">
+      <mat-icon>person</mat-icon> Usuarios
+      <span class="tab-count">{{ ranking.length }}</span>
+    </button>
+    <button class="tab" [class.active]="activeTab === 'grupos'" (click)="activeTab = 'grupos'">
+      <mat-icon>groups</mat-icon> Competencias
+      <span class="tab-count">{{ grupoRanking.length }}</span>
+    </button>
+  </nav>
 
-      <!-- Loading -->
-      @if (loading) {
-        <div class="state-container">
-          <mat-spinner diameter="48"></mat-spinner>
-          <p>Cargando ranking...</p>
-        </div>
-      }
-
-      <!-- Error -->
-      @if (!loading && error) {
-        <div class="state-container error">
-          <mat-icon class="state-icon">error_outline</mat-icon>
-          <p>{{ error }}</p>
-        </div>
-      }
-
-      <!-- Tabla ranking -->
-      @if (!loading && !error) {
-        <mat-card class="ranking-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>leaderboard</mat-icon>
-              Tabla de posiciones
-            </mat-card-title>
-            <mat-card-subtitle>{{ ranking.length }} participante{{ ranking.length !== 1 ? 's' : '' }}</mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content>
-            @if (ranking.length === 0) {
-              <div class="empty-state">
-                <mat-icon>group_off</mat-icon>
-                <p>Aún no hay participantes registrados.</p>
-              </div>
-            } @else {
-              <div class="ranking-table-wrapper">
-                <table class="ranking-table">
-                  <thead>
-                    <tr>
-                      <th class="col-pos">#</th>
-                      <th class="col-user">Usuario</th>
-                      <th class="col-pts">Puntos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (u of ranking; track u.internalId; let i = $index) {
-                      <tr [class.top-row]="i < 3">
-                        <td class="col-pos">
-                          <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
-                            @if (i < 3) { {{ getRankMedal(i + 1) }} }
-                            @if (i >= 3) { {{ i + 1 }} }
-                          </span>
-                        </td>
-                        <td class="col-user">
-                          <div class="user-info">
-                            <div class="avatar-circle">
-                              <app-avatar-icon [avatarId]="u.urlAvatar" [nombre]="u.nombre" [apellido]="u.apellido" [size]="36"></app-avatar-icon>
-                            </div>
-                            <div class="user-names">
-                              <span class="display-name">{{ getDisplayName(u) }}</span>
-                              <span class="username">&#64;{{ u.user }}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="col-pts">
-                          <span class="points-badge">{{ u.puntaje }}</span>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
-      }
-
+  <!-- Loading -->
+  @if ((activeTab === 'usuarios' && loading) || (activeTab === 'grupos' && loadingGrupos)) {
+    <div class="state-box">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando ranking...</p>
     </div>
-  </section>
+  }
+
+  <!-- Error -->
+  @if (!loading && error && activeTab === 'usuarios') {
+    <div class="state-box error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  <!-- ═══════════ RANKING USUARIOS ═══════════ -->
+  @if (activeTab === 'usuarios' && !loading && !error) {
+
+    <!-- Podio top 3 -->
+    @if (ranking.length >= 3) {
+      <div class="podium">
+        <!-- 2do -->
+        <div class="podium-item silver" (click)="null">
+          <div class="podium-avatar">
+            <app-avatar-icon [avatarId]="ranking[1].urlAvatar" [nombre]="ranking[1].nombre" [apellido]="ranking[1].apellido" [size]="48"></app-avatar-icon>
+          </div>
+          <span class="podium-medal">🥈</span>
+          <span class="podium-name">{{ getDisplayName(ranking[1]) }}</span>
+          <span class="podium-user">&#64;{{ ranking[1].user }}</span>
+          <span class="podium-pts">{{ ranking[1].puntaje }} pts</span>
+          <div class="podium-bar bar-2"></div>
+        </div>
+        <!-- 1ro -->
+        <div class="podium-item gold" (click)="null">
+          <div class="podium-avatar">
+            <app-avatar-icon [avatarId]="ranking[0].urlAvatar" [nombre]="ranking[0].nombre" [apellido]="ranking[0].apellido" [size]="56"></app-avatar-icon>
+          </div>
+          <span class="podium-medal">🥇</span>
+          <span class="podium-name">{{ getDisplayName(ranking[0]) }}</span>
+          <span class="podium-user">&#64;{{ ranking[0].user }}</span>
+          <span class="podium-pts">{{ ranking[0].puntaje }} pts</span>
+          <div class="podium-bar bar-1"></div>
+        </div>
+        <!-- 3ro -->
+        <div class="podium-item bronze" (click)="null">
+          <div class="podium-avatar">
+            <app-avatar-icon [avatarId]="ranking[2].urlAvatar" [nombre]="ranking[2].nombre" [apellido]="ranking[2].apellido" [size]="48"></app-avatar-icon>
+          </div>
+          <span class="podium-medal">🥉</span>
+          <span class="podium-name">{{ getDisplayName(ranking[2]) }}</span>
+          <span class="podium-user">&#64;{{ ranking[2].user }}</span>
+          <span class="podium-pts">{{ ranking[2].puntaje }} pts</span>
+          <div class="podium-bar bar-3"></div>
+        </div>
+      </div>
+    }
+
+    <!-- Lista del 4to en adelante -->
+    @if (ranking.length > 3) {
+      <div class="ranking-list">
+        @for (u of ranking.slice(3); track u.internalId; let i = $index) {
+          <div class="ranking-row">
+            <span class="rank-num">{{ i + 4 }}</span>
+            <div class="rank-avatar">
+              <app-avatar-icon [avatarId]="u.urlAvatar" [nombre]="u.nombre" [apellido]="u.apellido" [size]="34"></app-avatar-icon>
+            </div>
+            <div class="rank-info">
+              <span class="rank-name">{{ getDisplayName(u) }}</span>
+              <span class="rank-user">&#64;{{ u.user }}</span>
+            </div>
+            <span class="rank-pts">{{ u.puntaje }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (ranking.length === 0) {
+      <div class="state-box">
+        <mat-icon>group_off</mat-icon>
+        <p>Aún no hay participantes.</p>
+      </div>
+    }
+  }
+
+  <!-- ═══════════ RANKING GRUPOS ═══════════ -->
+  @if (activeTab === 'grupos' && !loadingGrupos) {
+
+    @if (grupoRanking.length === 0) {
+      <div class="state-box">
+        <mat-icon>group_off</mat-icon>
+        <p>Aún no hay competencias con puntaje.</p>
+      </div>
+    }
+
+    @if (grupoRanking.length > 0) {
+      <div class="grupos-grid">
+        @for (g of grupoRanking; track g.internalId; let i = $index) {
+          <div class="grupo-card" [class.top-grupo]="i < 3">
+            <div class="grupo-rank">
+              @if (i < 3) { <span class="grupo-medal">{{ getRankMedal(i + 1) }}</span> }
+              @if (i >= 3) { <span class="grupo-num">{{ i + 1 }}</span> }
+            </div>
+            <div class="grupo-info">
+              <span class="grupo-nombre">{{ g.nombre }}</span>
+              <span class="grupo-meta">
+                <mat-icon>person</mat-icon> {{ g.cantidadMiembros }}
+                · Creado por {{ g.creadorNombre }}
+              </span>
+            </div>
+            <div class="grupo-pts">
+              <span class="grupo-pts-num">{{ g.puntajeTotal }}</span>
+              <span class="grupo-pts-label">pts</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
 
 </div>
-
-

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StatsService, UsuarioRanking } from '../../core/services/stats.service';
+import { GrupoService, GrupoRanking } from '../../core/services/grupo.service';
 import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-icon.component';
 
 @Component({
@@ -11,7 +11,6 @@ import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
     AvatarIconComponent,
@@ -22,21 +21,25 @@ import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-
 export class StatsComponent implements OnInit {
 
   ranking: UsuarioRanking[] = [];
+  grupoRanking: GrupoRanking[] = [];
   loading = true;
+  loadingGrupos = true;
   error = '';
+  activeTab: 'usuarios' | 'grupos' = 'usuarios';
 
-  constructor(private statsService: StatsService) {}
+  constructor(
+    private statsService: StatsService,
+    private grupoService: GrupoService
+  ) {}
 
   ngOnInit(): void {
     this.statsService.getRanking().subscribe({
-      next: (data) => {
-        this.ranking = data;
-        this.loading = false;
-      },
-      error: () => {
-        this.error = 'No se pudo cargar el ranking.';
-        this.loading = false;
-      }
+      next: (data) => { this.ranking = data; this.loading = false; },
+      error: () => { this.error = 'No se pudo cargar el ranking.'; this.loading = false; }
+    });
+    this.grupoService.getRankingGrupos().subscribe({
+      next: (data) => { this.grupoRanking = data; this.loadingGrupos = false; },
+      error: () => { this.loadingGrupos = false; }
     });
   }
 
