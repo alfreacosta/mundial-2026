@@ -131,13 +131,10 @@
             <td class="td-favoritos">
               <ng-container *ngIf="row.perfilPublico !== false">
                 <div class="tabla-flags" *ngIf="row.equiposFavoritos?.length; else sinFavTd">
-                  <span *ngFor="let fav of row.equiposFavoritos.slice(0,3)"
+                  <span *ngFor="let fav of row.equiposFavoritos"
                         class="fi tabla-flag-item"
                         [class]="'fi-' + (fav.paisCodigo | fifaToFlag)"
                         [title]="fav.paisNombre">
-                  </span>
-                  <span *ngIf="row.equiposFavoritos.length > 3" class="mas-flags">
-                    +{{ row.equiposFavoritos.length - 3 }}
                   </span>
                 </div>
               </ng-container>
