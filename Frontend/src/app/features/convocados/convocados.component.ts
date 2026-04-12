@@ -520,6 +520,16 @@ export class ConvocadosComponent implements OnInit {
     }
   }
 
+  setTab(tab: 'convocatoria' | 'titulares' | 'nova'): void {
+    this.activeTab.set(tab);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tab === 'convocatoria' ? null : tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
   // ═══ STATS PANEL ═══
 
   selectPlayer(player: JugadorSeleccionable): void {

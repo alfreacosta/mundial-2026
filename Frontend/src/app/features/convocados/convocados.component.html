@@ -56,16 +56,16 @@
         <mat-icon>groups</mat-icon>
         Plantel
       </button>
-      <button class="tab-btn" [class.active]="activeTab() === 'convocatoria'" (click)="activeTab.set('convocatoria')">
+      <button class="tab-btn" [class.active]="activeTab() === 'convocatoria'" (click)="setTab('convocatoria')">
         <mat-icon>assignment</mat-icon>
         Convocatoria
       </button>
-      <button class="tab-btn" [class.active]="activeTab() === 'titulares'" (click)="activeTab.set('titulares')">
+      <button class="tab-btn" [class.active]="activeTab() === 'titulares'" (click)="setTab('titulares')">
         <mat-icon>star</mat-icon>
         Titulares
         <span class="tab-count" *ngIf="totalTitulares() > 0">{{ totalTitulares() }}/11</span>
       </button>
-      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="activeTab.set('nova')">
+      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="setTab('nova')">
         <mat-icon>person_off</mat-icon>
         No Va
         <span class="tab-count nova-count" *ngIf="totalNoVa() > 0">{{ totalNoVa() }}</span>
