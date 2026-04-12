@@ -174,6 +174,8 @@ classDiagram
         +Convocatoria convocatoria
         +Jugador jugador
         +String estado
+        +Double posicionX
+        +Double posicionY
         +LocalDateTime transDate
         --
         +cambiarEstado()
@@ -588,6 +590,12 @@ internalId: 549, masterId: 11, jugadorId: 249, estado: "PENDIENTE", transDate: "
 - `CONVOCADO`: Usuario confirmó que va al Mundial (máximo 26)
 - `TITULAR`: Jugador convocado elegido como titular (máximo 11, subconjunto de CONVOCADO)
 - `NO_VA`: Usuario decidió que no lo lleva
+
+**Posiciones en la cancha (solo TITULAR):**
+- `posicion_x`: Coordenada X en porcentaje (0-100) dentro del campo visual
+- `posicion_y`: Coordenada Y en porcentaje (0-100) dentro del campo visual
+- Nullables — solo se llenan cuando el usuario arrastra un titular en la cancha y guarda posiciones
+- Permiten persistir la ubicación visual del jugador entre sesiones
 
 **Relación:**
 - Pertenece a UNA convocatoria (N:1 con Convocatoria).
