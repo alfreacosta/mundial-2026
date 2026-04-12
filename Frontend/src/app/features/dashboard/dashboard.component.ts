@@ -45,6 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   miPrediccion: PrediccionTorneo | null = null;
   convocatorias: Map<number, ConvocatoriaResponse> = new Map();
   convocadosExpandidos = new Set<number>();
+  titularesExpandidos = new Set<number>();
   jugadoresPorPais: Map<number, JugadorPais[]> = new Map();
   convocadosCargando = new Set<number>();
   datosPersonalesLoading = false;
@@ -228,6 +229,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.convocadosCargando.delete(paisId);
       });
     }
+  }
+
+  toggleTitulares(paisId: number): void {
+    if (this.titularesExpandidos.has(paisId)) {
+      this.titularesExpandidos.delete(paisId);
+      return;
+    }
+    this.titularesExpandidos.add(paisId);
+    // Carga lazy de jugadores si no tenemos
+    if (!this.jugadoresPorPais.has(paisId) && !this.convocadosCargando.has(paisId)) {
+      this.convocadosCargando.add(paisId);
+      this.countriesService.getJugadoresPorPais(paisId).pipe(
+        catchError(() => of([]))
+      ).subscribe(jugadores => {
+        this.jugadoresPorPais.set(paisId, jugadores);
+        this.convocadosCargando.delete(paisId);
+      });
+    }
+  }
+
+  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] {
+    const todos = this.jugadoresPorPais.get(paisId) ?? [];
+    const conv = this.convocatorias.get(paisId);
+    if (!conv || todos.length === 0) return [];
+    const titIds = new Set(conv.titularesIds ?? []);
+    if (titIds.size === 0) return [];
+    const posMap = new Map((conv.posicionesTitulares ?? []).map(p => [p.jugadorId, { x: p.x, y: p.y }]));
+    return todos
+      .filter(j => titIds.has(j.internalId))
+      .map(j => {
+        const pos = posMap.get(j.internalId);
+        const defaultPos = this.getDefaultPos(j.posicion.abreviatura, [...titIds], j.internalId);
+        return {
+          id: j.internalId,
+          apellido: j.apellido ?? j.nombre,
+          camiseta: j.numeroCamiseta,
+          posAbr: j.posicion.abreviatura,
+          x: pos?.x ?? defaultPos.x,
+          y: pos?.y ?? defaultPos.y
+        };
+      });
+  }
+
+  private getDefaultPos(posAbr: string, _allIds: number[], _id: number): { x: number; y: number } {
+    const defaults: Record<string, { x: number; y: number }> = {
+      POR: { x: 50, y: 90 }, ARQ: { x: 50, y: 90 },
+      DEF: { x: 50, y: 68 }, MED: { x: 50, y: 42 }, DEL: { x: 50, y: 15 }
+    };
+    return defaults[posAbr] ?? { x: 50, y: 50 };
   }
 
   getDashboardConvocados(paisId: number): { id: number; nombre: string; numeroCamiseta: number | null; posicionAbr: string }[] {

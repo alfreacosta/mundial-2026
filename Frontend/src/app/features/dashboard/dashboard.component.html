@@ -142,50 +142,63 @@
                 </div>
                 <div class="favorites-list">
                   @for (fav of misFavoritos; track fav.paisId) {
-                    <div class="fav-expandable">
-                      <!-- Cabecera del equipo -->
-                      <div class="fav-expandable-header">
-                        <div class="fav-expandable-main" [routerLink]="['/seleccion', fav.paisCodigo]">
-                          <img
-                            [src]="getFlagUrl(fav.paisCodigo)"
-                            [alt]="fav.paisNombre"
-                            class="flag-img"
-                            loading="lazy" />
-                          <div class="fav-info">
-                            <span class="fav-name">{{ fav.paisNombre }}</span>
-                            <span class="fav-progress">
-                              {{ getConvocatoriaProgress(fav.paisId).total }}/26 jugadores
-                            </span>
-                          </div>
-                          @if (getConvocatoriaProgress(fav.paisId).total >= 23) {
-                            <mat-icon class="check-icon">check_circle</mat-icon>
-                          }
-                        </div>
+                    <div class="fav-compact">
+                      <!-- Fila compacta: bandera + nombre + progreso + acciones -->
+                      <div class="fav-row">
+                        <img
+                          [src]="getFlagUrl(fav.paisCodigo)"
+                          [alt]="fav.paisNombre"
+                          class="flag-img-sm"
+                          loading="lazy" />
+                        <span class="fav-name" [routerLink]="['/seleccion', fav.paisCodigo]">{{ fav.paisNombre }}</span>
+                        <span class="fav-prog">{{ getConvocatoriaProgress(fav.paisId).total }}/26</span>
+                        @if (getConvocatoriaProgress(fav.paisId).total >= 23) {
+                          <mat-icon class="check-sm">check_circle</mat-icon>
+                        }
+                        <a class="fav-link" [routerLink]="['/convocados', fav.paisId]">Ver convocados</a>
                         <button
-                          class="btn-conv-dash"
-                          [class.open]="convocadosExpandidos.has(fav.paisId)"
-                          (click)="toggleConvocados(fav.paisId)">
-                          {{ convocadosExpandidos.has(fav.paisId) ? '▲ Ocultar' : '▼ Ver convocados' }}
+                          class="btn-titulares"
+                          [class.open]="titularesExpandidos.has(fav.paisId)"
+                          (click)="toggleTitulares(fav.paisId)">
+                          <mat-icon>{{ titularesExpandidos.has(fav.paisId) ? 'expand_less' : 'sports_soccer' }}</mat-icon>
+                          {{ titularesExpandidos.has(fav.paisId) ? 'Ocultar' : 'Titulares' }}
                         </button>
                       </div>
 
-                      <!-- Lista expandible de convocados -->
-                      @if (convocadosExpandidos.has(fav.paisId)) {
-                        <div class="convocados-dash-lista">
+                      <!-- Mini cancha expandible con 11 titulares -->
+                      @if (titularesExpandidos.has(fav.paisId)) {
+                        <div class="mini-pitch-wrapper">
                           @if (convocadosCargando.has(fav.paisId)) {
                             <div class="conv-loading">
                               <mat-spinner diameter="18"></mat-spinner>
-                              <span>Cargando...</span>
+                              <span>Cargando titulares...</span>
                             </div>
                           } @else {
-                            <div class="convocados-dash-grid">
-                              @for (j of getDashboardConvocados(fav.paisId); track j.id) {
-                                <div class="conv-row">
-                                  <span class="conv-num">{{ j.numeroCamiseta ?? '–' }}</span>
-                                  <span class="conv-pos" [attr.data-pos]="j.posicionAbr">{{ j.posicionAbr }}</span>
-                                  <span class="conv-nombre">{{ j.nombre }}</span>
-                                </div>
-                              }
+                            <div class="mini-pitch">
+                              <div class="mini-pitch-field">
+                                <!-- Líneas de la cancha -->
+                                <div class="pitch-center-line"></div>
+                                <div class="pitch-center-circle"></div>
+                                <div class="pitch-area-top"></div>
+                                <div class="pitch-area-bottom"></div>
+                                <!-- Jugadores titulares posicionados -->
+                                @for (t of getTitularesParaCancha(fav.paisId); track t.id) {
+                                  <div class="mini-player"
+                                    [style.left.%]="t.x"
+                                    [style.top.%]="t.y">
+                                    <div class="mini-player-dot" [attr.data-pos]="t.posAbr"></div>
+                                    <span class="mini-player-num">{{ t.camiseta ?? '' }}</span>
+                                    <span class="mini-player-name">{{ t.apellido }}</span>
+                                  </div>
+                                }
+                                @if (getTitularesParaCancha(fav.paisId).length === 0) {
+                                  <div class="mini-pitch-empty">
+                                    <mat-icon>group_off</mat-icon>
+                                    <span>Sin titulares</span>
+                                    <a [routerLink]="['/convocados', fav.paisId]">Elegir titulares</a>
+                                  </div>
+                                }
+                              </div>
                             </div>
                           }
                         </div>
