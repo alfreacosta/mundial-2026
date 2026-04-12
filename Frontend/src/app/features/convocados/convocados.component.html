@@ -266,11 +266,10 @@
               <div class="pitch-field-goal-top"></div>
               <div class="pitch-field-goal-bottom"></div>
               <!-- Todos los titulares con drag libre -->
-              <div *ngFor="let p of jugadoresTitulares" class="pitch-player-abs"
+              <div *ngFor="let p of jugadoresTitulares; trackBy: trackById" class="pitch-player-abs"
                 cdkDrag [cdkDragBoundary]="'.pitch-field'"
-                (cdkDragEnded)="onDragEnded($event, p)"
-                [style.left]="getInitialPosition(p).x"
-                [style.top]="getInitialPosition(p).y">
+                [cdkDragFreeDragPosition]="getPlayerDragPos(p)"
+                (cdkDragEnded)="onDragEnded($event, p)">
                 <img *ngIf="p.urlFoto" [src]="p.urlFoto" class="pitch-avatar">
                 <div *ngIf="!p.urlFoto" class="pitch-avatar-placeholder">
                   <mat-icon>person</mat-icon>

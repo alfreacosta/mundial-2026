@@ -1437,9 +1437,11 @@ $save-bar-height: 72px;
   border-radius: 4px 4px 0 0;
 }
 
-// Jugador con posición absoluta + drag
+// Jugador con posición absoluta + drag (posicionado vía cdkDragFreeDragPosition)
 .pitch-player-abs {
   position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;

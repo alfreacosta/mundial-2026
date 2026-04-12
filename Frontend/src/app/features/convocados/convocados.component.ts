@@ -64,10 +64,13 @@ export class ConvocadosComponent implements OnInit {
   searchQuery = '';
   activeTab = signal<'convocatoria' | 'titulares' | 'nova'>('convocatoria');
 
-  /** Posiciones guardadas de drag: jugadorId → {x%, y%} */
+  /** Posiciones guardadas (porcentaje): jugadorId → {x%, y%} */
   savedPositions = new Map<number, { x: number; y: number }>();
-  /** Posiciones modificadas por drag pendientes de guardar */
+  /** Posiciones modificadas por drag pendientes de guardar (porcentaje) */
   draggedPositions = new Map<number, { x: number; y: number }>();
+  /** Cache de posiciones en píxeles para cdkDragFreeDragPosition (evita recrear objetos) */
+  private _dragPxCache = new Map<number, { x: number; y: number }>();
+  private static readonly ZERO_POS: { x: number; y: number } = { x: -999, y: -999 };
 
   // Computed signals — se actualizan AUTOMATICAMENTE cuando players cambia
   readonly totalSel = computed(() => this.players().filter(p => p.seleccionado).length);
@@ -172,6 +175,7 @@ export class ConvocadosComponent implements OnInit {
         // Cargar posiciones guardadas de titulares
         this.savedPositions.clear();
         this.draggedPositions.clear();
+        this._dragPxCache.clear();
         for (const pos of (convocatoria?.posicionesTitulares ?? [])) {
           this.savedPositions.set(Number(pos.jugadorId), { x: pos.x, y: pos.y });
         }
@@ -443,14 +447,30 @@ export class ConvocadosComponent implements OnInit {
   // ═══ DRAG & DROP CANCHA ═══
   @ViewChild('pitchFieldRef') pitchFieldRef!: ElementRef<HTMLDivElement>;
 
-  /** Calcula posición inicial (%) para cada titular en la cancha — usa guardada si existe */
-  getInitialPosition(player: JugadorSeleccionable): { x: string; y: string } {
-    const id = Number(player.internalId);
-    const saved = this.savedPositions.get(id);
-    if (saved) {
-      return { x: `calc(${saved.x}% - 28px)`, y: `calc(${saved.y}% - 30px)` };
-    }
+  trackById(_: number, player: JugadorSeleccionable): number {
+    return player.internalId;
+  }
 
+  /** Retorna posición en píxeles para cdkDragFreeDragPosition (con cache) */
+  getPlayerDragPos(player: JugadorSeleccionable): { x: number; y: number } {
+    const id = Number(player.internalId);
+    const cached = this._dragPxCache.get(id);
+    if (cached) return cached;
+
+    const field = this.pitchFieldRef?.nativeElement;
+    if (!field || !field.clientWidth) return ConvocadosComponent.ZERO_POS;
+
+    const pct = this.savedPositions.get(id) ?? this.getDefaultPositionPct(player);
+    const pos = {
+      x: (pct.x / 100) * field.clientWidth - 28,
+      y: (pct.y / 100) * field.clientHeight - 30
+    };
+    this._dragPxCache.set(id, pos);
+    return pos;
+  }
+
+  /** Calcula posición por defecto (%) según posición de juego */
+  private getDefaultPositionPct(player: JugadorSeleccionable): { x: number; y: number } {
     const pos = player.posicion?.codigo || 'MED';
     const titulares = this.players().filter(p => p.titular && p.posicion?.codigo === pos);
     const idx = titulares.findIndex(p => p.internalId === player.internalId);
@@ -462,23 +482,23 @@ export class ConvocadosComponent implements OnInit {
 
     const yMap: Record<string, number> = { 'DEL': 12, 'MED': 38, 'DEF': 64, 'ARQ': 88 };
     const y = yMap[pos] ?? 50;
-
-    return { x: `calc(${x}% - 28px)`, y: `calc(${y}% - 30px)` };
+    return { x, y };
   }
 
   /** Cuando se suelta un jugador después de arrastrarlo */
   onDragEnded(event: CdkDragEnd, player: JugadorSeleccionable): void {
     const field = this.pitchFieldRef?.nativeElement;
     if (!field) return;
-    const rect = field.getBoundingClientRect();
-    const el = event.source.element.nativeElement;
-    const elRect = el.getBoundingClientRect();
-    // Centro del elemento relativo al field
-    const centerX = elRect.left + elRect.width / 2 - rect.left;
-    const centerY = elRect.top + elRect.height / 2 - rect.top;
-    const xPct = (centerX / rect.width) * 100;
-    const yPct = (centerY / rect.height) * 100;
+
+    const pos = event.source.getFreeDragPosition();
     const id = Number(player.internalId);
+
+    // Actualizar cache de píxeles (misma referencia que CdkDrag usa)
+    this._dragPxCache.set(id, { x: pos.x, y: pos.y });
+
+    // Convertir a porcentaje para guardar en servidor
+    const xPct = ((pos.x + 28) / field.clientWidth) * 100;
+    const yPct = ((pos.y + 30) / field.clientHeight) * 100;
     this.draggedPositions.set(id, { x: xPct, y: yPct });
     this.savedPositions.set(id, { x: xPct, y: yPct });
   }
