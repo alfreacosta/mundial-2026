@@ -306,6 +306,7 @@ $save-bar-height: 72px;
     border-bottom: 2px solid transparent;
     cursor: pointer;
     transition: all $transition;
+    white-space: nowrap;
 
     mat-icon {
       font-size: 15px;
