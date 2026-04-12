@@ -20,4 +20,8 @@ public interface EquipoFavoritoRepository extends JpaRepository<EquipoFavorito, 
     boolean existsByUsuario_InternalIdAndPais_InternalId(Long usuarioId, Long paisId);
 
     int countByUsuario_InternalId(Long usuarioId);
+
+    /** Todos los usuarios que tienen un país como favorito (para auto-alineación) */
+    @Query("SELECT ef FROM EquipoFavorito ef JOIN FETCH ef.usuario WHERE ef.pais.internalId = :paisId")
+    List<EquipoFavorito> findByPaisInternalId(@Param("paisId") Long paisId);
 }
