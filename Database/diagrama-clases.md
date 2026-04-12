@@ -180,9 +180,10 @@ classDiagram
         +esPendiente()
         +esConvocado()
         +esNoVa()
+        +esTitular()
     }
     
-    note for ConvocatoriaRow "estado: PENDIENTE | CONVOCADO | NO_VA"
+    note for ConvocatoriaRow "estado: PENDIENTE | CONVOCADO | NO_VA | TITULAR"
 
     class Alineacion {
         +Long internalId
@@ -564,7 +565,8 @@ Cuando un usuario crea una convocatoria y elige un país, el sistema **PRECARGA 
 
 1. Usuario crea convocatoria para Paraguay → Sistema inserta 40-50 ConvocatoriaRow con estado "PENDIENTE"
 2. Usuario cambia estados: PENDIENTE → CONVOCADO / NO_VA
-3. **Máximo 26 CONVOCADOS**: Cuando llega a 26 CONVOCADOS, los demás se deshabilitan (no se pueden cambiar a CONVOCADO)
+3. Dentro de los CONVOCADOS, puede marcar hasta 11 como TITULAR (formación titular)
+4. **Máximo 26 CONVOCADOS**: Cuando llega a 26 CONVOCADOS, los demás se deshabilitan (no se pueden cambiar a CONVOCADO)
 
 **Ejemplo de registros para la convocatoria de Paraguay de alfredinho (masterId: 11):**
 ```
@@ -584,6 +586,7 @@ internalId: 549, masterId: 11, jugadorId: 249, estado: "PENDIENTE", transDate: "
 **Estados posibles:**
 - `PENDIENTE`: Estado inicial (precargado), usuario aún no decidió
 - `CONVOCADO`: Usuario confirmó que va al Mundial (máximo 26)
+- `TITULAR`: Jugador convocado elegido como titular (máximo 11, subconjunto de CONVOCADO)
 - `NO_VA`: Usuario decidió que no lo lleva
 
 **Relación:**
@@ -1051,7 +1054,7 @@ La tabla **Alineacion** almacena la predicción de alineación para un equipo en
 1. Usuario elige una selección (ej: Argentina, Brasil, España)
 2. Sistema crea la cabecera: `Convocatoria (usuarioId, paisId)`
 3. Usuario busca/selecciona jugadores REALES de la base de datos
-4. Por cada jugador, se crea un `ConvocatoriaRow` con estado: PENDIENTE/CONVOCADO/NO_VA
+4. Por cada jugador, se crea un `ConvocatoriaRow` con estado: PENDIENTE/CONVOCADO/NO_VA/TITULAR
 5. Debe completar entre 23-26 jugadores
 6. Sistema valida: mínimo 3 arqueros
 7. Guarda convocatoria completa

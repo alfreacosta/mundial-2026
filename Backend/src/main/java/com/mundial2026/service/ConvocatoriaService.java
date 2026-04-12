@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,13 +79,16 @@ public class ConvocatoriaService {
         convocatoriaRepository.saveAndFlush(conv);
         entityManager.flush();
 
-        // Agregar filas CONVOCADO
+        // Agregar filas CONVOCADO (si está en titularesIds, marcarlo como TITULAR directamente)
+        List<Long> safeTitularesIds = titularesIds != null ? titularesIds : List.of();
+        Set<Long> titularSet = new HashSet<>(safeTitularesIds);
         List<Jugador> jugadores = jugadorRepository.findAllById(jugadorIds);
         for (Jugador j : jugadores) {
+            String estado = titularSet.contains(j.getInternalId()) ? "TITULAR" : "CONVOCADO";
             ConvocatoriaRow row = ConvocatoriaRow.builder()
                     .convocatoria(conv)
                     .jugador(j)
-                    .estado("CONVOCADO")
+                    .estado(estado)
                     .build();
             conv.getRows().add(row);
         }
@@ -97,20 +102,6 @@ public class ConvocatoriaService {
                         .convocatoria(conv)
                         .jugador(j)
                         .estado("NO_VA")
-                        .build();
-                conv.getRows().add(row);
-            }
-        }
-
-        // Agregar filas TITULAR
-        List<Long> safeTitularesIds = titularesIds != null ? titularesIds : List.of();
-        if (!safeTitularesIds.isEmpty()) {
-            List<Jugador> titulares = jugadorRepository.findAllById(safeTitularesIds);
-            for (Jugador j : titulares) {
-                ConvocatoriaRow row = ConvocatoriaRow.builder()
-                        .convocatoria(conv)
-                        .jugador(j)
-                        .estado("TITULAR")
                         .build();
                 conv.getRows().add(row);
             }
