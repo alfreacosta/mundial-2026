@@ -1102,6 +1102,11 @@ $border:    rgba(255,255,255,0.1);
   margin-bottom: 16px;
   letter-spacing: 1px;
   line-height: 1.15;
+
+  @media (max-width: 560px) {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    margin-bottom: 10px;
+  }
 }
 
 .game-intro-subtitle {
@@ -1110,6 +1115,12 @@ $border:    rgba(255,255,255,0.1);
   max-width: 640px;
   margin: 0 auto 52px;
   line-height: 1.75;
+
+  @media (max-width: 560px) {
+    font-size: 0.82rem;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
 }
 
 .game-intro-steps {
@@ -1264,6 +1275,11 @@ $border:    rgba(255,255,255,0.1);
   color: #fff;
   margin-bottom: 12px;
   letter-spacing: 1px;
+
+  @media (max-width: 700px) {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    margin-bottom: 8px;
+  }
 }
 
 .scoring-subtitle {
@@ -1272,6 +1288,11 @@ $border:    rgba(255,255,255,0.1);
   max-width: 500px;
   margin: 0 auto;
   line-height: 1.6;
+
+  @media (max-width: 700px) {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
 }
 
 .scoring-grid {
