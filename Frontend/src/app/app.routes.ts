@@ -6,7 +6,6 @@ import { CountriesComponent } from './features/countries/countries.component';
 import { ConvocadosComponent } from './features/convocados/convocados.component';
 import { StatsComponent } from './features/stats/stats.component';
 import { MyTeamComponent } from './features/my-team/my-team.component';
-import { FixturesComponent } from './features/fixtures/fixtures.component';
 import { GroupsComponent } from './features/groups/groups.component';
 import { PrivacyComponent } from './features/privacy/privacy.component';
 import { SeleccionDetailComponent } from './features/seleccion-detail/seleccion-detail.component';
@@ -38,7 +37,6 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'my-team', component: MyTeamComponent, canActivate: [authGuard] },
   { path: 'players', component: PlayersComponent, canActivate: [authGuard] },
-  { path: 'fixtures', component: FixturesComponent, canActivate: [authGuard] },
   { path: 'stats', component: StatsComponent, canActivate: [authGuard] },
   { path: 'countries', component: CountriesComponent, canActivate: [authGuard] },
   { path: 'convocados/:paisId', component: ConvocadosComponent, canActivate: [authGuard] },
