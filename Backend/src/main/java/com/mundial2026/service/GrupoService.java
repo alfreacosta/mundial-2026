@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,9 @@ public class GrupoService {
 
     private final GrupoRepository              grupoRepository;
     private final GrupoRowRepository           grupoRowRepository;
+    private final GrupoRowPaisRepository       grupoRowPaisRepository;
     private final EquipoFavoritoRepository     equipoFavoritoRepository;
+    private final PaisRepository               paisRepository;
     private final UsuarioRepository            usuarioRepository;
     private final PrediccionTorneoRepository   prediccionTorneoRepository;
 
@@ -46,6 +49,10 @@ public class GrupoService {
 
         grupoRepository.save(grupo);
 
+        // Validar países seleccionados
+        int cantPaises = grupo.getCantidadPaises();
+        validarPaisIds(req.getPaisIds(), cantPaises, creador.getInternalId());
+
         // Auto-unir al creador como miembro con rol CREADOR
         GrupoRow.GrupoRowBuilder rowBuilder = GrupoRow.builder()
                 .grupo(grupo)
@@ -58,7 +65,10 @@ public class GrupoService {
                     rowBuilder.goleador(pred.getJugadorGoleador());
                 });
 
-        grupoRowRepository.save(rowBuilder.build());
+        GrupoRow row = rowBuilder.build();
+        grupoRowRepository.save(row);
+
+        guardarPaisesDelGrupo(row, req.getPaisIds());
 
         return toGrupoDTO(grupo, false);
     }
@@ -83,6 +93,9 @@ public class GrupoService {
             throw new IllegalStateException("Ya eres miembro de este grupo");
         }
 
+        // Validar países seleccionados
+        validarPaisIds(req.getPaisIds(), grupo.getCantidadPaises(), usuario.getInternalId());
+
         // Determinar rol
         String rol = grupo.getCreador().getInternalId().equals(usuario.getInternalId()) ? "CREADOR" : "MIEMBRO";
 
@@ -99,10 +112,12 @@ public class GrupoService {
                 });
 
         GrupoRow row = rowBuilder.build();
-
         grupoRowRepository.save(row);
 
-        return toGrupoRowDTO(row, List.of());
+        guardarPaisesDelGrupo(row, req.getPaisIds());
+
+        List<GrupoRowPais> paises = grupoRowPaisRepository.findByGrupoRowId(row.getInternalId());
+        return toGrupoRowDTO(row, paises);
     }
 
     // ----------------------------------------------------------------
@@ -219,13 +234,15 @@ public class GrupoService {
     }
 
     /**
-     * Construye la lista de DTOs de miembros leyendo siempre la predicción
-     * desde prediccion_torneo (fuente de verdad), no desde grupo_row.
+     * Construye la lista de DTOs de miembros leyendo la predicción
+     * desde prediccion_torneo y los países desde grupo_row_pais.
      */
     private List<GrupoRowDTO> buildMiembrosDTO(List<GrupoRow> miembros) {
         return miembros.stream().map(r -> {
             Long uid = r.getUsuario().getInternalId();
-            List<EquipoFavorito> favs = equipoFavoritoRepository.findByUsuarioId(uid);
+
+            // Países específicos del grupo (no los globales)
+            List<GrupoRowPais> paisesGrupo = grupoRowPaisRepository.findByGrupoRowId(r.getInternalId());
 
             // Siempre leer la predicción fresca desde prediccion_torneo
             PrediccionTorneo pred = prediccionTorneoRepository.findByUsuarioId(uid).orElse(null);
@@ -249,7 +266,7 @@ public class GrupoService {
                     .goleadorApellido(goleador != null ? goleador.getApellido() : null)
                     .goleadorFoto(goleador != null ? goleador.getUrlFoto() : null)
                     .fechaUnion(r.getFechaUnion())
-                    .equiposFavoritos(favs.stream().map(this::toEquipoFavoritoDTO).collect(Collectors.toList()))
+                    .equiposFavoritos(paisesGrupo.stream().map(this::toGrupoRowPaisDTO).collect(Collectors.toList()))
                     .puntaje(r.getUsuario().getPuntaje())
                     .perfilPublico(r.getUsuario().getPerfilPublico())
                     .build();
@@ -271,7 +288,7 @@ public class GrupoService {
                 .build();
     }
 
-    private GrupoRowDTO toGrupoRowDTO(GrupoRow r, List<EquipoFavorito> favs) {
+    private GrupoRowDTO toGrupoRowDTO(GrupoRow r, List<GrupoRowPais> paises) {
         Pais campeon = r.getPaisCampeon();
         Jugador goleador = r.getGoleador();
 
@@ -291,7 +308,7 @@ public class GrupoService {
                 .goleadorApellido(goleador != null ? goleador.getApellido() : null)
                 .goleadorFoto(goleador != null ? goleador.getUrlFoto() : null)
                 .fechaUnion(r.getFechaUnion())
-                .equiposFavoritos(favs.stream().map(this::toEquipoFavoritoDTO).collect(Collectors.toList()))
+                .equiposFavoritos(paises.stream().map(this::toGrupoRowPaisDTO).collect(Collectors.toList()))
                 .puntaje(r.getUsuario().getPuntaje())
                 .perfilPublico(r.getUsuario().getPerfilPublico())
                 .build();
@@ -306,6 +323,55 @@ public class GrupoService {
                 .orden(ef.getOrden())
                 .transDate(ef.getTransDate())
                 .build();
+    }
+
+    private EquipoFavoritoDTO toGrupoRowPaisDTO(GrupoRowPais grp) {
+        return EquipoFavoritoDTO.builder()
+                .internalId(grp.getInternalId())
+                .paisId(grp.getPais().getInternalId())
+                .paisNombre(grp.getPais().getNombre())
+                .paisCodigo(grp.getPais().getCodigo())
+                .orden(grp.getOrden())
+                .build();
+    }
+
+    /**
+     * Valida que la cantidad de países coincida con la cantidad requerida
+     * y que todos los países sean favoritos del usuario.
+     */
+    private void validarPaisIds(List<Long> paisIds, int cantidadRequerida, Long usuarioId) {
+        if (paisIds == null || paisIds.size() != cantidadRequerida) {
+            throw new IllegalArgumentException(
+                    "Debés seleccionar exactamente " + cantidadRequerida + " país(es)");
+        }
+        // Verificar que no haya duplicados
+        if (Set.copyOf(paisIds).size() != paisIds.size()) {
+            throw new IllegalArgumentException("No se permiten países duplicados");
+        }
+        // Verificar que todos los países sean favoritos del usuario
+        List<EquipoFavorito> favs = equipoFavoritoRepository.findByUsuarioId(usuarioId);
+        Set<Long> favPaisIds = favs.stream()
+                .map(f -> f.getPais().getInternalId())
+                .collect(Collectors.toSet());
+        for (Long paisId : paisIds) {
+            if (!favPaisIds.contains(paisId)) {
+                throw new IllegalArgumentException(
+                        "El país con id " + paisId + " no está entre tus favoritos");
+            }
+        }
+    }
+
+    private void guardarPaisesDelGrupo(GrupoRow row, List<Long> paisIds) {
+        for (int i = 0; i < paisIds.size(); i++) {
+            Pais pais = paisRepository.findById(paisIds.get(i))
+                    .orElseThrow(() -> new RuntimeException("País no encontrado"));
+            GrupoRowPais grp = GrupoRowPais.builder()
+                    .grupoRow(row)
+                    .pais(pais)
+                    .orden(i + 1)
+                    .build();
+            grupoRowPaisRepository.save(grp);
+        }
     }
 
     // ----------------------------------------------------------------

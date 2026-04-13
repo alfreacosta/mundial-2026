@@ -41,45 +41,102 @@
       </button>
     </div>
 
+    <!-- Indicador de pasos -->
+    <div class="pasos-progress">
+      <div class="paso-item" [class.activo]="paso === 1" [class.completado]="paso > 1">
+        <span class="paso-num">{{ paso > 1 ? '✓' : '1' }}</span>
+        <span class="paso-label">Datos</span>
+      </div>
+      <div class="paso-linea"></div>
+      <div class="paso-item" [class.activo]="paso === 2">
+        <span class="paso-num">2</span>
+        <span class="paso-label">Países</span>
+      </div>
+    </div>
+
     <div class="modal-body">
       <div class="form-error" *ngIf="error">
         <mat-icon>error</mat-icon>{{ error }}
       </div>
 
-      <div class="form-group">
-        <label for="nombre">Nombre del grupo *</label>
-        <input id="nombre" type="text" [(ngModel)]="nombre"
-               placeholder="" maxlength="100"
-               class="form-control">
-      </div>
-
-      <div class="form-group">
-        <label for="premio">Premio (opcional)</label>
-        <input id="premio" type="text" [(ngModel)]="premio"
-               placeholder="" maxlength="255"
-               class="form-control">
-      </div>
-
-      <div class="form-group">
-        <label for="cantidadPaises">Cantidad de países por jugador</label>
-        <div class="qty-selector">
-          <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises > 1 ? cantidadPaises - 1 : 1" [disabled]="cantidadPaises <= 1">
-            <mat-icon>remove</mat-icon>
-          </button>
-          <span class="qty-value">{{ cantidadPaises }}</span>
-          <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises < 5 ? cantidadPaises + 1 : 5" [disabled]="cantidadPaises >= 5">
-            <mat-icon>add</mat-icon>
-          </button>
+      <!-- ═══ PASO 1: Datos del grupo ═══ -->
+      <ng-container *ngIf="paso === 1">
+        <div class="form-group">
+          <label for="nombre">Nombre del grupo *</label>
+          <input id="nombre" type="text" [(ngModel)]="nombre"
+                 placeholder="" maxlength="100"
+                 class="form-control">
         </div>
-        <p class="form-hint">Cada miembro elegirá {{ cantidadPaises }} {{ cantidadPaises === 1 ? 'país' : 'países' }} para competir.</p>
-      </div>
+
+        <div class="form-group">
+          <label for="premio">Premio (opcional)</label>
+          <input id="premio" type="text" [(ngModel)]="premio"
+                 placeholder="" maxlength="255"
+                 class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="cantidadPaises">Cantidad de países por jugador</label>
+          <div class="qty-selector">
+            <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises > 1 ? cantidadPaises - 1 : 1" [disabled]="cantidadPaises <= 1">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="qty-value">{{ cantidadPaises }}</span>
+            <button type="button" class="qty-btn" (click)="cantidadPaises = cantidadPaises < 5 ? cantidadPaises + 1 : 5" [disabled]="cantidadPaises >= 5">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <p class="form-hint">Cada miembro elegirá {{ cantidadPaises }} {{ cantidadPaises === 1 ? 'país' : 'países' }} para competir.</p>
+        </div>
+      </ng-container>
+
+      <!-- ═══ PASO 2: Seleccionar países ═══ -->
+      <ng-container *ngIf="paso === 2">
+        <div class="loading-datos" *ngIf="loadingFavs">
+          <mat-spinner diameter="32"></mat-spinner>
+          <p>Cargando tus favoritos...</p>
+        </div>
+
+        <ng-container *ngIf="!loadingFavs">
+          <p class="paso-descripcion">
+            Seleccioná <strong>{{ cantidadPaises }}</strong> {{ cantidadPaises === 1 ? 'país' : 'países' }} de tus favoritos para competir
+            <span class="seleccionados-count">{{ paisesSeleccionados.size }} / {{ cantidadPaises }} seleccionados</span>
+          </p>
+
+          <div class="paises-grid">
+            <button *ngFor="let fav of misFavoritos"
+                    class="pais-btn"
+                    [class.seleccionado]="estaSeleccionado(fav.paisId)"
+                    [disabled]="!estaSeleccionado(fav.paisId) && !puedeSeleccionar()"
+                    (click)="togglePais(fav.paisId)">
+              <span class="fi" [class]="'fi-' + (fav.paisCodigo | fifaToFlag)"></span>
+              <span class="pais-nombre">{{ fav.paisNombre }}</span>
+              <mat-icon class="check-icon" *ngIf="estaSeleccionado(fav.paisId)">check_circle</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+      </ng-container>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="cancelar.emit()" [disabled]="loading">
+      <button class="btn btn-secondary" *ngIf="paso === 1" (click)="cancelar.emit()" [disabled]="loading">
         Cancelar
       </button>
-      <button class="btn btn-primary" (click)="crear()" [disabled]="loading || !nombre.trim()">
+      <button class="btn btn-secondary" *ngIf="paso === 2" (click)="volverPaso1()" [disabled]="loading">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+
+      <!-- Paso 1: Siguiente -->
+      <button class="btn btn-primary" *ngIf="paso === 1"
+              (click)="irAPaso2()" [disabled]="!nombre.trim() || loadingFavs">
+        <mat-icon>arrow_forward</mat-icon>
+        Siguiente
+      </button>
+
+      <!-- Paso 2: Crear -->
+      <button class="btn btn-primary" *ngIf="paso === 2"
+              (click)="crear()" [disabled]="loading || paisesSeleccionados.size !== cantidadPaises">
         <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
         <mat-icon *ngIf="!loading">add</mat-icon>
         {{ loading ? 'Creando...' : 'Crear grupo' }}

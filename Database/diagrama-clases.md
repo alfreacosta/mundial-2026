@@ -301,6 +301,15 @@ classDiagram
 
     note for EquipoFavorito "UNIQUE (usuarioId, paisId) y (usuarioId, orden) — max 5 por usuario"
 
+    class GrupoRowPais {
+        +Long internalId
+        +GrupoRow grupoRow
+        +Pais pais
+        +Integer orden
+    }
+
+    note for GrupoRowPais "Países elegidos por cada miembro para un grupo específico — orden 1..5, UNIQUE (grupoRowId, paisId)"
+
     class PasswordResetToken {
         +Long internalId
         +Usuario usuario
@@ -362,6 +371,8 @@ classDiagram
     Grupo "1" --> "*" GrupoRow : tieneMiembros
     GrupoRow "*" --> "1" Pais : prediccionCampeon
     GrupoRow "*" --> "1" Jugador : prediccionGoleador
+    GrupoRow "1" --> "*" GrupoRowPais : paisesElegidos
+    GrupoRowPais "*" --> "1" Pais : pais
     PrediccionTorneo "1" ..> "1" GrupoRow : fuenteDePrediccionAlUnirse
 ```
 

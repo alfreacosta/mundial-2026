@@ -217,6 +217,124 @@
   }
 }
 
+// Indicador de pasos
+.pasos-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: v.$spacing-xl;
+
+  .paso-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+
+    .paso-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: v.$gray-500;
+      transition: all 0.3s;
+    }
+
+    .paso-label {
+      font-size: 0.7rem;
+      color: v.$gray-600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.activo {
+      .paso-num {
+        background: v.$fantasy-purple;
+        border-color: v.$fantasy-purple;
+        color: v.$white;
+      }
+      .paso-label { color: v.$gray-300; }
+    }
+
+    &.completado .paso-num {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #34d399;
+      color: #34d399;
+    }
+  }
+
+  .paso-linea {
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 v.$spacing-sm;
+    margin-bottom: 18px;
+  }
+}
+
+// Paso 2: selección de países
+.paso-descripcion {
+  color: v.$gray-400;
+  font-size: 0.9rem;
+  margin-bottom: v.$spacing-lg;
+  strong { color: v.$white; }
+  .seleccionados-count {
+    display: block;
+    width: 100%;
+    color: v.$fantasy-cyan;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+}
+
+.loading-datos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$spacing-md;
+  padding: v.$spacing-xl 0;
+  color: v.$gray-400;
+}
+
+.paises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: v.$spacing-sm;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+}
+
+.pais-btn {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-sm;
+  padding: v.$spacing-sm;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: v.$radius-sm;
+  color: v.$gray-300;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+
+  .fi { width: 20px; height: 14px; flex-shrink: 0; }
+  .pais-nombre { flex: 1; text-align: left; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .check-icon { font-size: 1rem; color: #34d399; flex-shrink: 0; }
+
+  &:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: v.$white; }
+  &.seleccionado { background: rgba(16, 185, 129, 0.12); border-color: #34d399; color: v.$white; }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

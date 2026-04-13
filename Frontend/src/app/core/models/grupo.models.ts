@@ -53,10 +53,12 @@ export interface CrearGrupoRequest {
   nombre: string;
   premio?: string;
   cantidadPaises?: number;
+  paisIds: number[];
 }
 
 export interface UnirseGrupoRequest {
   codigoInvitacion: string;
+  paisIds: number[];
 }
 
 export interface AgregarFavoritoRequest {

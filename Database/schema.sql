@@ -402,6 +402,18 @@ CREATE TABLE equipo_favorito (
 
 CREATE INDEX idx_equipo_fav_usuario ON equipo_favorito(usuario_id);
 
+-- 19. GRUPO_ROW_PAIS (Países seleccionados por un usuario para un grupo específico)
+CREATE TABLE grupo_row_pais (
+    internal_id     BIGSERIAL       PRIMARY KEY,
+    grupo_row_id    BIGINT          NOT NULL REFERENCES grupo_row(internal_id) ON DELETE CASCADE,
+    pais_id         BIGINT          NOT NULL REFERENCES pais(internal_id) ON DELETE RESTRICT,
+    orden           INTEGER         NOT NULL,
+    CONSTRAINT uq_grp_row_pais UNIQUE (grupo_row_id, pais_id),
+    CONSTRAINT uq_grp_row_orden UNIQUE (grupo_row_id, orden),
+    CONSTRAINT chk_grp_row_orden CHECK (orden BETWEEN 1 AND 5)
+);
+CREATE INDEX idx_grupo_row_pais_row ON grupo_row_pais(grupo_row_id);
+
 -- ============================================================
 -- FIN DEL SCHEMA
 -- ============================================================

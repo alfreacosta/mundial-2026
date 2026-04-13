@@ -10,17 +10,32 @@
     </button>
   </div>
 
+  <!-- Indicador de pasos -->
+  <div class="pasos-progress">
+    <div class="paso-item" [class.activo]="paso === 1" [class.completado]="paso > 1">
+      <span class="paso-num">{{ paso > 1 ? '✓' : '1' }}</span>
+      <span class="paso-label">Código</span>
+    </div>
+    <div class="paso-linea"></div>
+    <div class="paso-item" [class.activo]="paso === 2">
+      <span class="paso-num">2</span>
+      <span class="paso-label">Países</span>
+    </div>
+  </div>
+
   <div class="form-error" *ngIf="error">
     <mat-icon>error</mat-icon>{{ error }}
   </div>
 
-  <div class="paso-contenido">
+  <!-- ═══ PASO 1: Código de invitación ═══ -->
+  <div class="paso-contenido" *ngIf="paso === 1">
     <p class="paso-descripcion">Ingresá el código de invitación que te compartieron</p>
     <div class="form-group">
       <label for="codigo">Código de invitación</label>
       <input id="codigo" type="text" [(ngModel)]="codigoInvitacion"
              placeholder="Ej: ABC12345" maxlength="20"
              class="form-control codigo-input"
+             (keydown.enter)="validarCodigo()"
              (input)="codigoInvitacion = codigoInvitacion.toUpperCase()">
     </div>
     <p class="join-hint">
@@ -29,15 +44,77 @@
     </p>
   </div>
 
+  <!-- ═══ PASO 2: Seleccionar países ═══ -->
+  <div class="paso-contenido" *ngIf="paso === 2">
+
+    <!-- Loading favoritos -->
+    <div class="loading-datos" *ngIf="loadingDatos">
+      <mat-spinner diameter="32"></mat-spinner>
+      <p>Cargando tus favoritos...</p>
+    </div>
+
+    <ng-container *ngIf="!loadingDatos">
+      <div class="grupo-preview-info">
+        <strong>{{ grupoPreview?.nombre }}</strong>
+        <span class="preview-detalle">
+          <mat-icon>flag</mat-icon>
+          {{ cantidadRequerida }} {{ cantidadRequerida === 1 ? 'país' : 'países' }} por jugador
+        </span>
+      </div>
+
+      <p class="paso-descripcion" *ngIf="misFavoritos.length >= cantidadRequerida">
+        Seleccioná <strong>{{ cantidadRequerida }}</strong> {{ cantidadRequerida === 1 ? 'país' : 'países' }} de tus favoritos para este grupo
+        <span class="seleccionados-count">{{ paisesSeleccionados.size }} / {{ cantidadRequerida }} seleccionados</span>
+      </p>
+
+      <!-- Sin suficientes favoritos -->
+      <div class="sin-favoritos-error" *ngIf="misFavoritos.length < cantidadRequerida">
+        <mat-icon>warning</mat-icon>
+        <div>
+          <p>Necesitás tener al menos <strong>{{ cantidadRequerida }}</strong> equipos favoritos para unirte a este grupo.</p>
+          <p>Actualmente tenés <strong>{{ misFavoritos.length }}</strong>. Andá a <strong>Mi Juego</strong> y agregá más favoritos.</p>
+        </div>
+      </div>
+
+      <!-- Grid de países -->
+      <div class="paises-grid" *ngIf="misFavoritos.length >= cantidadRequerida">
+        <button *ngFor="let fav of misFavoritos"
+                class="pais-btn"
+                [class.seleccionado]="estaSeleccionado(fav.paisId)"
+                [disabled]="!estaSeleccionado(fav.paisId) && !puedeSeleccionar()"
+                (click)="togglePais(fav.paisId)">
+          <span class="fi" [class]="'fi-' + (fav.paisCodigo | fifaToFlag)"></span>
+          <span class="pais-nombre">{{ fav.paisNombre }}</span>
+          <mat-icon class="check-icon" *ngIf="estaSeleccionado(fav.paisId)">check_circle</mat-icon>
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Footer -->
   <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="cancelar.emit()" [disabled]="loading">
+    <button class="btn btn-secondary" *ngIf="paso === 1" (click)="cancelar.emit()" [disabled]="loading">
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
+    <button class="btn btn-secondary" *ngIf="paso === 2" (click)="volverPaso1()" [disabled]="loading">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
 
-    <button class="btn btn-primary"
-            (click)="unirse()"
+    <!-- Paso 1: Validar código -->
+    <button class="btn btn-primary" *ngIf="paso === 1"
+            (click)="validarCodigo()"
             [disabled]="loading || !codigoInvitacion.trim()">
+      <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
+      <mat-icon *ngIf="!loading">arrow_forward</mat-icon>
+      {{ loading ? 'Verificando...' : 'Siguiente' }}
+    </button>
+
+    <!-- Paso 2: Unirse -->
+    <button class="btn btn-primary" *ngIf="paso === 2"
+            (click)="unirse()"
+            [disabled]="loading || paisesSeleccionados.size !== cantidadRequerida">
       <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
       <mat-icon *ngIf="!loading">check</mat-icon>
       {{ loading ? 'Uniéndose...' : 'Unirse al grupo' }}

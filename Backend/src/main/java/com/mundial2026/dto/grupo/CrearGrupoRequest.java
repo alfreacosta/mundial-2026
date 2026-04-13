@@ -1,10 +1,9 @@
 package com.mundial2026.dto.grupo;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class CrearGrupoRequest {
@@ -19,4 +18,7 @@ public class CrearGrupoRequest {
     @Min(value = 1, message = "La cantidad mínima de países es 1")
     @Max(value = 5, message = "La cantidad máxima de países es 5")
     private Integer cantidadPaises;
+
+    @NotEmpty(message = "Debés seleccionar al menos un país")
+    private List<Long> paisIds;
 }
