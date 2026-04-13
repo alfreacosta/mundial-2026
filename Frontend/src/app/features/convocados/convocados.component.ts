@@ -718,7 +718,11 @@ export class ConvocadosComponent implements OnInit {
       canvas.toBlob(blob => {
         if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
           const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
-          navigator.share({ files: [file], title: `Mi XI Titular - ${this.pais?.nombre}` }).catch(() => this.downloadCanvas(canvas));
+          const paisNombre = this.pais?.nombre ?? 'mi selección';
+          const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
+            `Armá tu equipo ideal en 👉 https://dt26.win\n` +
+            `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
+          navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText }).catch(() => this.downloadCanvas(canvas));
         } else {
           this.downloadCanvas(canvas);
         }
