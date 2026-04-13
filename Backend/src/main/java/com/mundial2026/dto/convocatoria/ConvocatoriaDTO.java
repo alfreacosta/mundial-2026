@@ -1,11 +1,10 @@
 package com.mundial2026.dto.convocatoria;
-
 import java.util.List;
-import java.util.Map;
-
 /**
  * DTO de respuesta para operaciones de Convocatoria en GraphQL.
  */
+
+
 public class ConvocatoriaDTO {
 
     private int totalJugadores;

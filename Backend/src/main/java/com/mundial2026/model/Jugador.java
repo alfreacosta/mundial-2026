@@ -77,6 +77,7 @@ public class Jugador {
     private Integer partidosTemporada;
 
     @Column(name = "convocado_eliminatoria")
+    @Builder.Default
     private Boolean convocadoEliminatoria = false;
 
     @Column(name = "rating", precision = 4, scale = 2)

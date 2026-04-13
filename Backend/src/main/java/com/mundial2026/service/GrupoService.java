@@ -316,17 +316,6 @@ public class GrupoService {
                 .build();
     }
 
-    private EquipoFavoritoDTO toEquipoFavoritoDTO(EquipoFavorito ef) {
-        return EquipoFavoritoDTO.builder()
-                .internalId(ef.getInternalId())
-                .paisId(ef.getPais().getInternalId())
-                .paisNombre(ef.getPais().getNombre())
-                .paisCodigo(ef.getPais().getCodigo())
-                .orden(ef.getOrden())
-                .transDate(ef.getTransDate())
-                .build();
-    }
-
     private EquipoFavoritoDTO toGrupoRowPaisDTO(GrupoRowPais grp) {
         return EquipoFavoritoDTO.builder()
                 .internalId(grp.getInternalId())
