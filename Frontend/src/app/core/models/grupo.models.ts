@@ -30,6 +30,7 @@ export interface GrupoRow {
   equiposFavoritos: EquipoFavorito[];
   puntaje: number;
   perfilPublico: boolean;
+  user?: string;
 }
 
 export interface Grupo {
@@ -104,6 +105,8 @@ export interface ConvocatoriaResumen {
   paisNombre: string;
   paisCodigo: string;
   jugadores: JugadorResumen[];
+  titularesIds?: number[];
+  posicionesTitulares?: { jugadorId: number; x: number; y: number }[];
 }
 
 export interface PerfilJuego {

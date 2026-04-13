@@ -35,4 +35,5 @@ public class GrupoRowDTO {
     private List<EquipoFavoritoDTO> equiposFavoritos;
     private Integer puntaje;
     private Boolean perfilPublico;
+    private String user;
 }

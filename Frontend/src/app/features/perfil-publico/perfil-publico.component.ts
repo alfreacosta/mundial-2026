@@ -28,6 +28,7 @@ export class PerfilPublicoComponent implements OnInit {
   error = '';
 
   convocadosExpandidos = new Set<number>();
+  titularesExpandidos = new Set<number>();
 
   constructor(
     private route: ActivatedRoute,
@@ -60,6 +61,50 @@ export class PerfilPublicoComponent implements OnInit {
     } else {
       this.convocadosExpandidos.add(paisId);
     }
+  }
+
+  toggleTitulares(paisId: number): void {
+    if (this.titularesExpandidos.has(paisId)) {
+      this.titularesExpandidos.delete(paisId);
+    } else {
+      this.titularesExpandidos.add(paisId);
+    }
+  }
+
+  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] {
+    const conv = this.juego?.convocatorias?.[paisId];
+    if (!conv) return [];
+    const titIds = new Set(conv.titularesIds ?? []);
+    if (titIds.size === 0) return [];
+    const posMap = new Map((conv.posicionesTitulares ?? []).map(p => [p.jugadorId, { x: p.x, y: p.y }]));
+
+    // Filtrar titulares de la lista de jugadores
+    const titulares = conv.jugadores.filter(j => titIds.has(j.id));
+    const porPos = new Map<string, typeof titulares>();
+    for (const j of titulares) {
+      const abr = j.posicionAbr === 'ARQ' ? 'POR' : j.posicionAbr;
+      if (!porPos.has(abr)) porPos.set(abr, []);
+      porPos.get(abr)!.push(j);
+    }
+
+    const yByPos: Record<string, number> = { POR: 90, DEF: 70, MED: 44, DEL: 18 };
+    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] = [];
+
+    for (const [abr, jugadores] of porPos) {
+      const baseY = yByPos[abr] ?? 50;
+      const n = jugadores.length;
+      jugadores.forEach((j, i) => {
+        const saved = posMap.get(j.id);
+        const apellido = j.nombre.split(' ').pop() ?? j.nombre;
+        if (saved) {
+          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x: saved.x, y: saved.y });
+        } else {
+          const x = n === 1 ? 50 : 15 + (70 * i) / (n - 1);
+          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x, y: baseY });
+        }
+      });
+    }
+    return results;
   }
 
   getConvocados(paisId: number): JugadorResumen[] {

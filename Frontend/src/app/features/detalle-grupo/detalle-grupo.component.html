@@ -108,7 +108,10 @@
                 <div class="tabla-avatar">
                   <app-avatar-icon [avatarId]="row.urlAvatar" [nombre]="row.usuarioNombre" [apellido]="row.usuarioApellido" [size]="32"></app-avatar-icon>
                 </div>
-                <span class="tabla-nombre">{{ row.usuarioNombre }}</span>
+                <a *ngIf="row.perfilPublico !== false && row.user"
+                   class="tabla-nombre tabla-nombre-link"
+                   [routerLink]="['/perfil-publico', row.user]">{{ row.usuarioNombre }}</a>
+                <span *ngIf="row.perfilPublico === false || !row.user" class="tabla-nombre">{{ row.usuarioNombre }}</span>
                 <mat-icon *ngIf="row.rol === 'CREADOR'" class="tabla-crown" matTooltip="Creador">star</mat-icon>
               </div>
             </td>
@@ -159,7 +162,10 @@
             <app-avatar-icon [avatarId]="row.urlAvatar" [nombre]="row.usuarioNombre" [apellido]="row.usuarioApellido" [size]="44"></app-avatar-icon>
           </div>
           <div class="miembro-datos">
-            <span class="miembro-nombre">{{ row.usuarioNombre }} {{ row.usuarioApellido }}</span>
+            <a *ngIf="row.perfilPublico !== false && row.user"
+               class="miembro-nombre miembro-nombre-link"
+               [routerLink]="['/perfil-publico', row.user]">{{ row.usuarioNombre }} {{ row.usuarioApellido }}</a>
+            <span *ngIf="row.perfilPublico === false || !row.user" class="miembro-nombre">{{ row.usuarioNombre }} {{ row.usuarioApellido }}</span>
             <span class="miembro-rol" [class.rol-creador]="row.rol === 'CREADOR'">
               <mat-icon>{{ row.rol === 'CREADOR' ? 'star' : 'person' }}</mat-icon>
               {{ row.rol === 'CREADOR' ? 'Creador' : 'Miembro' }}

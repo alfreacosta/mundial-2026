@@ -67,19 +67,33 @@ public class UsuarioController {
         // Predicción
         PrediccionTorneoDTO prediccion = prediccionTorneoService.getMiPrediccion(user);
 
-        // Convocatorias: paisId -> resumen (datos país + jugadores CONVOCADOS)
+        // Convocatorias: paisId -> resumen (datos país + jugadores CONVOCADOS + TITULARES)
         List<Convocatoria> convocatorias = convocatoriaRepository.findByUsuario_User(user);
         Map<Long, ConvocatoriaResumenDTO> convMap = new java.util.HashMap<>();
         for (Convocatoria conv : convocatorias) {
             List<JugadorResumenDTO> jugadores = conv.getRows().stream()
-                    .filter(r -> "CONVOCADO".equals(r.getEstado()))
+                    .filter(r -> "CONVOCADO".equals(r.getEstado()) || "TITULAR".equals(r.getEstado()))
                     .map(r -> JugadorResumenDTO.from(r))
                     .sorted(java.util.Comparator.comparing(j -> j.posicionAbr()))
                     .collect(Collectors.toList());
-            if (!jugadores.isEmpty()) {
+
+            // Titulares: ids + posiciones
+            List<Long> titularesIds = new java.util.ArrayList<>();
+            List<PosicionTitularDTO> posicionesTitulares = new java.util.ArrayList<>();
+            for (ConvocatoriaRow row : conv.getRows()) {
+                if ("TITULAR".equals(row.getEstado())) {
+                    titularesIds.add(row.getJugador().getInternalId());
+                    if (row.getPosicionX() != null && row.getPosicionY() != null) {
+                        posicionesTitulares.add(new PosicionTitularDTO(
+                                row.getJugador().getInternalId(), row.getPosicionX(), row.getPosicionY()));
+                    }
+                }
+            }
+
+            if (!jugadores.isEmpty() || !titularesIds.isEmpty()) {
                 var pais = conv.getPais();
                 convMap.put(pais.getInternalId(), new ConvocatoriaResumenDTO(
-                        pais.getNombre(), pais.getCodigo(), jugadores));
+                        pais.getNombre(), pais.getCodigo(), jugadores, titularesIds, posicionesTitulares));
             }
         }
 
@@ -174,7 +188,16 @@ public class UsuarioController {
     public record ConvocatoriaResumenDTO(
             String paisNombre,
             String paisCodigo,
-            List<JugadorResumenDTO> jugadores
+            List<JugadorResumenDTO> jugadores,
+            List<Long> titularesIds,
+            List<PosicionTitularDTO> posicionesTitulares
+    ) {}
+
+    /** DTO posición de titular en la cancha */
+    public record PosicionTitularDTO(
+            Long jugadorId,
+            Double x,
+            Double y
     ) {}
 
     /** DTO resumido de jugador para perfil público */

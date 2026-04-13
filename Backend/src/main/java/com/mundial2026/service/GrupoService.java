@@ -269,6 +269,7 @@ public class GrupoService {
                     .equiposFavoritos(paisesGrupo.stream().map(this::toGrupoRowPaisDTO).collect(Collectors.toList()))
                     .puntaje(r.getUsuario().getPuntaje())
                     .perfilPublico(r.getUsuario().getPerfilPublico())
+                    .user(r.getUsuario().getUser())
                     .build();
         }).collect(Collectors.toList());
     }
@@ -311,6 +312,7 @@ public class GrupoService {
                 .equiposFavoritos(paises.stream().map(this::toGrupoRowPaisDTO).collect(Collectors.toList()))
                 .puntaje(r.getUsuario().getPuntaje())
                 .perfilPublico(r.getUsuario().getPerfilPublico())
+                .user(r.getUsuario().getUser())
                 .build();
     }
 
