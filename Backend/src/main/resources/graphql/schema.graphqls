@@ -53,6 +53,8 @@ type Pais {
     pts: Int!
     apiTeamId: Int
     logoUrl: String
+    dtNombre: String
+    dtFotoUrl: String
 }
 
 type Club {
