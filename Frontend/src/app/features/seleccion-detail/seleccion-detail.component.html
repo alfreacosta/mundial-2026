@@ -48,10 +48,6 @@
     <!-- Tabs -->
     @if (seleccion() && !isLoading() && !errorMsg()) {
       <nav class="detail-tabs">
-        <button class="tab-btn" [class.active]="activeTab() === 'plantel'" (click)="activeTab.set('plantel')">
-          <mat-icon>groups</mat-icon>
-          Plantel ({{ totalJugadores() }})
-        </button>
         <button class="tab-btn" (click)="irAConvocatoria()">
           <mat-icon>assignment</mat-icon>
           Convocatoria

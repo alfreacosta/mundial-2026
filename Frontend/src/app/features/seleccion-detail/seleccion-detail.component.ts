@@ -157,8 +157,7 @@ export class SeleccionDetailComponent implements OnInit {
 
     this.seleccionService.getDetalle(codigo).subscribe({
       next: (data) => {
-        this.seleccion.set(data);
-        this.isLoading.set(false);
+        this.router.navigate(['/convocados', data.id], { replaceUrl: true });
       },
       error: () => {
         this.errorMsg.set('No se pudo cargar la información de la selección.');
