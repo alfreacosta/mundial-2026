@@ -72,8 +72,8 @@ export class PerfilPublicoComponent implements OnInit {
     }
   }
 
-  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] {
-    const conv = this.juego?.convocatorias?.[paisId];
+  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number; urlFoto: string | null }[] {
+    const conv = this.juego?.convocatorias?.[paisId] ?? this.juego?.convocatorias?.[paisId.toString() as any];
     if (!conv) return [];
     const titIds = new Set(conv.titularesIds ?? []);
     if (titIds.size === 0) return [];
