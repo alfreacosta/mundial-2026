@@ -135,29 +135,14 @@
                 <!-- Mini cancha de titulares -->
                 @if (titularesExpandidos.has(fav.paisId)) {
                   <div class="mini-pitch-wrapper">
-                    <div class="mini-pitch">
-                      <div class="mini-pitch-field">
-                        <div class="pitch-center-line"></div>
-                        <div class="pitch-center-circle"></div>
-                        <div class="pitch-area-top"></div>
-                        <div class="pitch-area-bottom"></div>
-                        @for (t of getTitularesParaCancha(fav.paisId); track t.id) {
-                          <div class="mini-player"
-                            [style.left.%]="t.x"
-                            [style.top.%]="t.y">
-                            <div class="mini-player-dot" [attr.data-pos]="t.posAbr"></div>
-                            <span class="mini-player-num">{{ t.camiseta ?? '' }}</span>
-                            <span class="mini-player-name">{{ t.apellido }}</span>
-                          </div>
-                        }
-                        @if (getTitularesParaCancha(fav.paisId).length === 0) {
-                          <div class="mini-pitch-empty">
-                            <mat-icon>group_off</mat-icon>
-                            <span>Sin titulares</span>
-                          </div>
-                        }
+                    @if (getTitularesParaCancha(fav.paisId).length === 0) {
+                      <div class="mini-pitch-empty">
+                        <mat-icon>group_off</mat-icon>
+                        <span>Sin titulares</span>
                       </div>
-                    </div>
+                    } @else {
+                      <app-mini-pitch [players]="getTitularesParaCancha(fav.paisId)"></app-mini-pitch>
+                    }
                   </div>
                 }
               </div>
@@ -203,29 +188,14 @@
                   <!-- Mini cancha de titulares -->
                   @if (titularesExpandidos.has(paisId)) {
                     <div class="mini-pitch-wrapper">
-                      <div class="mini-pitch">
-                        <div class="mini-pitch-field">
-                          <div class="pitch-center-line"></div>
-                          <div class="pitch-center-circle"></div>
-                          <div class="pitch-area-top"></div>
-                          <div class="pitch-area-bottom"></div>
-                          @for (t of getTitularesParaCancha(paisId); track t.id) {
-                            <div class="mini-player"
-                              [style.left.%]="t.x"
-                              [style.top.%]="t.y">
-                              <div class="mini-player-dot" [attr.data-pos]="t.posAbr"></div>
-                              <span class="mini-player-num">{{ t.camiseta ?? '' }}</span>
-                              <span class="mini-player-name">{{ t.apellido }}</span>
-                            </div>
-                          }
-                          @if (getTitularesParaCancha(paisId).length === 0) {
-                            <div class="mini-pitch-empty">
-                              <mat-icon>group_off</mat-icon>
-                              <span>Sin titulares</span>
-                            </div>
-                          }
+                      @if (getTitularesParaCancha(paisId).length === 0) {
+                        <div class="mini-pitch-empty">
+                          <mat-icon>group_off</mat-icon>
+                          <span>Sin titulares</span>
                         </div>
-                      </div>
+                      } @else {
+                        <app-mini-pitch [players]="getTitularesParaCancha(paisId)"></app-mini-pitch>
+                      }
                     </div>
                   }
                 </div>

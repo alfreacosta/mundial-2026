@@ -20,11 +20,12 @@ import { PrediccionPartidoService, ResumenPredicciones } from '../../core/servic
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { getFlagUrl } from '../../core/utils/flag.utils';
 import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-icon.component';
+import { MiniPitchComponent } from '../../shared/mini-pitch/mini-pitch.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatProgressSpinnerModule, ClipboardModule, AvatarIconComponent],
+  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatProgressSpinnerModule, ClipboardModule, AvatarIconComponent, MiniPitchComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -249,7 +250,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] {
+  getTitularesParaCancha(paisId: number): { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number; urlFoto: string | null }[] {
     const todos = this.jugadoresPorPais.get(paisId) ?? [];
     const conv = this.convocatorias.get(paisId);
     if (!conv || todos.length === 0) return [];
@@ -268,7 +269,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Y por posición, X distribuido equitativamente
     const yByPos: Record<string, number> = { POR: 90, DEF: 70, MED: 44, DEL: 18 };
-    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] = [];
+    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number; urlFoto: string | null }[] = [];
 
     for (const [abr, jugadores] of porPos) {
       const baseY = yByPos[abr] ?? 50;
@@ -276,11 +277,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       jugadores.forEach((j, i) => {
         const saved = posMap.get(j.internalId);
         if (saved) {
-          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x: saved.x, y: saved.y });
+          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
         } else {
           // Distribuir horizontalmente entre 15% y 85%
           const x = n === 1 ? 50 : 15 + (70 * i) / (n - 1);
-          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x, y: baseY });
+          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x, y: baseY, urlFoto: j.urlFoto });
         }
       });
     }

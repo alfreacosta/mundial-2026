@@ -10,11 +10,12 @@ import { PerfilPublico, PerfilJuego, JugadorResumen, ConvocatoriaResumen } from 
 import { getFlagUrl } from '../../core/utils/flag.utils';
 import { CountriesService } from '../../core/services/countries.service';
 import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-icon.component';
+import { MiniPitchComponent } from '../../shared/mini-pitch/mini-pitch.component';
 
 @Component({
   selector: 'app-perfil-publico',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatProgressSpinnerModule, AvatarIconComponent],
+  imports: [CommonModule, RouterLink, MatIconModule, MatProgressSpinnerModule, AvatarIconComponent, MiniPitchComponent],
   templateUrl: './perfil-publico.component.html',
   styleUrls: ['./perfil-publico.component.scss']
 })
@@ -88,7 +89,7 @@ export class PerfilPublicoComponent implements OnInit {
     }
 
     const yByPos: Record<string, number> = { POR: 90, DEF: 70, MED: 44, DEL: 18 };
-    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number }[] = [];
+    const results: { id: number; apellido: string; camiseta: number | null; posAbr: string; x: number; y: number; urlFoto: string | null }[] = [];
 
     for (const [abr, jugadores] of porPos) {
       const baseY = yByPos[abr] ?? 50;
@@ -97,10 +98,10 @@ export class PerfilPublicoComponent implements OnInit {
         const saved = posMap.get(j.id);
         const apellido = j.nombre.split(' ').pop() ?? j.nombre;
         if (saved) {
-          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x: saved.x, y: saved.y });
+          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
         } else {
           const x = n === 1 ? 50 : 15 + (70 * i) / (n - 1);
-          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x, y: baseY });
+          results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x, y: baseY, urlFoto: j.urlFoto });
         }
       });
     }
