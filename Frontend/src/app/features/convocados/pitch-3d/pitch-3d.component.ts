@@ -79,6 +79,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
       this.buildField();
       this.spawnPlayers();
       this.startLoop();
+      this.requestRender();
       this.bindEvents();
       this.ro = new ResizeObserver(() => this.onResize());
       this.ro.observe(this.wrapRef.nativeElement);
@@ -125,10 +126,11 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     this.scene.background = new THREE.Color('#071a07');
     this.scene.fog = new THREE.FogExp2('#071a07', 0.006);
 
-    // Camera – broadcast angle: elevated, behind one end, looking down the field
-    this.camera = new THREE.PerspectiveCamera(68, w / h, 0.5, 600);
-    this.camera.position.set(0, 100, -60);
-    this.camera.lookAt(0, 0, 15);
+    // Camera – broadcast angle: elevated, close, looking down the full field
+    // Z positive = behind the far goal (that goal appears at top of screen)
+    this.camera = new THREE.PerspectiveCamera(72, w / h, 0.5, 600);
+    this.camera.position.set(0, 72, 62);
+    this.camera.lookAt(0, 0, -10);
 
     // Ambient light
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
@@ -361,6 +363,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
       this.scene.add(grp);
       this.playerGroups.set(Number(p.internalId), grp);
     });
+    this.requestRender();
   }
 
   private createPlayerGroup(p: JugadorSeleccionable): THREE.Group {
@@ -369,6 +372,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     const [wx, wz] = this.pctToWorld(pct.x, pct.y);
     grp.position.set(wx, 0, wz);
     grp.userData['id'] = Number(p.internalId);
+    grp.scale.setScalar(1.7);
 
     const posColor = this.posColorFn(p.posicion?.codigo);
     const threeColor = new THREE.Color(posColor);
@@ -419,6 +423,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
         if (!this.scene) return;
         const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.FrontSide, transparent: true });
         photoDisc.material = mat;
+        this.requestRender();
       });
     } else {
       const initTex = this.makeInitialsTex(p.apellido || p.nombre || '?', posColor);
@@ -561,12 +566,20 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   // ════════════════════════════════════════ RENDER LOOP ══════════
 
+  needsRender = true;
+
   private startLoop(): void {
     const tick = () => {
       this.raf = requestAnimationFrame(tick);
+      if (!this.needsRender) return;
+      this.needsRender = false;
       this.renderer.render(this.scene, this.camera);
     };
     tick();
+  }
+
+  private requestRender(): void {
+    this.needsRender = true;
   }
 
   // ════════════════════════════════════════ RESIZE ══════════════
@@ -579,6 +592,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
+    this.requestRender();
   }
 
   // ════════════════════════════════════════ DRAG ════════════════
@@ -631,6 +645,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
       hit.x = Math.max(-hw, Math.min(hw, hit.x));
       hit.z = Math.max(-hh, Math.min(hh, hit.z));
       this.dragging.group.position.set(hit.x, 0, hit.z);
+      this.requestRender();
     }
   }
 

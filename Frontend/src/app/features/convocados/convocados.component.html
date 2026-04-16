@@ -347,23 +347,17 @@
       </div>
       <div class="save-actions">
         <ng-container *ngIf="activeTab() === 'titulares'; else convActions">
+          <span class="autosave-indicator" *ngIf="saving">
+            <mat-spinner diameter="14" style="display:inline-block;margin-right:4px;"></mat-spinner>
+            Guardando…
+          </span>
           <button
             mat-stroked-button
             class="clear-btn"
             [disabled]="draggedPositions.size === 0 && savedPositions.size === 0"
             (click)="clearPositions()">
             <mat-icon>restart_alt</mat-icon>
-            Reiniciar posiciones
-          </button>
-          <button
-            mat-raised-button
-            class="save-btn"
-            [style.background-color]="confColor"
-            [disabled]="savedPositions.size === 0 || saving"
-            (click)="guardarConvocatoria()">
-            <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block; margin-right:8px;"></mat-spinner>
-            <mat-icon *ngIf="!saving">save</mat-icon>
-            {{ saving ? 'Guardando…' : 'Guardar Posiciones' }}
+            Reiniciar
           </button>
           <button
             mat-stroked-button

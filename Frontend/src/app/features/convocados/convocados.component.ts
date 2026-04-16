@@ -520,11 +520,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   }
 
   irAPlantel(): void {
-    if (this.pais?.codigo) {
-      this.router.navigate(['/seleccion', this.pais.codigo]);
-    } else {
-      this.router.navigate(['/countries']);
-    }
+    this.router.navigate(['/countries']);
   }
 
   setTab(tab: 'convocatoria' | 'titulares' | 'nova'): void {
@@ -646,10 +642,11 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     this.savedPositions.set(id, { x: xPct, y: yPct });
   }
 
-  /** Handler de posición emitida por el componente 3D */
+  /** Handler de posición emitida por el componente 3D — auto-guarda */
   on3dPositionChanged(event: { jugadorId: number; x: number; y: number }): void {
     this.savedPositions.set(event.jugadorId, { x: event.x, y: event.y });
     this.draggedPositions.set(event.jugadorId, { x: event.x, y: event.y });
+    this.autoSave$.next();
   }
 
   /** Guarda SOLO las posiciones de los titulares en la cancha */

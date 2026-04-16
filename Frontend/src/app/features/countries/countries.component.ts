@@ -271,7 +271,7 @@ export class CountriesComponent implements OnInit {
   }
 
   verSeleccion(pais: Pais): void {
-    this.router.navigate(['/seleccion', pais.codigo]);
+    this.router.navigate(['/convocados', pais.internalId]);
   }
 
   private readonly FIFA_TO_ISO: Record<string, string> = {

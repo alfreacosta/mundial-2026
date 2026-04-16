@@ -150,7 +150,7 @@
                           [alt]="fav.paisNombre"
                           class="flag-img-sm"
                           loading="lazy" />
-                        <span class="fav-name" [routerLink]="['/seleccion', fav.paisCodigo]">{{ fav.paisNombre }}</span>
+                        <span class="fav-name" [routerLink]="['/convocados', fav.paisId]">{{ fav.paisNombre }}</span>
                         <span class="fav-prog">{{ getConvocatoriaProgress(fav.paisId).total }}/26</span>
                         @if (getConvocatoriaProgress(fav.paisId).total >= 23) {
                           <mat-icon class="check-sm">check_circle</mat-icon>
