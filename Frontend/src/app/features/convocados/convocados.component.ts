@@ -14,6 +14,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { forkJoin, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
+import { PitchThreeDComponent } from './pitch-3d/pitch-3d.component';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -74,7 +75,8 @@ interface PosicionGroup {
     MatTooltipModule,
     MatBadgeModule,
     RouterLink,
-    CdkDrag
+    CdkDrag,
+    PitchThreeDComponent
   ],
   templateUrl: './convocados.component.html',
   styleUrls: ['./convocados.component.scss']
@@ -582,6 +584,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   // ═══ DRAG & DROP CANCHA ═══
   @ViewChild('pitchFieldRef') pitchFieldRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('pitch3d') pitch3dRef?: PitchThreeDComponent;
 
   trackById(_: number, player: JugadorSeleccionable): number {
     return player.internalId;
@@ -643,6 +646,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     this.savedPositions.set(id, { x: xPct, y: yPct });
   }
 
+  /** Handler de posición emitida por el componente 3D */
+  on3dPositionChanged(event: { jugadorId: number; x: number; y: number }): void {
+    this.savedPositions.set(event.jugadorId, { x: event.x, y: event.y });
+    this.draggedPositions.set(event.jugadorId, { x: event.x, y: event.y });
+  }
+
   /** Guarda SOLO las posiciones de los titulares en la cancha */
   guardarPosiciones(): void {
     if (this.savedPositions.size === 0) {
@@ -670,74 +679,28 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   exportingPitch = false;
 
   exportPitchAsPng(): void {
-    const el = this.pitchFieldRef?.nativeElement;
-    if (!el) return;
+    if (!this.pitch3dRef) return;
     this.exportingPitch = true;
 
-    // Agregar marcas de agua temporales para la captura
     const username = this.authService.getCurrentUser()?.user;
-    const tmpEls: HTMLElement[] = [];
-
-    // 1) Arriba izquierda: dt26.win + usuario
-    const topLeft = document.createElement('div');
-    topLeft.style.cssText = 'position:absolute;top:8px;left:12px;display:flex;flex-direction:column;gap:1px;z-index:10;pointer-events:none;';
-    const siteName = document.createElement('span');
-    siteName.textContent = 'dt26.win';
-    siteName.style.cssText = 'font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.5px;';
-    topLeft.appendChild(siteName);
-    if (username) {
-      const userTag = document.createElement('span');
-      userTag.textContent = `usuario: @${username}`;
-      userTag.style.cssText = 'font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);';
-      topLeft.appendChild(userTag);
-    }
-    el.appendChild(topLeft);
-    tmpEls.push(topLeft);
-
-    // 2) Centro de la cancha: dt26.win horizontal sobre la línea central
-    const center = document.createElement('div');
-    center.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none;';
-    const centerText = document.createElement('span');
-    centerText.textContent = 'dt26.win';
-    centerText.style.cssText = 'font-size:22px;font-weight:800;color:rgba(255,255,255,0.08);letter-spacing:2px;white-space:nowrap;';
-    center.appendChild(centerText);
-    el.appendChild(center);
-    tmpEls.push(center);
-
-    // Info país + fecha arriba derecha
-    const infoEl = document.createElement('div');
-    infoEl.style.cssText = 'position:absolute;top:8px;right:12px;z-index:10;pointer-events:none;';
     const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    infoEl.innerHTML = `<span style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.30);">${this.pais?.nombre ?? ''} · ${fecha}</span>`;
-    el.appendChild(infoEl);
-    tmpEls.push(infoEl);
+    const canvas = this.pitch3dRef.captureSnapshot(username, this.pais?.nombre, fecha);
 
-    html2canvas(el, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true,
-      allowTaint: true
-    }).then(canvas => {
-      // Quitar overlays temporales
-      tmpEls.forEach(e => e.remove());
-      canvas.toBlob(blob => {
-        if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'xi-titular.png', { type: 'image/png' })] })) {
-          const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
-          const paisNombre = this.pais?.nombre ?? 'mi selección';
-          const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
-            `Armá tu equipo ideal en 👉 https://dt26.win\n` +
-            `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
-          navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText }).catch(() => this.downloadCanvas(canvas));
-        } else {
-          this.downloadCanvas(canvas);
-        }
-        this.exportingPitch = false;
-      }, 'image/png');
-    }).catch(() => {
-      tmpEls.forEach(e => e.remove());
+    canvas.toBlob(blob => {
+      if (!blob) { this.exportingPitch = false; return; }
+      const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
+      const paisNombre = this.pais?.nombre ?? 'mi selección';
+      const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
+        `Armá tu equipo ideal en 👉 https://dt26.win\n` +
+        `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText })
+          .catch(() => this.downloadCanvas(canvas));
+      } else {
+        this.downloadCanvas(canvas);
+      }
       this.exportingPitch = false;
-      this.snackBar.open('Error al exportar la imagen', '', { duration: 3000 });
-    });
+    }, 'image/png');
   }
 
   private downloadCanvas(canvas: HTMLCanvasElement): void {
