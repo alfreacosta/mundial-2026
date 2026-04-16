@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -78,7 +79,7 @@ interface PosicionGroup {
   templateUrl: './convocados.component.html',
   styleUrls: ['./convocados.component.scss']
 })
-export class ConvocadosComponent implements OnInit {
+export class ConvocadosComponent implements OnInit, OnDestroy {
   paisId!: number;
   pais: Pais | null = null;
   players = signal<JugadorSeleccionable[]>([]);
@@ -90,6 +91,9 @@ export class ConvocadosComponent implements OnInit {
   noEsFavorito = false;
   searchQuery = '';
   activeTab = signal<'convocatoria' | 'titulares' | 'nova'>('convocatoria');
+
+  private readonly autoSave$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   /** Posiciones guardadas (porcentaje): jugadorId → {x%, y%} */
   savedPositions = new Map<number, { x: number; y: number }>();
@@ -162,7 +166,17 @@ export class ConvocadosComponent implements OnInit {
     if (tab === 'titulares' || tab === 'nova') {
       this.activeTab.set(tab);
     }
+
+    this.autoSave$
+      .pipe(debounceTime(400), takeUntil(this.destroy$))
+      .subscribe(() => this.guardarConvocatoria());
+
     this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadData(): void {
@@ -310,6 +324,7 @@ export class ConvocadosComponent implements OnInit {
         ? { ...p, seleccionado: !wasSelected, titular: wasSelected ? false : p.titular }
         : p)
     );
+    this.autoSave$.next();
   }
 
   markNoVa(player: JugadorSeleccionable, event: Event): void {
@@ -317,12 +332,14 @@ export class ConvocadosComponent implements OnInit {
     this.players.update(curr =>
       curr.map(p => p.internalId === player.internalId ? { ...p, seleccionado: false, noVa: true, titular: false } : p)
     );
+    this.autoSave$.next();
   }
 
   undoNoVa(player: JugadorSeleccionable): void {
     this.players.update(curr =>
       curr.map(p => p.internalId === player.internalId ? { ...p, noVa: false } : p)
     );
+    this.autoSave$.next();
   }
 
   getNoVaByPosition(codigo: string): JugadorSeleccionable[] {
@@ -336,6 +353,7 @@ export class ConvocadosComponent implements OnInit {
       this.players.update(curr =>
         curr.map(p => p.internalId === player.internalId ? { ...p, titular: false } : p)
       );
+      this.autoSave$.next();
       return;
     }
     // Validar máximo 11
@@ -355,6 +373,7 @@ export class ConvocadosComponent implements OnInit {
     this.players.update(curr =>
       curr.map(p => p.internalId === player.internalId ? { ...p, titular: true } : p)
     );
+    this.autoSave$.next();
   }
 
   convocarPlayer(player: JugadorSeleccionable, event: Event): void {
@@ -372,6 +391,7 @@ export class ConvocadosComponent implements OnInit {
         ? { ...p, seleccionado: !wasSelected, titular: wasSelected ? false : p.titular }
         : p)
     );
+    this.autoSave$.next();
   }
 
   selectAll(codigo: string): void {
@@ -453,10 +473,6 @@ export class ConvocadosComponent implements OnInit {
     const seleccionados = this.players().filter(p => p.seleccionado);
     const noVa = this.players().filter(p => p.noVa);
     const titulares = this.players().filter(p => p.titular);
-    if (seleccionados.length === 0 && noVa.length === 0 && titulares.length === 0) {
-      this.snackBar.open('Seleccioná al menos un jugador o marcá alguno como "No Va" antes de guardar.', '', { duration: 3000 });
-      return;
-    }
 
     this.saving = true;
     const jugadorIds = seleccionados.map(p => Number(p.internalId));
@@ -477,31 +493,20 @@ export class ConvocadosComponent implements OnInit {
             next: () => {
               this.saving = false;
               this.draggedPositions.clear();
-              this.snackBar.open(`✅ Titulares y posiciones guardados: ${titulares.length} jugadores`, 'Cerrar',
-                { duration: 5000, panelClass: 'snack-success' });
             },
             error: () => {
               this.saving = false;
-              this.snackBar.open('Convocatoria guardada, pero hubo un error al guardar posiciones.', 'Cerrar',
-                { duration: 5000, panelClass: 'snack-error' });
+              this.snackBar.open('Error al guardar posiciones.', '', { duration: 3000, panelClass: 'snack-error' });
             }
           });
         } else {
           this.saving = false;
-          const msg = tab === 'titulares'
-            ? `✅ Titulares guardados: ${titulares.length} jugadores`
-            : tab === 'nova'
-              ? `✅ Convocatoria guardada (${noVa.length} descartados)`
-              : `✅ Convocatoria guardada: ${resp.totalJugadores} jugadores`;
-          this.snackBar.open(msg, 'Cerrar',
-            { duration: 5000, panelClass: 'snack-success' }
-          );
         }
       },
       error: () => {
         this.saving = false;
-        this.snackBar.open('Error al guardar la convocatoria. Intentá de nuevo.', 'Cerrar', {
-          duration: 5000,
+        this.snackBar.open('Error al guardar. Intentá de nuevo.', '', {
+          duration: 4000,
           panelClass: 'snack-error'
         });
       }

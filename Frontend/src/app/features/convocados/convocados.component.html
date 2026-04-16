@@ -391,6 +391,10 @@
           </button>
         </ng-container>
         <ng-template #convActions>
+          <span class="autosave-indicator" *ngIf="saving">
+            <mat-spinner diameter="14" style="display:inline-block;margin-right:4px;"></mat-spinner>
+            Guardando…
+          </span>
           <button
             mat-stroked-button
             class="clear-btn"
@@ -398,16 +402,6 @@
             (click)="clearAll()">
             <mat-icon>clear_all</mat-icon>
             Limpiar
-          </button>
-          <button
-            mat-raised-button
-            class="save-btn"
-            [style.background-color]="confColor"
-            [disabled]="(totalSel() === 0 && totalNoVa() === 0) || saving"
-            (click)="guardarConvocatoria()">
-            <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block; margin-right:8px;"></mat-spinner>
-            <mat-icon *ngIf="!saving">save</mat-icon>
-            {{ saving ? 'Guardando…' : 'Guardar Convocatoria' }}
           </button>
         </ng-template>
       </div>

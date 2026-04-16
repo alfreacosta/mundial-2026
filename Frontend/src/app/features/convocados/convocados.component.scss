@@ -924,6 +924,15 @@ $save-bar-height: 72px;
       color: $text-secondary;
     }
 
+    .autosave-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: $text-secondary;
+      opacity: 0.75;
+    }
+
     .save-btn {
       color: $white !important;
       font-size: 14px;
