@@ -22,7 +22,7 @@ const FH = 90;
   styles: [`
     :host { display: block; width: 100%; }
     .wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #071a07; }
-    .cvs  { width: 100%; display: block; }
+    .cvs  { width: 100%; display: block; touch-action: none; }
   `]
 })
 export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -293,8 +293,8 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   private bindEvents(): void {
     const cvs = this.cvsRef.nativeElement;
-    cvs.addEventListener('pointerdown',   e => this.onDown(e));
-    cvs.addEventListener('pointermove',   e => this.onMove(e));
+    cvs.addEventListener('pointerdown',   e => this.onDown(e),  { passive: false });
+    cvs.addEventListener('pointermove',   e => this.onMove(e),  { passive: false });
     cvs.addEventListener('pointerup',     e => this.onUp(e));
     cvs.addEventListener('pointercancel', () => { this.dragging = null; });
   }
