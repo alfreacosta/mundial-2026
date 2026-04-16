@@ -52,10 +52,6 @@
 
     <!-- Tabs -->
     <nav class="detail-tabs" *ngIf="pais && !loading">
-      <button class="tab-btn" (click)="irAPlantel()">
-        <mat-icon>groups</mat-icon>
-        Plantel
-      </button>
       <button class="tab-btn" [class.active]="activeTab() === 'convocatoria'" (click)="setTab('convocatoria')">
         <mat-icon>assignment</mat-icon>
         Convocatoria
