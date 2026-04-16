@@ -138,10 +138,10 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     cv.width = texW; cv.height = texH;
     const ctx  = cv.getContext('2d')!;
 
-    // Franjas
+    // Franjas (colores oscuros similares al fondo exterior)
     const N = 10;
     for (let i = 0; i < N; i++) {
-      ctx.fillStyle = i % 2 === 0 ? '#1e7a2e' : '#228c35';
+      ctx.fillStyle = i % 2 === 0 ? '#1a6b2a' : '#1e7030';
       ctx.fillRect(0, i * texH / N, texW, texH / N + 1);
     }
 
@@ -314,10 +314,14 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
         // Clip circular
         ctx.save();
         ctx.beginPath(); ctx.arc(c, c, r - 8, 0, Math.PI * 2); ctx.clip();
-        // Recortar la mitad superior de la foto (zona del rostro)
-        const sw = img.naturalWidth;
-        const sh = Math.round(img.naturalHeight * 0.62);
-        ctx.drawImage(img, 0, 0, sw, sh, 4, 4, S - 8, S - 8);
+        // Escalar para llenar el ancho, mostrar desde arriba (zona del rostro)
+        const scale = S / img.naturalWidth;
+        const drawW = S;
+        const drawH = img.naturalHeight * scale;
+        // Si la imagen es más alta que el canvas, la empujamos levemente hacia arriba
+        // para centrar en la zona de la cara (parte superior de la imagen)
+        const dy = drawH > S ? -(drawH - S) * 0.15 : (S - drawH) / 2;
+        ctx.drawImage(img, 0, dy, drawW, drawH);
         ctx.restore();
         const tex = new THREE.CanvasTexture(cv);
         this.texCache.set(key, tex);
