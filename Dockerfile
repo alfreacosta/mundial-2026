@@ -1,5 +1,5 @@
 # ── Etapa 1: Compilar con JDK 21 + Maven ──────────────────
-FROM maven:3.9-eclipse-temurin-25 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY Backend/src Backend/src
 RUN cd Backend && ./mvnw clean package -DskipTests -Pprod
 
 # ── Etapa 2: Imagen final liviana solo con JRE ─────────────
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
