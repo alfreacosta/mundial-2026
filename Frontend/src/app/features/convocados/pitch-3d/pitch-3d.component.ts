@@ -124,19 +124,18 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     // Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#071a07');
-    this.scene.fog = new THREE.FogExp2('#071a07', 0.006);
+    // Sin fog — impide ver jugadores del fondo con claridad
 
-    // Camera – broadcast angle: elevated, close, looking down the full field
-    // Z positive = behind the far goal (that goal appears at top of screen)
-    this.camera = new THREE.PerspectiveCamera(72, w / h, 0.5, 600);
-    this.camera.position.set(0, 72, 62);
-    this.camera.lookAt(0, 0, -10);
+    // Camera – más cenital para reducir el efecto de miniaturización en perspectiva
+    this.camera = new THREE.PerspectiveCamera(65, w / h, 0.5, 600);
+    this.camera.position.set(0, 145, 38);
+    this.camera.lookAt(0, 0, -18);
 
-    // Ambient light
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    // Ambient light — suave, no sobreexpone las fotos
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.75));
 
-    // Main sun (directional with shadows)
-    const sun = new THREE.DirectionalLight(0xfff8e7, 2.2);
+    // Main sun (directional) — menos intenso para no quemar las texturas
+    const sun = new THREE.DirectionalLight(0xfff8e7, 1.3);
     sun.position.set(25, 90, -30);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -146,8 +145,8 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     sun.shadow.bias = -0.0004;
     this.scene.add(sun);
 
-    // Cool fill light from opposite side
-    const fill = new THREE.DirectionalLight(0x9ac8ff, 0.5);
+    // Fill suave
+    const fill = new THREE.DirectionalLight(0x9ac8ff, 0.3);
     fill.position.set(-20, 45, 40);
     this.scene.add(fill);
 
@@ -294,13 +293,12 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     });
     this.scene.add(new THREE.Mesh(bowlGeo, bowlMat));
 
-    // ── Stadium lights (4 corner points) ────────────────────────
+    // Stadium lights — menos intensos
     const lightPositions = [[-55, 40, -50], [55, 40, -50], [55, 40, 55], [-55, 40, 55]] as const;
     lightPositions.forEach(([lx, ly, lz]) => {
-      const pt = new THREE.PointLight(0xfff0cc, 80, 160, 1.5);
+      const pt = new THREE.PointLight(0xfff0cc, 40, 160, 1.5);
       pt.position.set(lx, ly, lz);
       this.scene.add(pt);
-      // Light tower
       const tower = new THREE.Mesh(
         new THREE.CylinderGeometry(0.4, 0.6, 40, 6),
         new THREE.MeshBasicMaterial({ color: '#334433' })
@@ -372,7 +370,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     const [wx, wz] = this.pctToWorld(pct.x, pct.y);
     grp.position.set(wx, 0, wz);
     grp.userData['id'] = Number(p.internalId);
-    grp.scale.setScalar(1.7);
+    grp.scale.setScalar(2.6);
 
     const posColor = this.posColorFn(p.posicion?.codigo);
     const threeColor = new THREE.Color(posColor);
