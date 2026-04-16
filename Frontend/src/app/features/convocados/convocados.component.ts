@@ -414,6 +414,11 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     return pg?.color ?? '#94a3b8';
   }
 
+  /** Columnas del grid de figuritas según posición: ARQ=6, resto=7 */
+  getFigCols(codigo: string): number {
+    return codigo === 'ARQ' ? 6 : 7;
+  }
+
   /** Convocados + titulares de una posición (para el álbum del plantel) */
   getConvocadosByPos(codigo: string): JugadorSeleccionable[] {
     return this.players()

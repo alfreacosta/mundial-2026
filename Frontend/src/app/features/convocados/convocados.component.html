@@ -272,7 +272,7 @@
               <img *ngIf="getLogoUrl()" [src]="getLogoUrl()" [alt]="pais?.nombre" class="plantel-country-logo">
               <div>
                 <h2 class="plantel-album-title">PLANTEL COMPLETO</h2>
-                <span class="plantel-album-subtitle">{{ pais?.nombre }} · {{ jugadoresSeleccionados.length }} jugadores</span>
+                <span class="plantel-album-subtitle">{{ pais?.nombre }} · {{ jugadoresSeleccionados.length }} jugadores<ng-container *ngIf="pais?.dtNombre"> + DT</ng-container></span>
               </div>
             </div>
             <button class="plantel-download-btn" (click)="downloadPlantel()" [disabled]="downloadingPlantel">
@@ -300,7 +300,7 @@
                   <mat-icon>{{ pg.icon }}</mat-icon>
                   <span>{{ pg.label }}</span>
                 </div>
-                <div class="figuritas-row">
+                <div class="figuritas-row" [style.--fig-cols]="getFigCols(pg.codigo)">
                   <div class="figurita"
                        *ngFor="let player of getConvocadosByPos(pg.codigo)"
                        [class.titular]="player.titular"
@@ -331,6 +331,35 @@
                 </div>
               </div>
             </ng-container>
+
+            <!-- Técnico / DT -->
+            <div class="plantel-pos-row" *ngIf="pais?.dtNombre">
+              <div class="plantel-pos-badge plantel-pos-badge-dt">
+                <mat-icon>sports</mat-icon>
+                <span>Director Técnico</span>
+              </div>
+              <div class="figuritas-row" [style.--fig-cols]="1">
+                <div class="figurita figurita-dt" [style.--pos-color]="'#6366f1'">
+                  <!-- Franja DT -->
+                  <div class="fig-top-bar">
+                    <span class="fig-number">DT</span>
+                  </div>
+                  <!-- Foto DT -->
+                  <div class="fig-photo">
+                    <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" (error)="$any($event.target).style.display='none'">
+                    <div *ngIf="!pais?.dtFotoUrl" class="fig-no-photo">
+                      <mat-icon>manage_accounts</mat-icon>
+                    </div>
+                  </div>
+                  <!-- Info DT -->
+                  <div class="fig-info">
+                    <span class="fig-pos-abr">DT</span>
+                    <span class="fig-name">{{ (pais!.dtNombre!.split(' ').pop()) | uppercase }}</span>
+                    <span class="fig-club">{{ pais!.dtNombre }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           </div>
         </section>
