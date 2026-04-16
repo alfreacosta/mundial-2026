@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
@@ -76,7 +76,8 @@ interface PosicionGroup {
     MatBadgeModule,
     RouterLink,
     CdkDrag,
-    PitchThreeDComponent
+    PitchThreeDComponent,
+    UpperCasePipe
   ],
   templateUrl: './convocados.component.html',
   styleUrls: ['./convocados.component.scss']
@@ -145,6 +146,117 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     UEFA: '#1a56db', CONMEBOL: '#b45309', CONCACAF: '#b91c1c',
     CAF: '#065f46', AFC: '#6d28d9', OFC: '#0e7490'
   };
+
+  /** Colores primario/secundario de cada bandera (para las figuritas del plantel) */
+  readonly FLAG_COLORS: Record<string, { primary: string; secondary: string }> = {
+    'ARG': { primary: '#74ACDF', secondary: '#FFFFFF' },
+    'BRA': { primary: '#009C3B', secondary: '#FFDF00' },
+    'URU': { primary: '#5EB6E4', secondary: '#FFFFFF' },
+    'COL': { primary: '#FCD116', secondary: '#003893' },
+    'CHI': { primary: '#D52B1E', secondary: '#FFFFFF' },
+    'PAR': { primary: '#D52B1E', secondary: '#0038A8' },
+    'ECU': { primary: '#FFD100', secondary: '#003893' },
+    'BOL': { primary: '#D52B1E', secondary: '#F4E400' },
+    'PER': { primary: '#D91023', secondary: '#FFFFFF' },
+    'VEN': { primary: '#CF142B', secondary: '#003893' },
+    'GER': { primary: '#DD0000', secondary: '#FFCE00' },
+    'ENG': { primary: '#CF142B', secondary: '#FFFFFF' },
+    'FRA': { primary: '#002395', secondary: '#ED2939' },
+    'ESP': { primary: '#AA151B', secondary: '#F1BF00' },
+    'ITA': { primary: '#009246', secondary: '#CE2B37' },
+    'POR': { primary: '#006600', secondary: '#FF0000' },
+    'NED': { primary: '#AE1C28', secondary: '#21468B' },
+    'BEL': { primary: '#000000', secondary: '#EF3340' },
+    'SUI': { primary: '#FF0000', secondary: '#FFFFFF' },
+    'AUT': { primary: '#ED2939', secondary: '#FFFFFF' },
+    'CRO': { primary: '#FF0000', secondary: '#003087' },
+    'SVN': { primary: '#003DA5', secondary: '#E40422' },
+    'DEN': { primary: '#C60C30', secondary: '#FFFFFF' },
+    'SWE': { primary: '#006AA7', secondary: '#FECC02' },
+    'NOR': { primary: '#EF2B2D', secondary: '#002868' },
+    'ISL': { primary: '#003897', secondary: '#DC1E35' },
+    'TUR': { primary: '#E30A17', secondary: '#FFFFFF' },
+    'POL': { primary: '#DC143C', secondary: '#FFFFFF' },
+    'ROU': { primary: '#002B7F', secondary: '#FCD116' },
+    'HUN': { primary: '#CE2939', secondary: '#477050' },
+    'GRE': { primary: '#0D5EAF', secondary: '#FFFFFF' },
+    'SRB': { primary: '#C6363C', secondary: '#0C4076' },
+    'CZE': { primary: '#D7141A', secondary: '#11457E' },
+    'SVK': { primary: '#EE1C25', secondary: '#0B4EA2' },
+    'UKR': { primary: '#005BBB', secondary: '#FFD500' },
+    'ALB': { primary: '#E41E20', secondary: '#000000' },
+    'MKD': { primary: '#CE2028', secondary: '#F7A600' },
+    'MNE': { primary: '#D4AF37', secondary: '#C8463A' },
+    'BIH': { primary: '#002395', secondary: '#FFFF00' },
+    'GEO': { primary: '#DA121A', secondary: '#FFFFFF' },
+    'USA': { primary: '#B22234', secondary: '#3C3B6E' },
+    'MEX': { primary: '#006847', secondary: '#CE1126' },
+    'CAN': { primary: '#FF0000', secondary: '#FFFFFF' },
+    'CRC': { primary: '#002B7F', secondary: '#CE1126' },
+    'HON': { primary: '#0073CF', secondary: '#FFFFFF' },
+    'PAN': { primary: '#005293', secondary: '#D21034' },
+    'SLV': { primary: '#0F47AF', secondary: '#FFFFFF' },
+    'TRI': { primary: '#CE1126', secondary: '#000000' },
+    'JAM': { primary: '#000000', secondary: '#FED100' },
+    'HAI': { primary: '#00209F', secondary: '#D21034' },
+    'GUA': { primary: '#4997D0', secondary: '#FFFFFF' },
+    'CUW': { primary: '#003DA5', secondary: '#F9E814' },
+    'MAR': { primary: '#C1272D', secondary: '#006233' },
+    'SEN': { primary: '#00853F', secondary: '#EAE011' },
+    'NGA': { primary: '#008751', secondary: '#FFFFFF' },
+    'GHA': { primary: '#006B3F', secondary: '#FCD116' },
+    'CMR': { primary: '#007A5E', secondary: '#CE1126' },
+    'CIV': { primary: '#F77F00', secondary: '#009A44' },
+    'EGY': { primary: '#CE1126', secondary: '#FFFFFF' },
+    'TUN': { primary: '#E70013', secondary: '#FFFFFF' },
+    'ALG': { primary: '#006233', secondary: '#D21034' },
+    'RSA': { primary: '#007A4D', secondary: '#FFB81C' },
+    'COD': { primary: '#007FFF', secondary: '#F7D618' },
+    'CPV': { primary: '#003893', secondary: '#CF2027' },
+    'JPN': { primary: '#BC002D', secondary: '#FFFFFF' },
+    'KOR': { primary: '#CD2E3A', secondary: '#003478' },
+    'IRN': { primary: '#239F40', secondary: '#DA0000' },
+    'SAU': { primary: '#006C35', secondary: '#FFFFFF' },
+    'AUS': { primary: '#003087', secondary: '#FF0000' },
+    'QAT': { primary: '#8D1B3D', secondary: '#FFFFFF' },
+    'IRQ': { primary: '#CE1126', secondary: '#007A3D' },
+    'JOR': { primary: '#007A3D', secondary: '#CE1126' },
+    'UZB': { primary: '#1EB53A', secondary: '#CE1126' },
+    'CHN': { primary: '#DE2910', secondary: '#FFDE00' },
+    'NZL': { primary: '#003087', secondary: '#CC142B' },
+    'FIJ': { primary: '#68BFE5', secondary: '#003087' },
+  };
+
+  getFlagColors(): { primary: string; secondary: string } {
+    const code = this.pais?.codigo?.toUpperCase() ?? '';
+    return this.FLAG_COLORS[code] ?? { primary: this.confColor, secondary: '#FFFFFF' };
+  }
+
+  downloadingPlantel = false;
+
+  downloadPlantel(): void {
+    const el = document.getElementById('plantel-album');
+    if (!el) return;
+    this.downloadingPlantel = true;
+
+    import('html2canvas').then(({ default: h2c }) => {
+      h2c(el, {
+        backgroundColor: '#0a0e17',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Plantel-${this.pais?.nombre ?? 'seleccion'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        this.downloadingPlantel = false;
+      }).catch(() => {
+        this.downloadingPlantel = false;
+      });
+    });
+  }
 
   // Stats panel
   selectedPlayer = signal<JugadorSeleccionable | null>(null);
@@ -300,6 +412,13 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   getPosColor(codigo?: string): string {
     const pg = this.positionGroups.find(g => g.codigo === codigo);
     return pg?.color ?? '#94a3b8';
+  }
+
+  /** Convocados + titulares de una posición (para el álbum del plantel) */
+  getConvocadosByPos(codigo: string): JugadorSeleccionable[] {
+    return this.players()
+      .filter(p => (p.seleccionado || p.titular) && p.posicion?.codigo === codigo)
+      .sort((a, b) => (b.titular ? 1 : 0) - (a.titular ? 1 : 0) || (b.rating ?? 0) - (a.rating ?? 0));
   }
 
   /** Convocados de una posición (candidatos para titular) */

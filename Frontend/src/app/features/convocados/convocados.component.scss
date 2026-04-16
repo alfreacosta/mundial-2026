@@ -1689,3 +1689,309 @@ $save-bar-height: 72px;
     margin-top: 2px;
   }
 }
+
+// ════════════════════════════════════════════════════════
+// PLANTEL ALBUM — Figuritas estilo álbum de cromos
+// ════════════════════════════════════════════════════════
+
+.plantel-album-section {
+  margin: 0 16px 32px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid $dark-border;
+  background: $dark-surface;
+}
+
+// ── Header del plantel ──────────────────────────────────
+.plantel-album-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--flag-primary) 40%, #0a0e17) 0%,
+    color-mix(in srgb, var(--flag-secondary) 15%, #111827) 100%
+  );
+  border-bottom: 1px solid $dark-border;
+
+  .plantel-album-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .plantel-country-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  }
+
+  .plantel-album-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .plantel-album-subtitle {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.65);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .plantel-download-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: $radius-full;
+    border: 2px solid var(--flag-primary);
+    background: color-mix(in srgb, var(--flag-primary) 20%, transparent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background $transition, transform $transition;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--flag-primary) 45%, transparent);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── Grid de figuritas ───────────────────────────────────
+.plantel-album-grid {
+  padding: 20px 16px 24px;
+  background: $dark-surface;
+  position: relative;
+}
+
+// Marca de agua interna (sólo visible al exportar con html2canvas)
+.plantel-watermark {
+  display: none; // Oculto en pantalla, solo visible en export
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: $radius-md;
+
+  .plantel-wm-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
+  .plantel-wm-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.05em;
+    flex: 1;
+  }
+
+  .plantel-wm-app {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+  }
+}
+
+// ── Fila por posición ───────────────────────────────────
+.plantel-pos-row {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.plantel-pos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 6px;
+  border-radius: $radius-full;
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ── Fila de figuritas ───────────────────────────────────
+.figuritas-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+// ── Figurita individual ─────────────────────────────────
+.figurita {
+  width: 88px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: $dark-surface-2;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: default;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    z-index: 2;
+  }
+
+  // Borde dorado para titulares
+  &.titular {
+    border-color: color-mix(in srgb, var(--pos-color) 70%, #fff);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--pos-color) 50%, transparent), 0 4px 12px rgba(0,0,0,0.5);
+  }
+}
+
+// Franja superior coloreada
+.fig-top-bar {
+  background: var(--pos-color);
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 20px;
+
+  .fig-number {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  .fig-star {
+    font-size: 0.7rem;
+    color: #FFD700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+}
+
+// Zona de la foto
+.fig-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pos-color) 30%, $dark-surface-2) 0%,
+    $dark-surface-2 100%
+  );
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  .fig-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .fig-no-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: rgba(255,255,255,0.15);
+    }
+  }
+}
+
+// Info debajo de la foto
+.fig-info {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pos-color) 35%, #0a0e17) 0%,
+    #0a0e17 100%
+  );
+  padding: 4px 5px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .fig-pos-abr {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--pos-color);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .fig-name {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+  }
+
+  .fig-club {
+    font-size: 0.55rem;
+    color: rgba(255,255,255,0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+}
+
+@media (max-width: 480px) {
+  .figurita {
+    width: 76px;
+  }
+
+  .plantel-album-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .plantel-download-btn {
+      align-self: stretch;
+      justify-content: center;
+    }
+  }
+}
