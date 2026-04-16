@@ -17,6 +17,8 @@ export interface Pais {
   pts: number;
   apiTeamId: number | null;
   logoUrl: string | null;
+  dtNombre: string | null;
+  dtFotoUrl: string | null;
   confederacion: {
     internalId: number;
     nombre: string;
@@ -80,7 +82,7 @@ export class CountriesService {
   /** Devuelve TODOS los países (incluyendo inactivos — filtrar en el componente por activo) */
   getPaises(): Observable<Pais[]> {
     const query = `{ paises {
-      internalId nombre codigo grupo activo pj pg pe pp pts apiTeamId logoUrl
+      internalId nombre codigo grupo activo pj pg pe pp pts apiTeamId logoUrl dtNombre dtFotoUrl
       confederacion { internalId nombre codigo abreviatura }
     } }`;
     return this.http
@@ -90,7 +92,7 @@ export class CountriesService {
 
   getPaisesPorConfederacion(codigoConf: string): Observable<Pais[]> {
     const query = `query($codigo: String!) { paisesPorConfederacion(codigo: $codigo) {
-      internalId nombre codigo grupo activo pj pg pe pp pts apiTeamId logoUrl
+      internalId nombre codigo grupo activo pj pg pe pp pts apiTeamId logoUrl dtNombre dtFotoUrl
       confederacion { internalId nombre codigo abreviatura }
     } }`;
     return this.http

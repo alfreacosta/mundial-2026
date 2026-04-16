@@ -141,6 +141,14 @@
                         <span>Sin titulares</span>
                       </div>
                     } @else {
+                      @if (getConvocatoria(fav.paisId)?.dtNombre; as dtNombre) {
+                        <div class="dt-badge-mini">
+                          @if (getConvocatoria(fav.paisId)?.dtFotoUrl; as dtFoto) {
+                            <img [src]="dtFoto" class="dt-mini-foto" [alt]="dtNombre" (error)="$any($event.target).style.display='none'">
+                          }
+                          <span>{{ dtNombre.split(' ').at(-1) }}</span>
+                        </div>
+                      }
                       <app-mini-pitch [players]="getTitularesParaCancha(fav.paisId)"></app-mini-pitch>
                     }
                   </div>
@@ -194,6 +202,14 @@
                           <span>Sin titulares</span>
                         </div>
                       } @else {
+                        @if (getConvocatoria(paisId)?.dtNombre; as dtNombre) {
+                          <div class="dt-badge-mini">
+                            @if (getConvocatoria(paisId)?.dtFotoUrl; as dtFoto) {
+                              <img [src]="dtFoto" class="dt-mini-foto" [alt]="dtNombre" (error)="$any($event.target).style.display='none'">
+                            }
+                            <span>{{ dtNombre.split(' ').at(-1) }}</span>
+                          </div>
+                        }
                         <app-mini-pitch [players]="getTitularesParaCancha(paisId)"></app-mini-pitch>
                       }
                     </div>

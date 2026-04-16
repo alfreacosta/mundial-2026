@@ -107,6 +107,8 @@ export interface ConvocatoriaResumen {
   jugadores: JugadorResumen[];
   titularesIds?: number[];
   posicionesTitulares?: { jugadorId: number; x: number; y: number }[];
+  dtNombre?: string | null;
+  dtFotoUrl?: string | null;
 }
 
 export interface PerfilJuego {

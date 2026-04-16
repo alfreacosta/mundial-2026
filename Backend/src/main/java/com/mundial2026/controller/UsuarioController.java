@@ -93,7 +93,8 @@ public class UsuarioController {
             if (!jugadores.isEmpty() || !titularesIds.isEmpty()) {
                 var pais = conv.getPais();
                 convMap.put(pais.getInternalId(), new ConvocatoriaResumenDTO(
-                        pais.getNombre(), pais.getCodigo(), jugadores, titularesIds, posicionesTitulares));
+                        pais.getNombre(), pais.getCodigo(), jugadores, titularesIds, posicionesTitulares,
+                        pais.getDtNombre(), pais.getDtFotoUrl()));
             }
         }
 
@@ -190,7 +191,9 @@ public class UsuarioController {
             String paisCodigo,
             List<JugadorResumenDTO> jugadores,
             List<Long> titularesIds,
-            List<PosicionTitularDTO> posicionesTitulares
+            List<PosicionTitularDTO> posicionesTitulares,
+            String dtNombre,
+            String dtFotoUrl
     ) {}
 
     /** DTO posición de titular en la cancha */

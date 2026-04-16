@@ -243,6 +243,11 @@
           <div class="pitch-toolbar">
             <h2 class="pitch-title"><mat-icon>sports_soccer</mat-icon> Formación</h2>
             <span class="pitch-hint">Arrastrá los jugadores para reposicionarlos</span>
+            <!-- DT arriba a la derecha -->
+            <div class="dt-badge" *ngIf="pais?.dtNombre">
+              <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" class="dt-badge-foto" [alt]="pais!.dtNombre!" (error)="$any($event.target).style.display='none'">
+              <span class="dt-badge-nombre">{{ pais!.dtNombre!.split(' ')[pais!.dtNombre!.split(' ').length - 1] }}</span>
+            </div>
           </div>
           <app-pitch-3d
             #pitch3d

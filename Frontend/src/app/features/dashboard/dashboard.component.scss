@@ -861,6 +861,32 @@ $radius:      14px;
   padding: 8px;
 }
 
+.dt-badge-mini {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding-right: 4px;
+
+  .dt-mini-foto {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    border: 2px solid rgba(255,255,255,0.2);
+  }
+
+  span {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
 .mini-pitch {
   max-width: 320px;
   margin: 0 auto;

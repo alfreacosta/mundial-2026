@@ -181,6 +181,14 @@
                                 <a [routerLink]="['/convocados', fav.paisId]">Elegir titulares</a>
                               </div>
                             } @else {
+                              @if (convocatorias.get(fav.paisId)?.dtNombre; as dtNombre) {
+                                <div class="dt-badge-mini">
+                                  @if (convocatorias.get(fav.paisId)?.dtFotoUrl; as dtFoto) {
+                                    <img [src]="dtFoto" class="dt-mini-foto" [alt]="dtNombre" (error)="$any($event.target).style.display='none'">
+                                  }
+                                  <span>{{ dtNombre.split(' ').at(-1) }}</span>
+                                </div>
+                              }
                               <app-mini-pitch [players]="getTitularesParaCancha(fav.paisId)"></app-mini-pitch>
                             }
                           }

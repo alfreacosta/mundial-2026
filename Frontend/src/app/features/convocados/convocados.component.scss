@@ -1164,6 +1164,34 @@ $save-bar-height: 72px;
   font-style: italic;
 }
 
+.dt-badge {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 30px;
+  padding: 4px 12px 4px 4px;
+
+  .dt-badge-foto {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    border: 2px solid rgba(255,255,255,0.25);
+  }
+
+  .dt-badge-nombre {
+    font-size: 12px;
+    font-weight: 700;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
 .pitch-export-btn {
   margin-left: auto;
   display: flex;
