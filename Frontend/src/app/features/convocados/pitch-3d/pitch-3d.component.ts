@@ -27,7 +27,7 @@ const TR = 3.8;  // radio del token del jugador
       width: 100%;
       border-radius: 12px;
       overflow: hidden;
-      background: #1a6b2a;
+      background: #071a07;
       cursor: grab;
       &:active { cursor: grabbing; }
     }
@@ -104,7 +104,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     this.renderer.setSize(w, h);
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('#1a6b2a');
+    this.scene.background = new THREE.Color('#071a07');
 
     this.camera = this.makeCamera(w, h);
 
@@ -141,7 +141,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     // Franjas (colores oscuros similares al fondo exterior)
     const N = 10;
     for (let i = 0; i < N; i++) {
-      ctx.fillStyle = i % 2 === 0 ? '#1a6b2a' : '#1e7030';
+      ctx.fillStyle = i % 2 === 0 ? '#0d3d14' : '#0f4517';
       ctx.fillRect(0, i * texH / N, texW, texH / N + 1);
     }
 
