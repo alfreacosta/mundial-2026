@@ -22,7 +22,7 @@ const FH = 90;
   styles: [`
     :host { display: block; width: 100%; }
     .wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #071a07; }
-    .cvs  { width: 100%; display: block; touch-action: none; }
+    .cvs  { width: 100%; display: block; touch-action: pan-y; }
   `]
 })
 export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -300,7 +300,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     cvs.addEventListener('pointerdown',   e => this.onDown(e),  { passive: false });
     cvs.addEventListener('pointermove',   e => this.onMove(e),  { passive: false });
     cvs.addEventListener('pointerup',     e => this.onUp(e));
-    cvs.addEventListener('pointercancel', () => { this.dragging = null; });
+    cvs.addEventListener('pointercancel', () => { this.dragging = null; this.cvsRef.nativeElement.style.touchAction = 'pan-y'; });
   }
 
   private getPos(e: PointerEvent): { x: number; y: number } {
@@ -318,6 +318,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
         this.dragging    = { idx: i };
         this.dragOffset  = { x: pos.x - cx, y: pos.y - cy };
         e.preventDefault();
+        this.cvsRef.nativeElement.style.touchAction = 'none';
         this.cvsRef.nativeElement.setPointerCapture(e.pointerId);
         return;
       }
@@ -335,6 +336,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private onUp(e: PointerEvent): void {
+    this.cvsRef.nativeElement.style.touchAction = 'pan-y';
     if (!this.dragging) return;
     const d   = this.playerData[this.dragging.idx];
     const pct = { ...d.pct };
