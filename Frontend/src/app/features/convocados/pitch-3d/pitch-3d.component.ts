@@ -70,6 +70,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   ngOnChanges(c: SimpleChanges): void {
     if (!this.ctx) return;
+    if (this.dragging) return; // no reconstruir mientras se arrastra
     if (c['players'] || c['savedPositions']) { this.buildPlayerData(); this.draw(); }
   }
 
@@ -98,9 +99,12 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     const prev = new Map(this.playerData.map(d => [d.id, d]));
     this.playerData = this.players.map(p => {
       const id    = Number(p.internalId);
-      const pct   = this.savedPositions.get(id) ?? this.defaultPct(p);
+      const prevD = prev.get(id);
+      // Si el jugador estaba siendo arrastrado, conservar su posición actual
+      const isDragging = this.dragging !== null && prevD && this.playerData[this.dragging.idx]?.id === id;
+      const pct   = isDragging ? prevD!.pct : (this.savedPositions.get(id) ?? this.defaultPct(p));
       const color = this.posColorFn(p.posicion?.codigo);
-      return { id, p, pct, img: prev.get(id)?.img ?? null, color };
+      return { id, p, pct, img: prevD?.img ?? null, color };
     });
     this.loadPhotos();
   }
