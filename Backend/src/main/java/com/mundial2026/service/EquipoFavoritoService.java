@@ -135,6 +135,8 @@ public class EquipoFavoritoService {
                 .paisCodigo(ef.getPais().getCodigo())
                 .orden(ef.getOrden())
                 .transDate(ef.getTransDate())
+                .dtNombre(ef.getPais().getDtNombre())
+                .dtFotoUrl(ef.getPais().getDtFotoUrl())
                 .build();
     }
 }

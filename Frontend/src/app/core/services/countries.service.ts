@@ -65,6 +65,8 @@ export interface ConvocatoriaResponse {
   noVaIds: number[];
   titularesIds: number[];
   posicionesTitulares: { jugadorId: number; x: number; y: number }[];
+  dtNombre?: string | null;
+  dtFotoUrl?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

@@ -19,4 +19,6 @@ public class EquipoFavoritoDTO {
     private String paisCodigo;
     private Integer orden;
     private LocalDateTime transDate;
+    private String dtNombre;
+    private String dtFotoUrl;
 }

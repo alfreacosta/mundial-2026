@@ -9,6 +9,8 @@ export interface EquipoFavorito {
   paisCodigo: string;
   orden: number;
   transDate: string;
+  dtNombre?: string | null;
+  dtFotoUrl?: string | null;
 }
 
 export interface GrupoRow {
