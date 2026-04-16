@@ -40,7 +40,7 @@ export const routes: Routes = [
   { path: 'stats', component: StatsComponent, canActivate: [authGuard] },
   { path: 'countries', component: CountriesComponent, canActivate: [authGuard] },
   { path: 'convocados/:paisId', component: ConvocadosComponent, canActivate: [authGuard] },
-  { path: 'seleccion/:codigo', component: SeleccionDetailComponent, canActivate: [authGuard] },
+  { path: 'seleccion/:codigo', redirectTo: 'countries', pathMatch: 'full' },
   { path: 'groups', component: GroupsComponent, canActivate: [authGuard] },
   { path: 'estadios', component: EstadiosComponent, canActivate: [authGuard] },
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard] },

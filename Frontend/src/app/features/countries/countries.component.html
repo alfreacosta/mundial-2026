@@ -38,7 +38,7 @@
         <div 
           *ngFor="let fav of misFavoritos; let i = index"
           class="fav-item"
-          [routerLink]="['/seleccion', fav.paisCodigo]">
+          [routerLink]="['/convocados', fav.paisId]">
           
           <!-- Orden Badge -->
           <span class="fav-orden">{{ i + 1 }}</span>
