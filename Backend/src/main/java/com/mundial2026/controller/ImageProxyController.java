@@ -61,6 +61,7 @@ public class ImageProxyController {
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .cacheControl(CacheControl.maxAge(Duration.ofDays(7)).cachePublic())
+                    .header("Access-Control-Allow-Origin", "*")
                     .body(imageBytes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();

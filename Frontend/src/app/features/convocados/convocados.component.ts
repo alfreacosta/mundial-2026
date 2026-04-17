@@ -236,7 +236,10 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   compartirPlantel(): void {
     const el = document.getElementById('plantel-album');
-    if (!el) return;
+    if (!el) {
+      this.snackBar.open('No se encontró el elemento del plantel.', '', { duration: 3000, panelClass: 'snack-error' });
+      return;
+    }
     this.downloadingPlantel = true;
 
     import('html2canvas').then(({ default: h2c }) => {
@@ -245,31 +248,53 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        logging: false
-      }).then(canvas => {
+        logging: false,
+        imageTimeout: 10000,
+        onclone: (_doc: Document, cloned: HTMLElement) => {
+          // Asegurar fondo visible en el clon
+          cloned.style.background = '#0a0e17';
+        }
+      } as any).then((canvas: HTMLCanvasElement) => {
         const paisNombre = this.pais?.nombre ?? 'mi selección';
         const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
           `Armá tu convocatoria ideal en 👉 https://dt26.win\n` +
           `Elegí tus selecciones, armá los 26 y compartí con tus amigos. ¡Vamos! 🔥`;
 
         canvas.toBlob(blob => {
-          if (!blob) { this.downloadingPlantel = false; return; }
-          const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });
+          if (!blob) {
+            this.snackBar.open('Error generando imagen. Intentá de nuevo.', '', { duration: 3000, panelClass: 'snack-error' });
+            this.downloadingPlantel = false;
+            return;
+          }
+          const fileName = `Plantel-${paisNombre}.png`;
+          const file = new File([blob], fileName, { type: 'image/png' });
 
           if (navigator.share && navigator.canShare?.({ files: [file] })) {
             navigator.share({ files: [file], title: `Mi Plantel - ${paisNombre}`, text: shareText })
-              .catch(() => this.downloadCanvas(canvas))
+              .catch(() => this.downloadPlantelCanvas(canvas, paisNombre))
               .finally(() => { this.downloadingPlantel = false; });
           } else {
-            // Fallback: descargar PNG
-            this.downloadCanvas(canvas);
+            this.downloadPlantelCanvas(canvas, paisNombre);
             this.downloadingPlantel = false;
           }
         }, 'image/png');
-      }).catch(() => {
+      }).catch((err: unknown) => {
+        console.error('html2canvas error:', err);
+        this.snackBar.open('Error al generar la imagen. Intentá de nuevo.', '', { duration: 3000, panelClass: 'snack-error' });
         this.downloadingPlantel = false;
       });
+    }).catch((err: unknown) => {
+      console.error('Error cargando html2canvas:', err);
+      this.snackBar.open('Error cargando dependencia.', '', { duration: 3000, panelClass: 'snack-error' });
+      this.downloadingPlantel = false;
     });
+  }
+
+  private downloadPlantelCanvas(canvas: HTMLCanvasElement, paisNombre: string): void {
+    const link = document.createElement('a');
+    link.download = `Plantel-${paisNombre}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   // Stats panel

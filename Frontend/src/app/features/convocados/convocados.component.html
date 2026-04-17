@@ -298,15 +298,14 @@
                        [class.titular]="player.titular"
                        [style.--pos-color]="pg.color">
 
-                    <!-- Franja superior con número -->
+                    <!-- Franja superior -->
                     <div class="fig-top-bar">
-                      <span class="fig-number">#{{ player.numeroCamiseta || '?' }}</span>
-                      <span class="fig-star" *ngIf="player.titular" title="Titular">★</span>
+                      <span class="fig-star fig-star-solo" *ngIf="player.titular" title="Titular">★</span>
                     </div>
 
                     <!-- Foto del jugador -->
                     <div class="fig-photo">
-                      <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.apellido" class="fig-img" (error)="$any($event.target).style.display='none'">
+                      <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.apellido" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
                       <div *ngIf="!player.urlFoto" class="fig-no-photo">
                         <mat-icon>person</mat-icon>
                       </div>
@@ -338,7 +337,7 @@
                   </div>
                   <!-- Foto DT -->
                   <div class="fig-photo">
-                    <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" (error)="$any($event.target).style.display='none'">
+                    <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
                     <div *ngIf="!pais?.dtFotoUrl" class="fig-no-photo">
                       <mat-icon>manage_accounts</mat-icon>
                     </div>
