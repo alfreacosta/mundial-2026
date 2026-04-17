@@ -33,8 +33,12 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() players: JugadorSeleccionable[] = [];
   @Input() savedPositions: Map<number, PlayerPos> = new Map();
   @Input() posColorFn: (codigo?: string) => string = () => '#94a3b8';
+  @Input() dtNombre?: string;
+  @Input() dtFotoUrl?: string;
 
   @Output() positionChanged = new EventEmitter<{ jugadorId: number; x: number; y: number }>();
+
+  private dtImg: HTMLImageElement | null = null;
 
   private ctx!: CanvasRenderingContext2D;
   private ro!: ResizeObserver;
@@ -66,12 +70,14 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
       this.onResize();
       this.bindEvents();
     });
+    if (this.dtFotoUrl) { this.loadDtPhoto(); }
   }
 
   ngOnChanges(c: SimpleChanges): void {
     if (!this.ctx) return;
     if (this.dragging) return; // no reconstruir mientras se arrastra
-    if (c['players'] || c['savedPositions']) { this.buildPlayerData(); this.draw(); }
+    if (c['dtFotoUrl']) { this.loadDtPhoto(); }
+    if (c['players'] || c['savedPositions'] || c['dtNombre'] || c['dtFotoUrl']) { this.buildPlayerData(); this.draw(); }
   }
 
   ngOnDestroy(): void { this.ro?.disconnect(); }
@@ -128,6 +134,24 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     });
   }
 
+  private loadDtPhoto(): void {
+    if (!this.dtFotoUrl) { this.dtImg = null; return; }
+    if (this.photoCache.has(this.dtFotoUrl)) {
+      this.dtImg = this.photoCache.get(this.dtFotoUrl) ?? null;
+      return;
+    }
+    this.photoCache.set(this.dtFotoUrl, null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      this.photoCache.set(this.dtFotoUrl!, img);
+      this.dtImg = img;
+      this.draw();
+    };
+    img.onerror = () => { this.photoCache.set(this.dtFotoUrl!, null); };
+    img.src = this.dtFotoUrl;
+  }
+
   private defaultPct(p: JugadorSeleccionable): PlayerPos {
     const code = p.posicion?.codigo ?? 'MED';
     const same = this.players.filter(t => t.posicion?.codigo === code);
@@ -147,6 +171,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     this.ctx.clearRect(0, 0, cssW, cssH);
     this.drawField();
     this.playerData.forEach(d => this.drawToken(d));
+    if (this.dtNombre) { this.drawDtToken(); }
   }
 
   private drawField(): void {
@@ -267,6 +292,79 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 1;
     ctx.fillText(label, cx, ly + labelH / 2);
+    ctx.restore();
+  }
+
+  // ─── DT Token ────────────────────────────────────────────────────
+
+  private drawDtToken(): void {
+    const ctx = this.ctx;
+    const dpr = this.dpr;
+    const margin = 10 * dpr;
+    const R = Math.round(this.TR * 1.1);  // ligeramente más grande
+    const cx = this.fX * dpr + margin + R;
+    const cy = this.fY * dpr + margin + R;
+
+    // El ctx está en escala dpr via setTransform, pero drawDtToken dibuja
+    // en coordenadas CSS — usar coordenadas CSS directamente
+    const cssR  = Math.round(this.TR * 1.1);
+    const cssCx = this.fX + 8;
+    const cssCy = this.fY + 8;
+    const cxc   = cssCx + cssR;
+    const cyc   = cssCy + cssR;
+
+    // Sombra exterior
+    ctx.save();
+    ctx.shadowColor  = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur   = 10;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 3;
+    ctx.beginPath(); ctx.arc(cxc, cyc, cssR, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e293b'; ctx.fill();
+    ctx.restore();
+
+    // Anillo blanco exterior
+    ctx.beginPath(); ctx.arc(cxc, cyc, cssR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // Foto o inicial del DT
+    const innerR = cssR * 0.92;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cxc, cyc, innerR, 0, Math.PI * 2); ctx.clip();
+    if (this.dtImg) {
+      const diam  = innerR * 2;
+      const scale = diam / this.dtImg.naturalWidth;
+      const drawW = diam;
+      const drawH = this.dtImg.naturalHeight * scale;
+      const dy    = drawH > diam ? -(drawH - diam) * 0.15 : (diam - drawH) / 2;
+      ctx.drawImage(this.dtImg, cxc - innerR, cyc - innerR + dy, drawW, drawH);
+    } else {
+      ctx.fillStyle = '#334155';
+      ctx.beginPath(); ctx.arc(cxc, cyc, innerR, 0, Math.PI * 2); ctx.fill();
+      const initial = this.dtNombre?.split(' ').pop()?.charAt(0).toUpperCase() ?? 'D';
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = `bold ${Math.round(cssR * 0.65)}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(initial, cxc, cyc);
+    }
+    ctx.restore();
+
+    // Etiqueta debajo con apellido
+    const apellido = (this.dtNombre?.split(' ').pop() ?? 'DT').toUpperCase();
+    ctx.font = `700 ${Math.round(cssR * 0.36)}px Arial`;
+    const textW  = ctx.measureText(apellido).width;
+    const labelW = Math.max(textW + cssR * 0.6, cssR * 1.6);
+    const labelH = Math.round(cssR * 0.52);
+    const lx = cxc - labelW / 2;
+    const ly = cyc + cssR + 2;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.beginPath(); this.pill(ctx, lx, ly, labelW, labelH, labelH / 2); ctx.fill();
+    ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(apellido, cxc, ly + labelH / 2);
     ctx.restore();
   }
 

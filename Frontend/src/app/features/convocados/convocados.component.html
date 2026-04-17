@@ -248,16 +248,11 @@
               [players]="jugadoresTitulares"
               [savedPositions]="savedPositions"
               [posColorFn]="getPosColor.bind(this)"
+              [dtNombre]="pais?.dtNombre || undefined"
+              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
               (positionChanged)="on3dPositionChanged($event)">
             </app-pitch-3d>
-            <!-- DT token superpuesto arriba izquierda -->
-            <div class="dt-overlay" *ngIf="pais?.dtNombre">
-              <div class="dt-token">
-                <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" class="dt-token-foto" [alt]="pais!.dtNombre!" (error)="$any($event.target).style.display='none'">
-                <div *ngIf="!pais?.dtFotoUrl" class="dt-token-placeholder"><mat-icon>person</mat-icon></div>
-              </div>
-              <span class="dt-token-nombre">{{ pais!.dtNombre!.split(' ')[pais!.dtNombre!.split(' ').length - 1] }}</span>
-            </div>
+            <!-- DT eliminado del HTML: se dibuja directamente en el canvas -->
           </div>
         </section>
       </ng-container>
@@ -275,10 +270,7 @@
                 <span class="plantel-album-subtitle">{{ pais?.nombre }} · {{ jugadoresSeleccionados.length }} jugadores<ng-container *ngIf="pais?.dtNombre"> + DT</ng-container></span>
               </div>
             </div>
-            <button class="plantel-download-btn" (click)="downloadPlantel()" [disabled]="downloadingPlantel">
-              <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'download' }}</mat-icon>
-              {{ downloadingPlantel ? 'Descargando…' : 'Descargar Plantel' }}
-            </button>
+
           </div>
 
           <!-- Grid de figuritas -->
@@ -359,6 +351,15 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Botón compartir al pie del album -->
+            <div class="plantel-share-footer">
+              <button class="plantel-share-btn" (click)="compartirPlantel()" [disabled]="downloadingPlantel"
+                      [style.--flag-primary]="getFlagColors().primary">
+                <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'share' }}</mat-icon>
+                {{ downloadingPlantel ? 'Generando imagen…' : 'Compartir Plantel' }}
+              </button>
             </div>
 
           </div>

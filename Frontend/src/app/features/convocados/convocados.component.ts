@@ -234,7 +234,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   downloadingPlantel = false;
 
-  downloadPlantel(): void {
+  compartirPlantel(): void {
     const el = document.getElementById('plantel-album');
     if (!el) return;
     this.downloadingPlantel = true;
@@ -247,11 +247,25 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         allowTaint: true,
         logging: false
       }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `Plantel-${this.pais?.nombre ?? 'seleccion'}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        this.downloadingPlantel = false;
+        const paisNombre = this.pais?.nombre ?? 'mi selección';
+        const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
+          `Armá tu convocatoria ideal en 👉 https://dt26.win\n` +
+          `Elegí tus selecciones, armá los 26 y compartí con tus amigos. ¡Vamos! 🔥`;
+
+        canvas.toBlob(blob => {
+          if (!blob) { this.downloadingPlantel = false; return; }
+          const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });
+
+          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+            navigator.share({ files: [file], title: `Mi Plantel - ${paisNombre}`, text: shareText })
+              .catch(() => this.downloadCanvas(canvas))
+              .finally(() => { this.downloadingPlantel = false; });
+          } else {
+            // Fallback: descargar PNG
+            this.downloadCanvas(canvas);
+            this.downloadingPlantel = false;
+          }
+        }, 'image/png');
       }).catch(() => {
         this.downloadingPlantel = false;
       });

@@ -1745,38 +1745,6 @@ $save-bar-height: 72px;
     display: block;
     margin-top: 2px;
   }
-
-  .plantel-download-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: $radius-full;
-    border: 2px solid var(--flag-primary);
-    background: color-mix(in srgb, var(--flag-primary) 20%, transparent);
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background $transition, transform $transition;
-    white-space: nowrap;
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--flag-primary) 45%, transparent);
-      transform: translateY(-1px);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
 }
 
 // ── Grid de figuritas ───────────────────────────────────
@@ -1998,6 +1966,59 @@ $save-bar-height: 72px;
       align-self: stretch;
       justify-content: center;
     }
+  }
+}
+
+// ── Footer compartir ────────────────────────────────────
+.plantel-share-footer {
+  display: flex;
+  justify-content: center;
+  padding: 20px 16px 8px;
+  border-top: 1px solid $dark-border;
+  margin-top: 16px;
+}
+
+.plantel-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  padding: 13px 24px;
+  border-radius: $radius-full;
+  border: none;
+  background: linear-gradient(
+    135deg,
+    var(--flag-primary, #6366f1) 0%,
+    color-mix(in srgb, var(--flag-primary, #6366f1) 70%, #000) 100%
+  );
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
