@@ -730,7 +730,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (res) => {
         const s = res.stats as any;
-        if (!s || Object.keys(s).length === 0 || (!s.club && !s.goles && !s.nacimiento)) {
+        if (!s || Object.keys(s).length === 0) {
           this.statsError.set('Sin estadísticas disponibles para esta temporada.');
         } else {
           this.playerStats.set(s as PlayerStats);

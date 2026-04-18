@@ -23,6 +23,9 @@ public interface JugadorRepository extends JpaRepository<Jugador, Long> {
 
     Optional<Jugador> findByApiPlayerId(Long apiPlayerId);
 
+    @Query("SELECT j FROM Jugador j LEFT JOIN FETCH j.club LEFT JOIN FETCH j.posicion WHERE j.internalId = :id")
+    Optional<Jugador> findByIdWithClub(@Param("id") Long id);
+
     @Query("SELECT j FROM Jugador j WHERE j.pais.internalId = :paisId AND j.apiPlayerId IS NOT NULL")
     List<Jugador> findSyncedByPaisId(@Param("paisId") Long paisId);
 
