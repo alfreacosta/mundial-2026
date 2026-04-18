@@ -327,12 +327,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
     // Dimensiones por figurita
     const CARD_W = 120 * DPR;
-    const CARD_H = 170 * DPR;
+    const CARD_H = 112 * DPR;   // reducido: corta justo después del club
     const GAP    = 8   * DPR;
     const PAD    = 16  * DPR;
     const HEADER = 64  * DPR;
 
-    const FOOTER   = 48  * DPR;
+    const FOOTER   = 64  * DPR;
     const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
     const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
 
@@ -434,7 +434,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.lineWidth = 1 * DPR;
       ctx.stroke();
 
-      const photoH = Math.round(CARD_H * 0.65);
+      const photoH = Math.round(CARD_H * 0.72);
       ctx.save();
       drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
       if (img) {
@@ -486,7 +486,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
       ctx.fillStyle = '#1a2035'; ctx.fill();
       ctx.strokeStyle = color; ctx.lineWidth = 2 * DPR; ctx.stroke();
-      const photoH = Math.round(CARD_H * 0.65);
+      const photoH = Math.round(CARD_H * 0.72);
       ctx.save();
       drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
       if (dtImg) {
@@ -615,18 +615,18 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.stroke();
 
       const selCount = todos.length;
-      const footerLine1 = `${selCount}/26 jugadores seleccionados  ·  Tenes tiempo de completar o modificar tu plantel hasta el 25 de Mayo`;
+      const footerLine1 = `${selCount}/26 jugadores seleccionados  ·  Tenés tiempo de completar o modificar tu plantel hasta el 25 de Mayo`;
       const footerLine2 = `Después podrás hacer el 11 ideal de tus equipos favoritos y predecir todos los resultados del Mundial  ·  Participá en competencias privadas con tus amigos`;
-      const lineH = 13 * DPR;
+      const lineH = 17 * DPR;
       const midY  = footerY + FOOTER / 2;
       const maxW  = CANVAS_W - PAD * 6;
 
-      ctx.font = `${10 * DPR}px Arial`;
+      ctx.font = `bold ${13 * DPR}px Arial`;
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(footerLine1, CANVAS_W / 2, midY - lineH / 2, maxW);
-      ctx.font = `${9.5 * DPR}px Arial`;
+      ctx.font = `${12 * DPR}px Arial`;
       ctx.fillStyle = 'rgba(255,255,255,0.75)';
       ctx.fillText(footerLine2, CANVAS_W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
