@@ -47,14 +47,14 @@
           </div>
           <div class="group-meta">
             <span class="group-name">Grupo {{ group.letra }}</span>
-            <!--
-            <span class="group-status" [style.color]="group.color">
-              {{ getConfirmedCount(group) }}/4
-              <span class="status-dot" *ngIf="getConfirmedCount(group) < 4"> · pendiente</span>
-              <span class="status-dot confirmed" *ngIf="getConfirmedCount(group) === 4"> · completo ✓</span>
-            </span>
-            -->
           </div>
+          <a class="predict-btn"
+             [routerLink]="['/predicciones']"
+             [queryParams]="{ grupo: group.letra }"
+             [style.border-color]="group.color"
+             [style.color]="group.color">
+            <span>Predecir</span>
+          </a>
         </header>
 
         <!-- Tabla de estadísticas -->

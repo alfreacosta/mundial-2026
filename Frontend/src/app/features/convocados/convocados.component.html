@@ -406,9 +406,7 @@
     <div class="save-bar-inner">
       <div class="save-info">
         <ng-container *ngIf="activeTab() === 'titulares'; else convInfo">
-          <span class="save-count">
-            <strong [style.color]="confColor">{{ totalTitulares() }}</strong> / {{ MAX_TITULARES }} titulares
-          </span>
+          <!-- sin contador en titulares, queda solo los botones -->
         </ng-container>
         <ng-template #convInfo>
           <span class="save-count">

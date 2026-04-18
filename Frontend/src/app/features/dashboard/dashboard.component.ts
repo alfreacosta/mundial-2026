@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
@@ -25,7 +26,7 @@ import { MiniPitchComponent } from '../../shared/mini-pitch/mini-pitch.component
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatProgressSpinnerModule, ClipboardModule, AvatarIconComponent, MiniPitchComponent],
+  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule, ClipboardModule, AvatarIconComponent, MiniPitchComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -110,7 +111,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private prediccionPartidoService: PrediccionPartidoService,
     private countriesService: CountriesService,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private snackBar: MatSnackBar
   ) {
     const origin = encodeURIComponent(window.location.origin);
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -330,16 +332,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
   toggleTitularDashboard(paisId: number, jugadorId: number): void {
     const conv = this.convocatorias.get(paisId);
     if (!conv) return;
-    const titSet = new Set(conv.titularesIds ?? []);
+    const titSet  = new Set(conv.titularesIds ?? []);
+    const jugadores = this.jugadoresPorPais.get(paisId) ?? [];
+
     if (titSet.has(jugadorId)) {
+      // Quitar titular
       titSet.delete(jugadorId);
     } else {
+      // Validar máximo 11 titulares
+      if (titSet.size >= 11) {
+        this.snackBar.open('Máximo 11 titulares', '', { duration: 2500, panelClass: 'snack-warn' });
+        return;
+      }
+      // Validar máximo 1 ARQ
+      const jugador = jugadores.find(j => j.internalId === jugadorId);
+      const posAbr  = jugador?.posicion?.abreviatura ?? jugador?.posicion?.codigo ?? '';
+      const esArq   = posAbr === 'ARQ' || posAbr === 'POR';
+      if (esArq) {
+        const arqsActuales = jugadores.filter(j =>
+          titSet.has(j.internalId) &&
+          (j.posicion?.abreviatura === 'ARQ' || j.posicion?.abreviatura === 'POR' ||
+           j.posicion?.codigo === 'ARQ' || j.posicion?.codigo === 'POR')
+        ).length;
+        if (arqsActuales >= 1) {
+          this.snackBar.open('Solo podés tener 1 arquero titular', '', { duration: 2500, panelClass: 'snack-warn' });
+          return;
+        }
+      }
       titSet.add(jugadorId);
     }
+
     const newTitulares = Array.from(titSet);
-    // Actualizar localmente de forma optimista
     conv.titularesIds = newTitulares;
-    // Persistir en el backend
     this.countriesService.guardarConvocatoria(paisId, conv.jugadoresIds, conv.noVaIds ?? [], newTitulares)
       .subscribe({ error: () => {} });
   }

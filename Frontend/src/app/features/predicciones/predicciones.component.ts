@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { forkJoin, of, Subject, Subscription } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 
@@ -85,6 +85,7 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
     private prediccionTorneoService:  PrediccionTorneoService,
     private authService:              AuthService,
     private router:                   Router,
+    private route:                    ActivatedRoute,
     private cd:                       ChangeDetectorRef
   ) {}
 
@@ -197,7 +198,9 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
     }
 
     this.grupos = [...gruposMap.keys()].sort();
-    this.grupoActivo = this.grupos[0] ?? '';
+    // Si viene queryParam ?grupo=X, activar ese grupo; si no, el primero
+    const grupoQuery = this.route.snapshot.queryParamMap.get('grupo')?.toUpperCase();
+    this.grupoActivo = (grupoQuery && this.grupos.includes(grupoQuery)) ? grupoQuery : (this.grupos[0] ?? '');
     this.grupos.forEach(g => this.partidosPorGrupo.set(g, gruposMap.get(g)!));
     this._todosCache = this.getTodosPartidos();
   }
