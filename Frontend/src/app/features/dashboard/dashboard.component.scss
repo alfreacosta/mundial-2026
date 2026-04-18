@@ -1640,4 +1640,106 @@ $radius:      14px;
   font-weight: 600;
 }
 
+// ── Mobile Photo Mosaic ──────────────────────────────────
+.mobile-photo-mosaic {
+  display: none; // oculto en desktop
+
+  @media (max-width: 860px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 16/9;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  }
+}
+
+.mosaic-cell {
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.92);
+  animation: mosaicFadeIn 0.55s ease forwards;
+
+  &:nth-child(1) { border-radius: 10px 0 0 0; }
+  &:nth-child(2) { border-radius: 0 10px 0 0; }
+  &:nth-child(3) { border-radius: 0 0 0 10px; }
+  &:nth-child(4) { border-radius: 0 0 10px 0; }
+
+  &:hover .mosaic-img {
+    transform: scale(1.08);
+    filter: brightness(1.1);
+  }
+}
+
+.mosaic-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.mosaic-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0,0,0,0.18) 0%,
+    rgba(0,0,0,0.0) 60%,
+    rgba(0,0,0,0.25) 100%
+  );
+  pointer-events: none;
+}
+
+.mosaic-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 24px;
+  padding: 6px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+
+  .mosaic-badge-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+
+  .mosaic-badge-sub {
+    font-size: 11px;
+    color: $gold;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+}
+
+@keyframes mosaicFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 

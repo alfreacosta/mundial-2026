@@ -109,6 +109,20 @@
     <!-- COLUMNA CENTRAL – Mi Juego + Video + Noticias -->
     <main class="col-center">
 
+      <!-- ══ MOBILE PHOTO MOSAIC (solo visible en mobile) ════════════ -->
+      <div class="mobile-photo-mosaic">
+        @for (photo of slideshowPhotos.slice(0, 4); track photo; let i = $index) {
+          <div class="mosaic-cell" [class]="'mosaic-cell-' + i" [style.animation-delay]="(i * 120) + 'ms'">
+            <img [src]="photo" alt="Mundial 2026" class="mosaic-img" loading="lazy" />
+            <div class="mosaic-overlay"></div>
+          </div>
+        }
+        <div class="mosaic-badge">
+          <span class="mosaic-badge-title">Mundial 2026</span>
+          <span class="mosaic-badge-sub">🏆 11 Jun · 19 Jul</span>
+        </div>
+      </div>
+
       <!-- ══════════════════════════════════════════════════════════════
            SECCIÓN: MI JUEGO - Favoritos, Convocatorias, Predicciones
            (SIEMPRE VISIBLE - Primera sección)
