@@ -334,7 +334,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
     const FOOTER   = 48  * DPR;
     const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
-    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + PAD + FOOTER;
+    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
 
     // Ordenar: ARQ, DEF, MED, DEL
     const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
@@ -546,15 +546,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.fillStyle = grad; ctx.fill();
       ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5 * DPR; ctx.stroke();
       if (logoImg) {
-        // Centrar logo con padding
-        const maxLogoW = CARD_W  * 0.78;
-        const maxLogoH = CARD_H  * 0.78;
-        const scale    = Math.min(maxLogoW / logoImg.naturalWidth, maxLogoH / logoImg.naturalHeight);
-        const lw = logoImg.naturalWidth  * scale;
-        const lh = logoImg.naturalHeight * scale;
-        const lx = cardX + (CARD_W - lw) / 2;
-        const ly = cardY + (CARD_H - lh) / 2;
-        ctx.drawImage(logoImg, lx, ly, lw, lh);
+        // Logo ocupa todo el card con clip redondeado
+        ctx.save();
+        drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+        ctx.clip();
+        ctx.drawImage(logoImg, cardX, cardY, CARD_W, CARD_H);
+        ctx.restore();
       } else {
         // Fallback si no carga
         ctx.font = `bold ${11 * DPR}px Arial`;
