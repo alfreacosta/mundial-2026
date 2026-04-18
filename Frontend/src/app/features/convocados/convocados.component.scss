@@ -921,7 +921,21 @@ $save-bar-height: 72px;
       font-size: 13px;
       font-weight: 600;
       border-radius: $radius-full !important;
-      color: $text-secondary;
+      color: $white !important;
+      background: rgba(255,255,255,0.08) !important;
+      border-color: rgba(255,255,255,0.18) !important;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:disabled { opacity: 0.4; }
+      &:not(:disabled):hover { background: rgba(255,255,255,0.14) !important; }
     }
 
     .autosave-indicator {
@@ -1155,6 +1169,39 @@ $save-bar-height: 72px;
 }
 
 /* ═══ CANCHA / PITCH ═══ */
+.tactica-bar {
+  display: flex;
+  justify-content: center;
+  padding: 16px 16px 8px;
+}
+
+.tactica-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 24px;
+  border: 1.5px solid rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.10);
+  color: #a5b4fc;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+  letter-spacing: 0.02em;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.20);
+    border-color: rgba(99, 102, 241, 0.75);
+  }
+}
+
 .pitch-section {
   margin-top: 24px;
 

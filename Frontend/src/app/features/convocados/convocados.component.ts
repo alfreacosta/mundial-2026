@@ -274,7 +274,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         const paisNombre = this.pais?.nombre ?? 'mi selección';
         const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
           `Armá tu convocatoria ideal en 👉 https://dt26.win\n` +
-          `Elegí tus selecciones, armá los 26 y compartí con tus amigos. ¡Vamos! 🔥`;
+          `Elegí tus selecciones, armá los 26 y competí con tus amigos.`;
 
         canvas.toBlob(blob => {
           if (!blob) {
@@ -525,7 +525,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       // Trofeo
       ctx.font = `${40 * DPR}px Arial`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('🏆', cardX + CARD_W / 2, cardY + CARD_H * 0.38);
+      ctx.fillText('\uD83C\uDFC6', cardX + CARD_W / 2, cardY + CARD_H * 0.38);
       // Texto www.dt26.win
       ctx.font = `bold ${11 * DPR}px Arial`;
       ctx.fillStyle = '#a5b4fc';
@@ -535,6 +535,33 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.font = `${9 * DPR}px Arial`;
       ctx.fillStyle = 'rgba(165,180,252,0.55)';
       ctx.fillText('Mundial 2026', cardX + CARD_W / 2, cardY + CARD_H * 0.80);
+    };
+
+    // Función brand con logo real
+    const drawBrandWithLogo = (cardX: number, cardY: number, logoImg: HTMLImageElement | null) => {
+      drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+      const grad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + CARD_H);
+      grad.addColorStop(0, '#0d1117');
+      grad.addColorStop(1, '#1a2035');
+      ctx.fillStyle = grad; ctx.fill();
+      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5 * DPR; ctx.stroke();
+      if (logoImg) {
+        // Centrar logo con padding
+        const maxLogoW = CARD_W  * 0.78;
+        const maxLogoH = CARD_H  * 0.78;
+        const scale    = Math.min(maxLogoW / logoImg.naturalWidth, maxLogoH / logoImg.naturalHeight);
+        const lw = logoImg.naturalWidth  * scale;
+        const lh = logoImg.naturalHeight * scale;
+        const lx = cardX + (CARD_W - lw) / 2;
+        const ly = cardY + (CARD_H - lh) / 2;
+        ctx.drawImage(logoImg, lx, ly, lw, lh);
+      } else {
+        // Fallback si no carga
+        ctx.font = `bold ${11 * DPR}px Arial`;
+        ctx.fillStyle = '#a5b4fc';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('www.dt26.win', cardX + CARD_W / 2, cardY + CARD_H / 2);
+      }
     };
 
     // Cargar imágenes de jugadores
@@ -553,8 +580,13 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
           img.src = this.pais!.dtFotoUrl!;
         })
       : Promise.resolve(null);
+    const brandLogoPromise: Promise<HTMLImageElement | null> = new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(img); img.onerror = () => resolve(null);
+      img.src = '/images/logodt26.png';
+    });
 
-    Promise.all([Promise.all(playerImgPromises), dtImgPromise]).then(([playerImgs, dtImg]) => {
+    Promise.all([Promise.all(playerImgPromises), dtImgPromise, brandLogoPromise]).then(([playerImgs, dtImg, brandLogo]) => {
       // Dibujar los 28 slots en grid 7×4
       grid.forEach((slot, idx) => {
         const row  = Math.floor(idx / COLS);
@@ -567,7 +599,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         } else if (slot === 'DT') {
           drawDT(cardX, cardY, dtImg);
         } else if (slot === 'BRAND') {
-          drawBrand(cardX, cardY);
+          drawBrandWithLogo(cardX, cardY, brandLogo);
         } else {
           const imgIdx = sorted.indexOf(slot);
           drawCard(slot, cardX, cardY, playerImgs[imgIdx] ?? null);
@@ -602,7 +634,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.fillText(footerLine2, CANVAS_W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
       // Compartir
-      const shareText = `🏆 Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\nArmá el tuyo en 👉 https://dt26.win`;
+      const shareText = `🏆 Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\nArmá la tuya en 👉 https://dt26.win`;
       cvs.toBlob(blob => {
         if (!blob) { this.downloadingPlantel = false; return; }
         const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });
@@ -1191,6 +1223,10 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   /** Exportar cancha como imagen PNG con marca DT26 y país + fecha */
   exportingPitch = false;
+
+  scrollToPitch(): void {
+    document.getElementById('pitch-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   exportPitchAsPng(): void {
     if (!this.pitch3dRef) return;
