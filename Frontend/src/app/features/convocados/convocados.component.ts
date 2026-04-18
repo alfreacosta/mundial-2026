@@ -320,6 +320,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     this.downloadingPlantel = true;
 
     const paisNombre = this.pais?.nombre ?? 'Mi Selección';
+    const usuario    = this.currentUsername ?? 'dt26';
     const DPR  = 2;
     const COLS = 7;
     const ROWS = 4;
@@ -329,11 +330,10 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const CARD_H = 170 * DPR;
     const GAP    = 8   * DPR;
     const PAD    = 16  * DPR;
-    const HEADER = 60  * DPR;
-    const FOOTER = 30  * DPR;
+    const HEADER = 64  * DPR;
 
     const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
-    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
+    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + PAD;
 
     // Ordenar: ARQ, DEF, MED, DEL
     const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
@@ -343,11 +343,11 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       return ao !== bo ? ao - bo : a.apellido.localeCompare(b.apellido);
     });
 
-    // Grid plano 28 slots: 26 jugadores + null + DT
-    const grid: Array<typeof sorted[0] | 'DT' | null> = [];
+    // Grid plano 28 slots: 26 jugadores + DT + BRAND
+    const grid: Array<typeof sorted[0] | 'DT' | 'BRAND' | null> = [];
     for (let i = 0; i < 26; i++) grid.push(sorted[i] ?? null);
-    grid.push(null); // slot 27 vacío
-    grid.push('DT'); // slot 28 DT
+    grid.push('DT');    // slot 27
+    grid.push('BRAND'); // slot 28 — celda dt26.win
 
     const cvs = document.createElement('canvas');
     cvs.width  = CANVAS_W;
@@ -375,14 +375,38 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.closePath();
     };
 
-    // Header
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    // ── Header de 3 columnas ─────────────────────────────────────
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
     ctx.fillRect(0, 0, CANVAS_W, HEADER + PAD);
-    ctx.font = `bold ${22 * DPR}px Arial`;
+
+    const headerMidY = (HEADER + PAD) / 2;
+    const sideW = CANVAS_W * 0.28;
+
+    // Izquierda: usuario
+    ctx.font = `bold ${13 * DPR}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`usuario: ${usuario}`, PAD + 4 * DPR, headerMidY);
+
+    // Derecha: www.dt26.win
+    ctx.font = `bold ${13 * DPR}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('www.dt26.win', CANVAS_W - PAD - 4 * DPR, headerMidY);
+
+    // Centro: texto principal (dos líneas si hace falta)
+    const centroText = `Esta es mi lista de convocados de ${paisNombre.toUpperCase()}`;
+    const subText    = 'para el Mundial 2026';
+    ctx.font = `bold ${14 * DPR}px Arial`;
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`${paisNombre.toUpperCase()} · PLANTEL MUNDIAL 2026`, CANVAS_W / 2, (HEADER + PAD) / 2);
+    ctx.fillText(centroText, CANVAS_W / 2, headerMidY - 9 * DPR, CANVAS_W - sideW * 2 - PAD * 4);
+    ctx.font = `${12 * DPR}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText(subText, CANVAS_W / 2, headerMidY + 9 * DPR);
 
     // Función para dibujar slot vacío
     const drawEmpty = (cardX: number, cardY: number) => {
@@ -393,7 +417,6 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.setLineDash([6 * DPR, 4 * DPR]);
       ctx.stroke();
       ctx.restore();
-      // Ícono + persona
       ctx.font = `${28 * DPR}px Arial`;
       ctx.fillStyle = 'rgba(255,255,255,0.07)';
       ctx.textAlign = 'center';
@@ -401,13 +424,13 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.fillText('?', cardX + CARD_W / 2, cardY + CARD_H / 2);
     };
 
-    // Función para dibujar jugador
+    // Función para dibujar jugador (sin borde de color titular — solo estrella)
     const drawCard = (player: (typeof sorted)[0], cardX: number, cardY: number, img: HTMLImageElement | null) => {
       const color = getPosColor(player.posicion?.codigo ?? '');
       drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
       ctx.fillStyle = '#1a2035'; ctx.fill();
-      ctx.strokeStyle = player.titular ? color : 'rgba(255,255,255,0.08)';
-      ctx.lineWidth   = player.titular ? 3 * DPR : 1 * DPR;
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1 * DPR;
       ctx.stroke();
 
       const photoH = Math.round(CARD_H * 0.65);
@@ -435,14 +458,14 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(player.posicion?.codigo ?? '', cardX + 18 * DPR, badgeY + 8 * DPR);
 
-      // Estrella titular arriba-derecha
+      // Estrella titular arriba-derecha (único indicador)
       if (player.titular) {
         ctx.font = `${14 * DPR}px Arial`; ctx.fillStyle = '#fbbf24';
         ctx.textAlign = 'right'; ctx.textBaseline = 'top';
         ctx.fillText('★', cardX + CARD_W - 4 * DPR, cardY + 4 * DPR);
       }
 
-      // Nombre
+      // Nombre (primer apellido)
       const infoY = cardY + photoH + 4 * DPR;
       const apellido = (player.apellido?.split(' ')[0] ?? player.nombre ?? '').toUpperCase();
       ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
@@ -477,7 +500,6 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         ctx.fillText('DT', cardX + CARD_W / 2, cardY + photoH / 2);
       }
       ctx.restore();
-      // Badge DT
       const badgeY = cardY + photoH - 18 * DPR;
       ctx.fillStyle = color;
       drawRoundRect(cardX + 4 * DPR, badgeY, 22 * DPR, 16 * DPR, 4 * DPR);
@@ -485,11 +507,33 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.font = `bold ${9 * DPR}px Arial`; ctx.fillStyle = '#fff';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('DT', cardX + 15 * DPR, badgeY + 8 * DPR);
-      // Nombre DT
       const dtApellido = (this.pais?.dtNombre?.split(' ').pop() ?? 'DT').toUpperCase();
       ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
       ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       ctx.fillText(dtApellido, cardX + CARD_W / 2, cardY + photoH + 4 * DPR, CARD_W - 6 * DPR);
+    };
+
+    // Función para dibujar celda de marca dt26.win
+    const drawBrand = (cardX: number, cardY: number) => {
+      drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+      const grad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + CARD_H);
+      grad.addColorStop(0, '#1e1b4b');
+      grad.addColorStop(1, '#312e81');
+      ctx.fillStyle = grad; ctx.fill();
+      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5 * DPR; ctx.stroke();
+      // Trofeo
+      ctx.font = `${40 * DPR}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🏆', cardX + CARD_W / 2, cardY + CARD_H * 0.38);
+      // Texto www.dt26.win
+      ctx.font = `bold ${11 * DPR}px Arial`;
+      ctx.fillStyle = '#a5b4fc';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('www.dt26.win', cardX + CARD_W / 2, cardY + CARD_H * 0.68);
+      // Subtexto
+      ctx.font = `${9 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(165,180,252,0.55)';
+      ctx.fillText('Mundial 2026', cardX + CARD_W / 2, cardY + CARD_H * 0.80);
     };
 
     // Cargar imágenes de jugadores
@@ -521,20 +565,16 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
           drawEmpty(cardX, cardY);
         } else if (slot === 'DT') {
           drawDT(cardX, cardY, dtImg);
+        } else if (slot === 'BRAND') {
+          drawBrand(cardX, cardY);
         } else {
           const imgIdx = sorted.indexOf(slot);
           drawCard(slot, cardX, cardY, playerImgs[imgIdx] ?? null);
         }
       });
 
-      // Footer
-      ctx.font = `${11 * DPR}px Arial`;
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-      ctx.fillText('dt26.win · Mundial 2026', CANVAS_W / 2, CANVAS_H - 6 * DPR);
-
       // Compartir
-      const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\nArmá el tuyo en 👉 https://dt26.win`;
+      const shareText = `🏆 Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\nArmá el tuyo en 👉 https://dt26.win`;
       cvs.toBlob(blob => {
         if (!blob) { this.downloadingPlantel = false; return; }
         const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });

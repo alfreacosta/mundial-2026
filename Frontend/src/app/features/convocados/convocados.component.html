@@ -183,9 +183,6 @@
             <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
               <mat-icon [style.color]="pg.color">person</mat-icon>
             </div>
-            <span class="jersey-number" *ngIf="player.numeroCamiseta">
-              #{{ player.numeroCamiseta }}
-            </span>
           </div>
 
           <!-- Info del jugador -->
@@ -237,15 +234,31 @@
         <p>Seleccioná titulares desde la pestaña <strong>Convocatoria</strong> usando el botón "Titular".</p>
       </div>
 
-      <!-- Lista plana de titulares (mismo layout que convocatoria) -->
+      <!-- Secciones por posición -->
       <ng-container *ngIf="totalTitulares() > 0">
-        <section class="position-section has-players">
+        <section
+          *ngFor="let pg of positionGroups"
+          class="position-section"
+          [class.has-players]="getTitularesByPos(pg.codigo).length > 0">
 
-          <div class="players-grid">
+          <div class="position-header" [style.--pos-color]="pg.color"
+               *ngIf="getTitularesByPos(pg.codigo).length > 0">
+            <div class="pos-title">
+              <div class="pos-icon-wrap" [style.background-color]="pg.color">
+                <mat-icon>{{ pg.icon }}</mat-icon>
+              </div>
+              <div>
+                <h2>{{ pg.label }}</h2>
+                <p>{{ getTitularesByPos(pg.codigo).length }} titular{{ getTitularesByPos(pg.codigo).length !== 1 ? 'es' : '' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="players-grid" *ngIf="getTitularesByPos(pg.codigo).length > 0">
             <div
-              *ngFor="let player of jugadoresTitulares"
+              *ngFor="let player of getTitularesByPos(pg.codigo)"
               class="player-card selected"
-              [style.--player-color]="getPosColor(player.posicion?.codigo)">
+              [style.--player-color]="pg.color">
 
               <!-- Estrella titular siempre visible -->
               <span class="titular-star-badge">★</span>
@@ -258,12 +271,9 @@
               <!-- Avatar -->
               <div class="player-avatar" (click)="selectPlayer(player)" style="cursor:pointer">
                 <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
-                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="getPosColor(player.posicion?.codigo) + '22'">
-                  <mat-icon [style.color]="getPosColor(player.posicion?.codigo)">person</mat-icon>
+                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="pg.color + '22'">
+                  <mat-icon [style.color]="pg.color">person</mat-icon>
                 </div>
-                <span class="jersey-number" *ngIf="player.numeroCamiseta">
-                  #{{ player.numeroCamiseta }}
-                </span>
               </div>
 
               <!-- Info del jugador -->
@@ -294,6 +304,25 @@
             </div>
           </div>
 
+        </section>
+      </ng-container>
+
+      <!-- Cancha con titulares -->
+      <ng-container *ngIf="totalTitulares() > 0">
+        <section class="pitch-section">
+          <div class="pitch-toolbar"></div>
+          <div class="pitch-canvas-wrap">
+            <app-pitch-3d
+              #pitch3d
+              [players]="jugadoresTitulares"
+              [savedPositions]="savedPositions"
+              [posColorFn]="getPosColor.bind(this)"
+              [dtNombre]="pais?.dtNombre || undefined"
+              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
+              (positionChanged)="on3dPositionChanged($event)"
+              (playerClicked)="onPitchPlayerClicked($event)">
+            </app-pitch-3d>
+          </div>
         </section>
       </ng-container>
 
