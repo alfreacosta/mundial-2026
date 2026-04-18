@@ -474,55 +474,7 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    /* ── Particles container ── */
-    .sidebar-particles {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
 
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0;
-      animation: floatParticle linear infinite;
-    }
-
-    /* Genera variaciones con data-i (1-30) */
-    @for $i from 1 through 30 {
-      .particle[data-i='#{$i}'] {
-        $size: 1.5px + random(3) * 1px;
-        $left: random(100) * 1%;
-        $delay: random(12) * 1s;
-        $dur: 8s + random(10) * 1s;
-        $hue: 185 + random(30);
-
-        width: $size;
-        height: $size;
-        left: $left;
-        bottom: -5%;
-        background: hsl($hue, 80%, 60%);
-        box-shadow: 0 0 #{3px + random(4) * 1px} hsl($hue, 90%, 55%);
-        animation-duration: $dur;
-        animation-delay: $delay;
-      }
-    }
-
-    @keyframes floatParticle {
-      0%   { transform: translateY(0) translateX(0); opacity: 0; }
-      10%  { opacity: 0.7; }
-      50%  { opacity: 0.9; transform: translateY(-50vh) translateX(#{-10 + random(20)}px); }
-      90%  { opacity: 0.4; }
-      100% { transform: translateY(-105vh) translateX(#{-15 + random(30)}px); opacity: 0; }
-    }
-
-    /* Links above particles */
-    .nav-link, .mobile-user-section {
-      position: relative;
-      z-index: 1;
-    }
     
     &.active {
       left: 0;
@@ -531,6 +483,8 @@
     .nav-link {
       justify-content: flex-start;
       padding: 14px 16px;
+      width: fit-content;
+      min-width: unset;
       
       span {
         display: inline;

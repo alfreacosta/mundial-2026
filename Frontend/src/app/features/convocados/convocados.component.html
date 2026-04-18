@@ -276,7 +276,8 @@
                   <div class="figurita"
                        *ngFor="let player of getConvocadosByPos(pg.codigo)"
                        [class.titular]="player.titular"
-                       [style.--pos-color]="pg.color">
+                       [style.--pos-color]="pg.color"
+                       (click)="selectFigurita(player)">
 
                     <!-- Foto del jugador -->
                     <div class="fig-photo">
@@ -287,7 +288,7 @@
                     </div>
 
                     <!-- Info del jugador -->
-                    <div class="fig-info" (click)="selectFigurita(player)" style="cursor:pointer">
+                    <div class="fig-info">
                       <span class="fig-pos-abr">{{ player.posicion?.codigo }}</span>
                       <span class="fig-name">{{ player.apellido | uppercase }}</span>
                       <span class="fig-club" *ngIf="player.club">{{ player.club.nombre }}</span>

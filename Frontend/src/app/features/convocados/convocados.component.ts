@@ -708,7 +708,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   /** Columnas del grid de figuritas según posición: ARQ=6, resto=7 */
   getFigCols(codigo: string): number {
-    return codigo === 'ARQ' ? 6 : 7;
+    return 5;
   }
 
   /** Convocados + titulares de una posición (para el álbum del plantel) */
