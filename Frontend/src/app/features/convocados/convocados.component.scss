@@ -1876,6 +1876,16 @@ $save-bar-height: 72px;
     z-index: 2;
   }
 
+  // Cuando está seleccionada: overflow visible para que los botones no queden cortados
+  &.selected {
+    overflow: visible;
+    z-index: 10;
+    // Mantener border-radius en la foto para que se vea bien
+    .fig-photo {
+      border-radius: 6px 6px 0 0;
+    }
+  }
+
   // Borde coloreado para titulares — más grueso
   &.titular {
     border: 2.5px solid color-mix(in srgb, var(--pos-color) 80%, #fff);

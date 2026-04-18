@@ -287,6 +287,7 @@
                 @else {
                   <div class="figurita"
                        [class.titular]="slot.titular"
+                       [class.selected]="figuritaSeleccionada === slot.internalId"
                        [style.--pos-color]="getPosColor(slot.posicion?.codigo)"
                        (click)="selectFigurita(slot)">
                     <div class="fig-photo">

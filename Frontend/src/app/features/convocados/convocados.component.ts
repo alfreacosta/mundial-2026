@@ -238,7 +238,16 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   figuritaSeleccionada: number | null = null;
 
   selectFigurita(player: JugadorSeleccionable): void {
-    this.figuritaSeleccionada = this.figuritaSeleccionada === player.internalId ? null : player.internalId;
+    if (this.figuritaSeleccionada === player.internalId) {
+      this.figuritaSeleccionada = null;
+    } else {
+      this.figuritaSeleccionada = player.internalId;
+      // Scroll suave hacia la figurita seleccionada
+      setTimeout(() => {
+        const el = document.querySelector('.figurita.selected');
+        el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }, 50);
+    }
   }
 
   compartirPlantel(): void {
