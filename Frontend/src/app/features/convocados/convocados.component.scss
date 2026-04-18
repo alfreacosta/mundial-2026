@@ -1832,7 +1832,7 @@ $save-bar-height: 72px;
   flex-shrink: 0;
   position: relative;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  cursor: default;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-3px) scale(1.04);
@@ -1848,6 +1848,7 @@ $save-bar-height: 72px;
 }
 
 // Franja superior coloreada
+// Franja superior — solo visible en figurita DT (fig-top-bar sin estrella en jugadores)
 .fig-top-bar {
   background: var(--pos-color);
   padding: 3px 6px;
@@ -1863,16 +1864,53 @@ $save-bar-height: 72px;
     letter-spacing: 0.02em;
     text-shadow: 0 1px 2px rgba(0,0,0,0.4);
   }
+}
 
-  .fig-star {
-    font-size: 0.7rem;
-    color: #FFD700;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  }
+// ── Botones de acción en figurita (Titular / Stats) ─────
+.fig-actions {
+  display: flex;
+  gap: 4px;
+  padding: 4px 4px 5px;
+  background: rgba(0,0,0,0.3);
+  justify-content: stretch;
+}
 
-  .fig-star-solo {
-    margin: 0 auto;
+.fig-btn {
+  flex: 1;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: opacity 0.15s;
+  letter-spacing: 0.02em;
+
+  &:hover { opacity: 0.85; }
+
+  mat-icon { font-size: 10px; width: 10px; height: 10px; }
+}
+
+.fig-btn-titular {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+
+  &.active {
+    background: color-mix(in srgb, var(--pos-color) 25%, transparent);
+    border-color: var(--pos-color);
+    color: var(--pos-color);
   }
+}
+
+.fig-btn-stats {
+  background: rgba(99,102,241,0.15);
+  border: 1px solid rgba(99,102,241,0.3);
+  color: #a5b4fc;
 }
 
 // Zona de la foto

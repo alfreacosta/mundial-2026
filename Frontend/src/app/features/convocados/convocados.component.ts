@@ -234,6 +234,13 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   downloadingPlantel = false;
 
+  // ── Figurita seleccionada (para mostrar botones Titular/Stats) ──
+  figuritaSeleccionada: number | null = null;
+
+  selectFigurita(player: JugadorSeleccionable): void {
+    this.figuritaSeleccionada = this.figuritaSeleccionada === player.internalId ? null : player.internalId;
+  }
+
   compartirPlantel(): void {
     const el = document.getElementById('plantel-album');
     if (!el) {
@@ -296,6 +303,252 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     link.href = canvas.toDataURL('image/png');
     link.click();
   }
+
+  /** Genera imagen con 26 jugadores en cuadrícula 7-7-7-6 + DT */
+  compartirPlantelGrid(): void {
+    const todos = this.jugadoresSeleccionados;
+    if (todos.length === 0) return;
+    this.downloadingPlantel = true;
+
+    const paisNombre = this.pais?.nombre ?? 'Mi Selección';
+    const DPR = 2;
+
+    // Dimensiones por figurita
+    const CARD_W = 120 * DPR;
+    const CARD_H = 170 * DPR;
+    const GAP    = 8  * DPR;
+    const COLS   = 7;
+    const PAD    = 16 * DPR;
+    const HEADER = 60 * DPR;
+    const FOOTER = 30 * DPR;
+
+    // Ordenar: ARQ, DEF, MED, DEL
+    const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
+    const sorted = [...todos].sort((a, b) => {
+      const ao = POS_ORDER[a.posicion?.codigo ?? ''] ?? 4;
+      const bo = POS_ORDER[b.posicion?.codigo ?? ''] ?? 4;
+      return ao !== bo ? ao - bo : a.apellido.localeCompare(b.apellido);
+    });
+
+    // Dividir en filas de 7-7-7-6 (+ DT al final)
+    const chunks: JugadorSeleccionable[][] = [];
+    let i = 0;
+    const limits = [7, 7, 7, 6];
+    for (const limit of limits) {
+      const slice = sorted.slice(i, i + limit);
+      if (slice.length > 0) chunks.push(slice);
+      i += limit;
+    }
+    if (this.pais?.dtNombre) chunks.push([]); // placeholder para fila DT
+
+    const ROWS = chunks.length;
+    const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
+    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
+
+    const cvs = document.createElement('canvas');
+    cvs.width  = CANVAS_W;
+    cvs.height = CANVAS_H;
+    const ctx  = cvs.getContext('2d')!;
+
+    // Colores de pos
+    const POS_COLOR: Record<string, string> = { ARQ: '#f59e0b', DEF: '#3b82f6', MED: '#10b981', DEL: '#ef4444' };
+    const getPosColor = (code: string) => POS_COLOR[code] ?? '#94a3b8';
+
+    // ── Fondo ──────────────────────────────────────────────────────
+    const bg = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
+    bg.addColorStop(0, '#0a0e17');
+    bg.addColorStop(1, '#111827');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    const drawRoundRect = (x: number, y: number, w: number, h: number, r: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+      ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+      ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+      ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+      ctx.closePath();
+    };
+
+    // ── Header ─────────────────────────────────────────────────────
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(0, 0, CANVAS_W, HEADER + PAD);
+    ctx.font = `bold ${22 * DPR}px Arial`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${paisNombre.toUpperCase()} · PLANTEL MUNDIAL 2026`, CANVAS_W / 2, (HEADER + PAD) / 2);
+
+    const drawCard = (player: JugadorSeleccionable, cardX: number, cardY: number, img: HTMLImageElement | null) => {
+      const color = getPosColor(player.posicion?.codigo ?? '');
+      // Fondo card
+      drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+      ctx.fillStyle = '#1a2035';
+      ctx.fill();
+      // Borde
+      ctx.strokeStyle = player.titular ? color : 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = player.titular ? 2 * DPR : 1 * DPR;
+      ctx.stroke();
+
+      // Foto
+      const photoH = Math.round(CARD_H * 0.65);
+      const photoY = cardY;
+      ctx.save();
+      drawRoundRect(cardX, photoY, CARD_W, photoH, 6 * DPR);
+      ctx.clip();
+      if (img) {
+        const scale = CARD_W / img.naturalWidth;
+        const drawH = img.naturalHeight * scale;
+        const dy    = drawH > photoH ? -(drawH - photoH) * 0.15 : 0;
+        ctx.drawImage(img, cardX, photoY + dy, CARD_W, drawH);
+      } else {
+        ctx.fillStyle = color + '33';
+        ctx.fillRect(cardX, photoY, CARD_W, photoH);
+        ctx.font = `bold ${36 * DPR}px Arial`;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((player.apellido || '?').charAt(0).toUpperCase(), cardX + CARD_W / 2, photoY + photoH / 2);
+      }
+      ctx.restore();
+
+      // Badge posición
+      const badgeY = photoY + photoH - 18 * DPR;
+      ctx.fillStyle = color;
+      drawRoundRect(cardX + 4 * DPR, badgeY, 28 * DPR, 16 * DPR, 4 * DPR);
+      ctx.fill();
+      ctx.font = `bold ${9 * DPR}px Arial`;
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(player.posicion?.codigo ?? '', cardX + 4 * DPR + 14 * DPR, badgeY + 8 * DPR);
+
+      // Estrella titular
+      if (player.titular) {
+        ctx.font = `${12 * DPR}px Arial`;
+        ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = 'right';
+        ctx.fillText('★', cardX + CARD_W - 4 * DPR, badgeY + 8 * DPR);
+      }
+
+      // Info nombre
+      const infoY = cardY + photoH + 4 * DPR;
+      ctx.font = `bold ${10 * DPR}px Arial`;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const apellido = (player.apellido?.split(' ')[0] ?? player.nombre ?? '').toUpperCase();
+      ctx.fillText(apellido, cardX + CARD_W / 2, infoY, CARD_W - 4 * DPR);
+
+      // Club
+      if (player.club?.nombre) {
+        ctx.font = `${8 * DPR}px Arial`;
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText(player.club.nombre, cardX + CARD_W / 2, infoY + 12 * DPR, CARD_W - 4 * DPR);
+      }
+    };
+
+    // ── Cargar todas las imágenes y luego dibujar ──────────────────
+    const allPlayers = sorted;
+    const imagePromises = allPlayers.map(p => {
+      if (!p.urlFoto) return Promise.resolve<HTMLImageElement | null>(null);
+      return new Promise<HTMLImageElement | null>(resolve => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload  = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = p.urlFoto!;
+      });
+    });
+
+    // DT imagen
+    let dtImgPromise: Promise<HTMLImageElement | null> = Promise.resolve(null);
+    if (this.pais?.dtFotoUrl) {
+      dtImgPromise = new Promise(resolve => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload  = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = this.pais!.dtFotoUrl!;
+      });
+    }
+
+    Promise.all([Promise.all(imagePromises), dtImgPromise]).then(([images, dtImg]) => {
+      // Dibujar filas de jugadores
+      let pIdx = 0;
+      chunks.forEach((chunk, rowIdx) => {
+        if (chunk.length === 0 && this.pais?.dtNombre) {
+          // Fila del DT centrada
+          const cardX = PAD + Math.floor(COLS / 2) * (CARD_W + GAP) - (CARD_W + GAP) / 2;
+          const cardY = PAD + HEADER + rowIdx * (CARD_H + GAP);
+          // DT como figurita especial
+          const color = '#6366f1';
+          drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+          ctx.fillStyle = '#1a2035'; ctx.fill();
+          ctx.strokeStyle = color; ctx.lineWidth = 2 * DPR; ctx.stroke();
+          const photoH = Math.round(CARD_H * 0.65);
+          ctx.save();
+          drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
+          if (dtImg) {
+            const scale = CARD_W / dtImg.naturalWidth;
+            ctx.drawImage(dtImg, cardX, cardY, CARD_W, dtImg.naturalHeight * scale);
+          } else {
+            ctx.fillStyle = color + '33'; ctx.fillRect(cardX, cardY, CARD_W, photoH);
+            ctx.font = `bold ${36 * DPR}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('DT', cardX + CARD_W / 2, cardY + photoH / 2);
+          }
+          ctx.restore();
+          ctx.fillStyle = color;
+          drawRoundRect(cardX + 4 * DPR, cardY + photoH - 18 * DPR, 22 * DPR, 16 * DPR, 4 * DPR);
+          ctx.fill();
+          ctx.font = `bold ${9 * DPR}px Arial`; ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('DT', cardX + 4 * DPR + 11 * DPR, cardY + photoH - 10 * DPR);
+          ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          const dtApellido = (this.pais!.dtNombre!.split(' ').pop() ?? 'DT').toUpperCase();
+          ctx.fillText(dtApellido, cardX + CARD_W / 2, cardY + photoH + 4 * DPR, CARD_W - 4 * DPR);
+          return;
+        }
+        const rowStart = PAD + HEADER + rowIdx * (CARD_H + GAP);
+        const rowWidth = chunk.length * CARD_W + (chunk.length - 1) * GAP;
+        const offsetX  = PAD + Math.floor((COLS * CARD_W + (COLS - 1) * GAP - rowWidth) / 2);
+        chunk.forEach((player, colIdx) => {
+          const cardX = offsetX + colIdx * (CARD_W + GAP);
+          const img   = images[pIdx++];
+          drawCard(player, cardX, rowStart, img);
+        });
+      });
+
+      // Footer watermark
+      ctx.font = `${11 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('dt26.win · Mundial 2026', CANVAS_W / 2, CANVAS_H - 6 * DPR);
+
+      // Compartir
+      const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\nArmá el tuyo en 👉 https://dt26.win`;
+      cvs.toBlob(blob => {
+        if (!blob) { this.downloadingPlantel = false; return; }
+        const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          navigator.share({ files: [file], title: `Mi Plantel - ${paisNombre}`, text: shareText })
+            .catch(() => this.downloadPlantelCanvas(cvs, paisNombre))
+            .finally(() => { this.downloadingPlantel = false; });
+        } else {
+          this.downloadPlantelCanvas(cvs, paisNombre);
+          this.downloadingPlantel = false;
+        }
+      }, 'image/png');
+    }).catch(() => {
+      this.snackBar.open('Error generando imagen.', '', { duration: 3000, panelClass: 'snack-error' });
+      this.downloadingPlantel = false;
+    });
+  }
+
 
   // Stats panel
   selectedPlayer = signal<JugadorSeleccionable | null>(null);

@@ -237,28 +237,7 @@
         <p>Seleccioná titulares desde la pestaña <strong>Convocatoria</strong> usando el botón "Titular".</p>
       </div>
 
-      <!-- Cancha con titulares -->
-      <ng-container *ngIf="totalTitulares() > 0">
-        <section class="pitch-section">
-          <div class="pitch-toolbar">
-          </div>
-          <div class="pitch-canvas-wrap">
-            <app-pitch-3d
-              #pitch3d
-              [players]="jugadoresTitulares"
-              [savedPositions]="savedPositions"
-              [posColorFn]="getPosColor.bind(this)"
-              [dtNombre]="pais?.dtNombre || undefined"
-              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
-              (positionChanged)="on3dPositionChanged($event)"
-              (playerClicked)="onPitchPlayerClicked($event)">
-            </app-pitch-3d>
-            <!-- DT eliminado del HTML: se dibuja directamente en el canvas -->
-          </div>
-        </section>
-      </ng-container>
-
-      <!-- ═══ PLANTEL ALBUM (debajo de la cancha) ═══ -->
+      <!-- ═══ PLANTEL ALBUM (arriba de la cancha) ═══ -->
       <ng-container *ngIf="jugadoresSeleccionados.length > 0">
         <section class="plantel-album-section">
 
@@ -299,11 +278,6 @@
                        [class.titular]="player.titular"
                        [style.--pos-color]="pg.color">
 
-                    <!-- Franja superior -->
-                    <div class="fig-top-bar">
-                      <span class="fig-star fig-star-solo" *ngIf="player.titular" title="Titular">★</span>
-                    </div>
-
                     <!-- Foto del jugador -->
                     <div class="fig-photo">
                       <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.apellido" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
@@ -313,11 +287,28 @@
                     </div>
 
                     <!-- Info del jugador -->
-                    <div class="fig-info">
+                    <div class="fig-info" (click)="selectFigurita(player)" style="cursor:pointer">
                       <span class="fig-pos-abr">{{ player.posicion?.codigo }}</span>
                       <span class="fig-name">{{ player.apellido | uppercase }}</span>
                       <span class="fig-club" *ngIf="player.club">{{ player.club.nombre }}</span>
                     </div>
+
+                    <!-- Botones al seleccionar figurita -->
+                    @if (figuritaSeleccionada === player.internalId) {
+                      <div class="fig-actions">
+                        <button class="fig-btn fig-btn-titular"
+                          [class.active]="player.titular"
+                          [style.--pos-color]="'var(--pos-color)'"
+                          (click)="$event.stopPropagation(); toggleTitular(player)">
+                          {{ player.titular ? '★ Titular' : '☆ Titular' }}
+                        </button>
+                        <button class="fig-btn fig-btn-stats"
+                          (click)="$event.stopPropagation(); selectPlayer(player)">
+                          <mat-icon style="font-size:12px;width:12px;height:12px">bar_chart</mat-icon>
+                          Stats
+                        </button>
+                      </div>
+                    }
 
                   </div>
                 </div>
@@ -353,15 +344,27 @@
               </div>
             </div>
 
-            <!-- Botón compartir al pie del album -->
-            <div class="plantel-share-footer">
-              <button class="plantel-share-btn" (click)="compartirPlantel()" [disabled]="downloadingPlantel"
-                      [style.--flag-primary]="getFlagColors().primary">
-                <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'share' }}</mat-icon>
-                {{ downloadingPlantel ? 'Generando imagen…' : 'Compartir Plantel' }}
-              </button>
-            </div>
+          </div>
+        </section>
+      </ng-container>
 
+      <!-- Cancha con titulares —— DEBAJO del plantel -->
+      <ng-container *ngIf="totalTitulares() > 0">
+        <section class="pitch-section">
+          <div class="pitch-toolbar">
+          </div>
+          <div class="pitch-canvas-wrap">
+            <app-pitch-3d
+              #pitch3d
+              [players]="jugadoresTitulares"
+              [savedPositions]="savedPositions"
+              [posColorFn]="getPosColor.bind(this)"
+              [dtNombre]="pais?.dtNombre || undefined"
+              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
+              (positionChanged)="on3dPositionChanged($event)"
+              (playerClicked)="onPitchPlayerClicked($event)">
+            </app-pitch-3d>
+            <!-- DT eliminado del HTML: se dibuja directamente en el canvas -->
           </div>
         </section>
       </ng-container>
@@ -477,7 +480,7 @@
             [disabled]="exportingPitch"
             (click)="exportPitchAsPng()">
             <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
-            {{ exportingPitch ? 'Exportando…' : 'Compartir PNG' }}
+            {{ exportingPitch ? 'Exportando…' : 'Compartir Titulares' }}
           </button>
         </ng-container>
         <ng-template #convActions>
@@ -490,8 +493,16 @@
             class="clear-btn"
             [disabled]="totalSel() === 0 && totalNoVa() === 0"
             (click)="clearAll()">
-            <mat-icon>clear_all</mat-icon>
-            Limpiar
+            <mat-icon>restart_alt</mat-icon>
+            Reiniciar
+          </button>
+          <button
+            mat-stroked-button
+            class="export-btn"
+            [disabled]="downloadingPlantel || jugadoresSeleccionados.length === 0"
+            (click)="compartirPlantelGrid()">
+            <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'share' }}</mat-icon>
+            {{ downloadingPlantel ? 'Generando…' : 'Compartir Plantel' }}
           </button>
         </ng-template>
       </div>
