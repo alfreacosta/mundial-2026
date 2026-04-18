@@ -295,7 +295,7 @@
                     </div>
                     <div class="fig-info">
                       <span class="fig-pos-abr">{{ slot.posicion?.codigo }}</span>
-                      <span class="fig-name">{{ (slot.apellido?.split(' ')[0] || slot.apellido || '') | uppercase }}</span>
+                      <span class="fig-name">{{ (slot.apellido || '').split(' ')[0] | uppercase }}</span>
                       <span class="fig-club" *ngIf="slot.club">{{ slot.club.nombre }}</span>
                     </div>
                     @if (slot.titular) {
