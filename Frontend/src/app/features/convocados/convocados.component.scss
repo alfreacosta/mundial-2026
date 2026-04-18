@@ -1707,9 +1707,8 @@ $save-bar-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 12px 16px;
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--flag-primary) 40%, #0a0e17) 0%,
@@ -1717,41 +1716,78 @@ $save-bar-height: 72px;
   );
   border-bottom: 1px solid $dark-border;
 
-  .plantel-album-title-group {
+  .plantel-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .plantel-country-logo {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
   }
 
-  .plantel-album-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: #fff;
-    text-transform: uppercase;
+  .plantel-header-texts {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
   }
 
-  .plantel-album-subtitle {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.65);
-    display: block;
-    margin-top: 2px;
+  .plantel-header-user {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .plantel-header-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    strong { color: color-mix(in srgb, var(--flag-primary) 80%, #fff); }
+  }
+
+  .plantel-header-url {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
   }
 }
 
 // ── Grid de figuritas ───────────────────────────────────
 .plantel-album-grid {
-  padding: 20px 16px 24px;
+  padding: 16px 12px 20px;
   background: $dark-surface;
   position: relative;
+}
+
+// Grid plano 7×4 fijo
+.plantel-flat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+// Slot vacío (jugador no elegido aún)
+.fig-empty-slot {
+  aspect-ratio: 110 / 170;
+  border-radius: 8px;
+  border: 1.5px dashed rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: rgba(255,255,255,0.1);
+  }
 }
 
 // Marca de agua interna (sólo visible al exportar con html2canvas)
@@ -1840,11 +1876,24 @@ $save-bar-height: 72px;
     z-index: 2;
   }
 
-  // Borde dorado para titulares
+  // Borde coloreado para titulares — más grueso
   &.titular {
-    border-color: color-mix(in srgb, var(--pos-color) 70%, #fff);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--pos-color) 50%, transparent), 0 4px 12px rgba(0,0,0,0.5);
+    border: 2.5px solid color-mix(in srgb, var(--pos-color) 80%, #fff);
+    box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--pos-color) 40%, transparent), 0 4px 12px rgba(0,0,0,0.5);
   }
+}
+
+// Estrella titular arriba-derecha
+.fig-star-titular {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: 0.75rem;
+  color: #fbbf24;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  pointer-events: none;
+  z-index: 3;
+  line-height: 1;
 }
 
 // Franja superior coloreada
@@ -1958,7 +2007,7 @@ $save-bar-height: 72px;
     color-mix(in srgb, var(--pos-color) 35%, #0a0e17) 0%,
     #0a0e17 100%
   );
-  padding: 4px 5px 5px;
+  padding: 4px 5px 4px;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -1972,7 +2021,7 @@ $save-bar-height: 72px;
   }
 
   .fig-name {
-    font-size: 0.68rem;
+    font-size: 0.6rem;
     font-weight: 800;
     color: #fff;
     letter-spacing: 0.02em;
@@ -2083,6 +2132,7 @@ $save-bar-height: 72px;
   }
 
   .fig-photo {
+    aspect-ratio: 4 / 3;  // foto DT más chica
     background: linear-gradient(180deg, rgba(99,102,241,0.3) 0%, $dark-surface-2 100%);
   }
 

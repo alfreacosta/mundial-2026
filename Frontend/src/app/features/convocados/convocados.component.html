@@ -243,106 +243,83 @@
 
           <!-- Header del plantel -->
           <div class="plantel-album-header" [style.--flag-primary]="getFlagColors().primary" [style.--flag-secondary]="getFlagColors().secondary">
-            <div class="plantel-album-title-group">
+            <div class="plantel-header-left">
               <img *ngIf="getLogoUrl()" [src]="getLogoUrl()" [alt]="pais?.nombre" class="plantel-country-logo">
-              <div>
-                <h2 class="plantel-album-title">PLANTEL COMPLETO</h2>
-                <span class="plantel-album-subtitle">{{ pais?.nombre }} · {{ jugadoresSeleccionados.length }} jugadores<ng-container *ngIf="pais?.dtNombre"> + DT</ng-container></span>
+              <div class="plantel-header-texts">
+                <span class="plantel-header-user">{{ currentUsername }}</span>
+                <span class="plantel-header-title">Mis convocados · <strong>{{ pais?.nombre }}</strong></span>
               </div>
             </div>
-
+            <span class="plantel-header-url">www.dt26.win</span>
           </div>
 
-          <!-- Grid de figuritas -->
+          <!-- Grid de figuritas 7×4 fijo -->
           <div class="plantel-album-grid" id="plantel-album"
                [style.--flag-primary]="getFlagColors().primary"
                [style.--flag-secondary]="getFlagColors().secondary">
 
-            <!-- Marca de agua del plantel para la descarga -->
-            <div class="plantel-watermark">
-              <img *ngIf="getLogoUrl()" [src]="getLogoUrl()" [alt]="pais?.nombre" class="plantel-wm-logo">
-              <span class="plantel-wm-name">{{ pais?.nombre | uppercase }}</span>
-              <span class="plantel-wm-app">dt26.win</span>
-            </div>
+            <div class="plantel-flat-grid">
+              @for (slot of getPlantelGrid(); track $index) {
 
-            <!-- Figuritas por grupo de posición -->
-            <ng-container *ngFor="let pg of positionGroups">
-              <div class="plantel-pos-row" *ngIf="getConvocadosByPos(pg.codigo).length > 0">
-                <div class="plantel-pos-badge" [style.background-color]="pg.color">
-                  <mat-icon>{{ pg.icon }}</mat-icon>
-                  <span>{{ pg.label }}</span>
-                </div>
-                <div class="figuritas-row" [style.--fig-cols]="getFigCols(pg.codigo)">
-                  <div class="figurita"
-                       *ngFor="let player of getConvocadosByPos(pg.codigo)"
-                       [class.titular]="player.titular"
-                       [style.--pos-color]="pg.color"
-                       (click)="selectFigurita(player)">
+                <!-- Slot vacío -->
+                @if (slot === null) {
+                  <div class="fig-empty-slot">
+                    <mat-icon>person_add</mat-icon>
+                  </div>
+                }
 
-                    <!-- Foto del jugador -->
+                <!-- Slot DT (último, posición 28) -->
+                @else if (slot === 'DT') {
+                  <div class="figurita figurita-dt" [style.--pos-color]="'#6366f1'">
+                    <div class="fig-top-bar"><span class="fig-number">DT</span></div>
                     <div class="fig-photo">
-                      <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.apellido" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
-                      <div *ngIf="!player.urlFoto" class="fig-no-photo">
-                        <mat-icon>person</mat-icon>
-                      </div>
+                      <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
+                      <div *ngIf="!pais?.dtFotoUrl" class="fig-no-photo"><mat-icon>manage_accounts</mat-icon></div>
                     </div>
-
-                    <!-- Info del jugador -->
                     <div class="fig-info">
-                      <span class="fig-pos-abr">{{ player.posicion?.codigo }}</span>
-                      <span class="fig-name">{{ player.apellido | uppercase }}</span>
-                      <span class="fig-club" *ngIf="player.club">{{ player.club.nombre }}</span>
+                      <span class="fig-pos-abr">DT</span>
+                      <span class="fig-name">{{ (pais?.dtNombre?.split(' ')?.pop()) | uppercase }}</span>
                     </div>
+                  </div>
+                }
 
-                    <!-- Botones al seleccionar figurita -->
-                    @if (figuritaSeleccionada === player.internalId) {
+                <!-- Figurita de jugador -->
+                @else {
+                  <div class="figurita"
+                       [class.titular]="slot.titular"
+                       [style.--pos-color]="getPosColor(slot.posicion?.codigo)"
+                       (click)="selectFigurita(slot)">
+                    <div class="fig-photo">
+                      <img *ngIf="slot.urlFoto" [src]="slot.urlFoto" [alt]="slot.apellido" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
+                      <div *ngIf="!slot.urlFoto" class="fig-no-photo"><mat-icon>person</mat-icon></div>
+                    </div>
+                    <div class="fig-info">
+                      <span class="fig-pos-abr">{{ slot.posicion?.codigo }}</span>
+                      <span class="fig-name">{{ (slot.apellido?.split(' ')[0]) | uppercase }}</span>
+                      <span class="fig-club" *ngIf="slot.club">{{ slot.club.nombre }}</span>
+                    </div>
+                    @if (slot.titular) {
+                      <span class="fig-star-titular">★</span>
+                    }
+                    @if (figuritaSeleccionada === slot.internalId) {
                       <div class="fig-actions">
                         <button class="fig-btn fig-btn-titular"
-                          [class.active]="player.titular"
+                          [class.active]="slot.titular"
                           [style.--pos-color]="'var(--pos-color)'"
-                          (click)="$event.stopPropagation(); toggleTitular(player)">
-                          {{ player.titular ? '★ Titular' : '☆ Titular' }}
+                          (click)="$event.stopPropagation(); toggleTitular(slot)">
+                          {{ slot.titular ? '★ Titular' : '☆ Titular' }}
                         </button>
                         <button class="fig-btn fig-btn-stats"
-                          (click)="$event.stopPropagation(); selectPlayer(player)">
+                          (click)="$event.stopPropagation(); selectPlayer(slot)">
                           <mat-icon style="font-size:12px;width:12px;height:12px">bar_chart</mat-icon>
                           Stats
                         </button>
                       </div>
                     }
+                  </div>
+                }
 
-                  </div>
-                </div>
-              </div>
-            </ng-container>
-
-            <!-- Técnico / DT -->
-            <div class="plantel-pos-row" *ngIf="pais?.dtNombre">
-              <div class="plantel-pos-badge plantel-pos-badge-dt">
-                <mat-icon>sports</mat-icon>
-                <span>Director Técnico</span>
-              </div>
-              <div class="figuritas-row" [style.--fig-cols]="1">
-                <div class="figurita figurita-dt" [style.--pos-color]="'#6366f1'">
-                  <!-- Franja DT -->
-                  <div class="fig-top-bar">
-                    <span class="fig-number">DT</span>
-                  </div>
-                  <!-- Foto DT -->
-                  <div class="fig-photo">
-                    <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
-                    <div *ngIf="!pais?.dtFotoUrl" class="fig-no-photo">
-                      <mat-icon>manage_accounts</mat-icon>
-                    </div>
-                  </div>
-                  <!-- Info DT -->
-                  <div class="fig-info">
-                    <span class="fig-pos-abr">DT</span>
-                    <span class="fig-name">{{ (pais!.dtNombre!.split(' ').pop()) | uppercase }}</span>
-                    <span class="fig-club">{{ pais!.dtNombre }}</span>
-                  </div>
-                </div>
-              </div>
+              }
             </div>
 
           </div>

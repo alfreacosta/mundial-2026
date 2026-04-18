@@ -304,23 +304,27 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     link.click();
   }
 
-  /** Genera imagen con 26 jugadores en cuadrícula 7-7-7-6 + DT */
+  /** Genera imagen con grid plano 7×4: 26 jugadores + 1 vacío + DT */
   compartirPlantelGrid(): void {
     const todos = this.jugadoresSeleccionados;
     if (todos.length === 0) return;
     this.downloadingPlantel = true;
 
     const paisNombre = this.pais?.nombre ?? 'Mi Selección';
-    const DPR = 2;
+    const DPR  = 2;
+    const COLS = 7;
+    const ROWS = 4;
 
     // Dimensiones por figurita
     const CARD_W = 120 * DPR;
     const CARD_H = 170 * DPR;
-    const GAP    = 8  * DPR;
-    const COLS   = 7;
-    const PAD    = 16 * DPR;
-    const HEADER = 60 * DPR;
-    const FOOTER = 30 * DPR;
+    const GAP    = 8   * DPR;
+    const PAD    = 16  * DPR;
+    const HEADER = 60  * DPR;
+    const FOOTER = 30  * DPR;
+
+    const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
+    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
 
     // Ordenar: ARQ, DEF, MED, DEL
     const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
@@ -330,20 +334,11 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       return ao !== bo ? ao - bo : a.apellido.localeCompare(b.apellido);
     });
 
-    // Dividir en filas de 7-7-7-6 (+ DT al final)
-    const chunks: JugadorSeleccionable[][] = [];
-    let i = 0;
-    const limits = [7, 7, 7, 6];
-    for (const limit of limits) {
-      const slice = sorted.slice(i, i + limit);
-      if (slice.length > 0) chunks.push(slice);
-      i += limit;
-    }
-    if (this.pais?.dtNombre) chunks.push([]); // placeholder para fila DT
-
-    const ROWS = chunks.length;
-    const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
-    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + FOOTER;
+    // Grid plano 28 slots: 26 jugadores + null + DT
+    const grid: Array<typeof sorted[0] | 'DT' | null> = [];
+    for (let i = 0; i < 26; i++) grid.push(sorted[i] ?? null);
+    grid.push(null); // slot 27 vacío
+    grid.push('DT'); // slot 28 DT
 
     const cvs = document.createElement('canvas');
     cvs.width  = CANVAS_W;
@@ -354,7 +349,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const POS_COLOR: Record<string, string> = { ARQ: '#f59e0b', DEF: '#3b82f6', MED: '#10b981', DEL: '#ef4444' };
     const getPosColor = (code: string) => POS_COLOR[code] ?? '#94a3b8';
 
-    // ── Fondo ──────────────────────────────────────────────────────
+    // Fondo
     const bg = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
     bg.addColorStop(0, '#0a0e17');
     bg.addColorStop(1, '#111827');
@@ -364,14 +359,14 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const drawRoundRect = (x: number, y: number, w: number, h: number, r: number) => {
       ctx.beginPath();
       ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+      ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y,     x + w, y + r,     r);
       ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-      ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
-      ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+      ctx.lineTo(x + r, y + h); ctx.arcTo(x,     y + h, x,     y + h - r, r);
+      ctx.lineTo(x, y + r);     ctx.arcTo(x,     y,     x + r, y,         r);
       ctx.closePath();
     };
 
-    // ── Header ─────────────────────────────────────────────────────
+    // Header
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
     ctx.fillRect(0, 0, CANVAS_W, HEADER + PAD);
     ctx.font = `bold ${22 * DPR}px Arial`;
@@ -380,153 +375,153 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     ctx.textBaseline = 'middle';
     ctx.fillText(`${paisNombre.toUpperCase()} · PLANTEL MUNDIAL 2026`, CANVAS_W / 2, (HEADER + PAD) / 2);
 
-    const drawCard = (player: JugadorSeleccionable, cardX: number, cardY: number, img: HTMLImageElement | null) => {
-      const color = getPosColor(player.posicion?.codigo ?? '');
-      // Fondo card
+    // Función para dibujar slot vacío
+    const drawEmpty = (cardX: number, cardY: number) => {
+      ctx.save();
       drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
-      ctx.fillStyle = '#1a2035';
-      ctx.fill();
-      // Borde
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1.5 * DPR;
+      ctx.setLineDash([6 * DPR, 4 * DPR]);
+      ctx.stroke();
+      ctx.restore();
+      // Ícono + persona
+      ctx.font = `${28 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.07)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', cardX + CARD_W / 2, cardY + CARD_H / 2);
+    };
+
+    // Función para dibujar jugador
+    const drawCard = (player: (typeof sorted)[0], cardX: number, cardY: number, img: HTMLImageElement | null) => {
+      const color = getPosColor(player.posicion?.codigo ?? '');
+      drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+      ctx.fillStyle = '#1a2035'; ctx.fill();
       ctx.strokeStyle = player.titular ? color : 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = player.titular ? 2 * DPR : 1 * DPR;
+      ctx.lineWidth   = player.titular ? 3 * DPR : 1 * DPR;
       ctx.stroke();
 
-      // Foto
       const photoH = Math.round(CARD_H * 0.65);
-      const photoY = cardY;
       ctx.save();
-      drawRoundRect(cardX, photoY, CARD_W, photoH, 6 * DPR);
-      ctx.clip();
+      drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
       if (img) {
         const scale = CARD_W / img.naturalWidth;
         const drawH = img.naturalHeight * scale;
         const dy    = drawH > photoH ? -(drawH - photoH) * 0.15 : 0;
-        ctx.drawImage(img, cardX, photoY + dy, CARD_W, drawH);
+        ctx.drawImage(img, cardX, cardY + dy, CARD_W, drawH);
       } else {
-        ctx.fillStyle = color + '33';
-        ctx.fillRect(cardX, photoY, CARD_W, photoH);
-        ctx.font = `bold ${36 * DPR}px Arial`;
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText((player.apellido || '?').charAt(0).toUpperCase(), cardX + CARD_W / 2, photoY + photoH / 2);
+        ctx.fillStyle = color + '33'; ctx.fillRect(cardX, cardY, CARD_W, photoH);
+        ctx.font = `bold ${36 * DPR}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText((player.apellido || '?').charAt(0).toUpperCase(), cardX + CARD_W / 2, cardY + photoH / 2);
       }
       ctx.restore();
 
       // Badge posición
-      const badgeY = photoY + photoH - 18 * DPR;
+      const badgeY = cardY + photoH - 18 * DPR;
       ctx.fillStyle = color;
       drawRoundRect(cardX + 4 * DPR, badgeY, 28 * DPR, 16 * DPR, 4 * DPR);
       ctx.fill();
-      ctx.font = `bold ${9 * DPR}px Arial`;
-      ctx.fillStyle = '#fff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(player.posicion?.codigo ?? '', cardX + 4 * DPR + 14 * DPR, badgeY + 8 * DPR);
+      ctx.font = `bold ${9 * DPR}px Arial`; ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(player.posicion?.codigo ?? '', cardX + 18 * DPR, badgeY + 8 * DPR);
 
-      // Estrella titular
+      // Estrella titular arriba-derecha
       if (player.titular) {
-        ctx.font = `${12 * DPR}px Arial`;
-        ctx.fillStyle = '#fbbf24';
-        ctx.textAlign = 'right';
-        ctx.fillText('★', cardX + CARD_W - 4 * DPR, badgeY + 8 * DPR);
+        ctx.font = `${14 * DPR}px Arial`; ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+        ctx.fillText('★', cardX + CARD_W - 4 * DPR, cardY + 4 * DPR);
       }
 
-      // Info nombre
+      // Nombre
       const infoY = cardY + photoH + 4 * DPR;
-      ctx.font = `bold ${10 * DPR}px Arial`;
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
       const apellido = (player.apellido?.split(' ')[0] ?? player.nombre ?? '').toUpperCase();
-      ctx.fillText(apellido, cardX + CARD_W / 2, infoY, CARD_W - 4 * DPR);
+      ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(apellido, cardX + CARD_W / 2, infoY, CARD_W - 6 * DPR);
 
       // Club
       if (player.club?.nombre) {
-        ctx.font = `${8 * DPR}px Arial`;
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.fillText(player.club.nombre, cardX + CARD_W / 2, infoY + 12 * DPR, CARD_W - 4 * DPR);
+        ctx.font = `${8 * DPR}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText(player.club.nombre, cardX + CARD_W / 2, infoY + 13 * DPR, CARD_W - 6 * DPR);
       }
     };
 
-    // ── Cargar todas las imágenes y luego dibujar ──────────────────
-    const allPlayers = sorted;
-    const imagePromises = allPlayers.map(p => {
+    // Función para dibujar DT
+    const drawDT = (cardX: number, cardY: number, dtImg: HTMLImageElement | null) => {
+      const color = '#6366f1';
+      drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
+      ctx.fillStyle = '#1a2035'; ctx.fill();
+      ctx.strokeStyle = color; ctx.lineWidth = 2 * DPR; ctx.stroke();
+      const photoH = Math.round(CARD_H * 0.65);
+      ctx.save();
+      drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
+      if (dtImg) {
+        const scale = CARD_W / dtImg.naturalWidth;
+        const drawH = dtImg.naturalHeight * scale;
+        const dy    = drawH > photoH ? -(drawH - photoH) * 0.15 : 0;
+        ctx.drawImage(dtImg, cardX, cardY + dy, CARD_W, drawH);
+      } else {
+        ctx.fillStyle = color + '33'; ctx.fillRect(cardX, cardY, CARD_W, photoH);
+        ctx.font = `bold ${28 * DPR}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('DT', cardX + CARD_W / 2, cardY + photoH / 2);
+      }
+      ctx.restore();
+      // Badge DT
+      const badgeY = cardY + photoH - 18 * DPR;
+      ctx.fillStyle = color;
+      drawRoundRect(cardX + 4 * DPR, badgeY, 22 * DPR, 16 * DPR, 4 * DPR);
+      ctx.fill();
+      ctx.font = `bold ${9 * DPR}px Arial`; ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('DT', cardX + 15 * DPR, badgeY + 8 * DPR);
+      // Nombre DT
+      const dtApellido = (this.pais?.dtNombre?.split(' ').pop() ?? 'DT').toUpperCase();
+      ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(dtApellido, cardX + CARD_W / 2, cardY + photoH + 4 * DPR, CARD_W - 6 * DPR);
+    };
+
+    // Cargar imágenes de jugadores
+    const playerImgPromises = sorted.map(p => {
       if (!p.urlFoto) return Promise.resolve<HTMLImageElement | null>(null);
       return new Promise<HTMLImageElement | null>(resolve => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload  = () => resolve(img);
-        img.onerror = () => resolve(null);
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img); img.onerror = () => resolve(null);
         img.src = p.urlFoto!;
       });
     });
+    const dtImgPromise: Promise<HTMLImageElement | null> = this.pais?.dtFotoUrl
+      ? new Promise(resolve => {
+          const img = new Image(); img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img); img.onerror = () => resolve(null);
+          img.src = this.pais!.dtFotoUrl!;
+        })
+      : Promise.resolve(null);
 
-    // DT imagen
-    let dtImgPromise: Promise<HTMLImageElement | null> = Promise.resolve(null);
-    if (this.pais?.dtFotoUrl) {
-      dtImgPromise = new Promise(resolve => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload  = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = this.pais!.dtFotoUrl!;
-      });
-    }
+    Promise.all([Promise.all(playerImgPromises), dtImgPromise]).then(([playerImgs, dtImg]) => {
+      // Dibujar los 28 slots en grid 7×4
+      grid.forEach((slot, idx) => {
+        const row  = Math.floor(idx / COLS);
+        const col  = idx % COLS;
+        const cardX = PAD + col * (CARD_W + GAP);
+        const cardY = PAD + HEADER + row * (CARD_H + GAP);
 
-    Promise.all([Promise.all(imagePromises), dtImgPromise]).then(([images, dtImg]) => {
-      // Dibujar filas de jugadores
-      let pIdx = 0;
-      chunks.forEach((chunk, rowIdx) => {
-        if (chunk.length === 0 && this.pais?.dtNombre) {
-          // Fila del DT centrada
-          const cardX = PAD + Math.floor(COLS / 2) * (CARD_W + GAP) - (CARD_W + GAP) / 2;
-          const cardY = PAD + HEADER + rowIdx * (CARD_H + GAP);
-          // DT como figurita especial
-          const color = '#6366f1';
-          drawRoundRect(cardX, cardY, CARD_W, CARD_H, 6 * DPR);
-          ctx.fillStyle = '#1a2035'; ctx.fill();
-          ctx.strokeStyle = color; ctx.lineWidth = 2 * DPR; ctx.stroke();
-          const photoH = Math.round(CARD_H * 0.65);
-          ctx.save();
-          drawRoundRect(cardX, cardY, CARD_W, photoH, 6 * DPR); ctx.clip();
-          if (dtImg) {
-            const scale = CARD_W / dtImg.naturalWidth;
-            ctx.drawImage(dtImg, cardX, cardY, CARD_W, dtImg.naturalHeight * scale);
-          } else {
-            ctx.fillStyle = color + '33'; ctx.fillRect(cardX, cardY, CARD_W, photoH);
-            ctx.font = `bold ${36 * DPR}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText('DT', cardX + CARD_W / 2, cardY + photoH / 2);
-          }
-          ctx.restore();
-          ctx.fillStyle = color;
-          drawRoundRect(cardX + 4 * DPR, cardY + photoH - 18 * DPR, 22 * DPR, 16 * DPR, 4 * DPR);
-          ctx.fill();
-          ctx.font = `bold ${9 * DPR}px Arial`; ctx.fillStyle = '#fff';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('DT', cardX + 4 * DPR + 11 * DPR, cardY + photoH - 10 * DPR);
-          ctx.font = `bold ${10 * DPR}px Arial`; ctx.fillStyle = '#fff';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-          const dtApellido = (this.pais!.dtNombre!.split(' ').pop() ?? 'DT').toUpperCase();
-          ctx.fillText(dtApellido, cardX + CARD_W / 2, cardY + photoH + 4 * DPR, CARD_W - 4 * DPR);
-          return;
+        if (slot === null) {
+          drawEmpty(cardX, cardY);
+        } else if (slot === 'DT') {
+          drawDT(cardX, cardY, dtImg);
+        } else {
+          const imgIdx = sorted.indexOf(slot);
+          drawCard(slot, cardX, cardY, playerImgs[imgIdx] ?? null);
         }
-        const rowStart = PAD + HEADER + rowIdx * (CARD_H + GAP);
-        const rowWidth = chunk.length * CARD_W + (chunk.length - 1) * GAP;
-        const offsetX  = PAD + Math.floor((COLS * CARD_W + (COLS - 1) * GAP - rowWidth) / 2);
-        chunk.forEach((player, colIdx) => {
-          const cardX = offsetX + colIdx * (CARD_W + GAP);
-          const img   = images[pIdx++];
-          drawCard(player, cardX, rowStart, img);
-        });
       });
 
-      // Footer watermark
+      // Footer
       ctx.font = `${11 * DPR}px Arial`;
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
       ctx.fillText('dt26.win · Mundial 2026', CANVAS_W / 2, CANVAS_H - 6 * DPR);
 
       // Compartir
@@ -704,6 +699,29 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   getPosColor(codigo?: string): string {
     const pg = this.positionGroups.find(g => g.codigo === codigo);
     return pg?.color ?? '#94a3b8';
+  }
+
+  get currentUsername(): string {
+    return this.authService.getCurrentUser()?.user ?? '';
+  }
+
+  /** Grid plano 7×4 = 28 slots: 27 jugadores (ordenados por pos) + 1 DT al final */
+  getPlantelGrid(): Array<JugadorSeleccionable | 'DT' | null> {
+    const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
+    const sorted = this.jugadoresSeleccionados.slice().sort((a, b) => {
+      const ao = POS_ORDER[a.posicion?.codigo ?? ''] ?? 4;
+      const bo = POS_ORDER[b.posicion?.codigo ?? ''] ?? 4;
+      return ao !== bo ? ao - bo : (b.titular ? 1 : 0) - (a.titular ? 1 : 0) || (b.rating ?? 0) - (a.rating ?? 0);
+    });
+    const slots: Array<JugadorSeleccionable | 'DT' | null> = [];
+    // 26 jugadores en los primeros slots
+    for (let i = 0; i < 26; i++) {
+      slots.push(sorted[i] ?? null);
+    }
+    // slot 27 vacío, slot 28 DT → completa fila 4: [J][J][J][J][J][vacío][DT]
+    slots.push(null);
+    slots.push('DT');
+    return slots;
   }
 
   /** Columnas del grid de figuritas según posición: ARQ=6, resto=7 */
