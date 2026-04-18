@@ -84,13 +84,14 @@ $border:    rgba(255,255,255,0.1);
   background-clip: text;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
-  .nav-logo-icon {
-    width: 22px;
-    height: 22px;
-    stroke: $cyan;
+  .nav-logo-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
     -webkit-text-fill-color: initial;
+    filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.4));
   }
 }
 

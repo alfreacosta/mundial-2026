@@ -40,6 +40,18 @@
       transform: translateY(-1px);
     }
   }
+
+  .navbar-logo-img {
+    height: 52px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.35));
+    transition: filter 0.3s ease;
+
+    &:hover {
+      filter: drop-shadow(0 0 14px rgba(0, 212, 255, 0.6));
+    }
+  }
 }
 
 // FIFA World Cup Badge
@@ -412,13 +424,8 @@
     }
   }
 
-  .navbar-logo .fifa-badge {
-    min-width: auto;
-    padding: 3px 8px 2px;
-
-    .fifa-top { font-size: 7px; letter-spacing: 0.8px; }
-    .fifa-divider { margin: 2px 0; }
-    .fifa-year { font-size: 10px; letter-spacing: 2px; }
+  .navbar-logo .navbar-logo-img {
+    height: 38px;
   }
 
   .navbar-actions.desktop-only {
