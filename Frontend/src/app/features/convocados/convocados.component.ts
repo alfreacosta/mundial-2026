@@ -332,8 +332,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const PAD    = 16  * DPR;
     const HEADER = 64  * DPR;
 
+    const FOOTER   = 48  * DPR;
     const CANVAS_W = PAD * 2 + COLS * CARD_W + (COLS - 1) * GAP;
-    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + PAD;
+    const CANVAS_H = PAD * 2 + HEADER + ROWS * CARD_H + (ROWS - 1) * GAP + PAD + FOOTER;
 
     // Ordenar: ARQ, DEF, MED, DEL
     const POS_ORDER: Record<string, number> = { ARQ: 0, DEF: 1, MED: 2, DEL: 3 };
@@ -572,6 +573,33 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
           drawCard(slot, cardX, cardY, playerImgs[imgIdx] ?? null);
         }
       });
+
+      // ── Footer con mensaje ────────────────────────────────────────
+      const footerY = CANVAS_H - FOOTER;
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(0, footerY, CANVAS_W, FOOTER);
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1 * DPR;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(PAD, footerY); ctx.lineTo(CANVAS_W - PAD, footerY);
+      ctx.stroke();
+
+      const selCount = todos.length;
+      const footerLine1 = `${selCount}/26 jugadores seleccionados  ·  Tenes tiempo de completar o modificar tu plantel hasta el 25 de Mayo`;
+      const footerLine2 = `Después podrás hacer el 11 ideal de tus equipos favoritos y predecir todos los resultados del Mundial  ·  Participá en competencias privadas con tus amigos`;
+      const lineH = 13 * DPR;
+      const midY  = footerY + FOOTER / 2;
+      const maxW  = CANVAS_W - PAD * 6;
+
+      ctx.font = `${10 * DPR}px Arial`;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(footerLine1, CANVAS_W / 2, midY - lineH / 2, maxW);
+      ctx.font = `${9.5 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.fillText(footerLine2, CANVAS_W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
       // Compartir
       const shareText = `🏆 Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\nArmá el tuyo en 👉 https://dt26.win`;
