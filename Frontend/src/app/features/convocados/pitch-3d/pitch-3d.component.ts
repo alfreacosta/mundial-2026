@@ -37,6 +37,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() dtFotoUrl?: string;
 
   @Output() positionChanged = new EventEmitter<{ jugadorId: number; x: number; y: number }>();
+  @Output() playerClicked   = new EventEmitter<number>(); // emite jugadorId al hacer tap
 
   private dtImg: HTMLImageElement | null = null;
 
@@ -57,8 +58,10 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
   private photoCache = new Map<string, HTMLImageElement | null>();
   private dragging: { idx: number } | null = null;
   private dragOffset = { x: 0, y: 0 };
+  private pointerDownPos = { x: 0, y: 0 };
+  private pointerDownTime = 0;
 
-  private get TR(): number { return Math.round(this.fW / FW * 4.9); }
+  private get TR(): number { return Math.round(this.fW / FW * 3.9); }
 
   constructor(private zone: NgZone) {}
 
@@ -86,7 +89,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   private onResize(): void {
     const cssW = this.wrapRef.nativeElement.clientWidth || 360;
-    const cssH = Math.round(cssW * (FH + 10) / (FW + 10));
+    const cssH = Math.max(180, Math.round(cssW * (FH + 10) / (FW + 10)) - 70);
     this.dpr   = Math.min(window.devicePixelRatio || 1, 2);
     const cvs  = this.cvsRef.nativeElement;
     cvs.width  = cssW * this.dpr;
@@ -299,17 +302,11 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   private drawDtToken(): void {
     const ctx = this.ctx;
-    const dpr = this.dpr;
-    const margin = 10 * dpr;
-    const R = Math.round(this.TR * 1.1);  // ligeramente más grande
-    const cx = this.fX * dpr + margin + R;
-    const cy = this.fY * dpr + margin + R;
-
     // El ctx está en escala dpr via setTransform, pero drawDtToken dibuja
     // en coordenadas CSS — usar coordenadas CSS directamente
     const cssR  = Math.round(this.TR * 1.1);
     const cssCx = this.fX + 8;
-    const cssCy = this.fY + 8;
+    const cssCy = this.fY + this.fH - cssR * 2 - 10;  // esquina inferior izquierda
     const cxc   = cssCx + cssR;
     const cyc   = cssCy + cssR;
 
@@ -415,6 +412,8 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
       if (Math.hypot(pos.x - cx, pos.y - cy) <= R + 8) {
         this.dragging    = { idx: i };
         this.dragOffset  = { x: pos.x - cx, y: pos.y - cy };
+        this.pointerDownPos  = { ...pos };
+        this.pointerDownTime = Date.now();
         e.preventDefault();
         this.cvsRef.nativeElement.style.touchAction = 'none';
         this.cvsRef.nativeElement.setPointerCapture(e.pointerId);
@@ -437,6 +436,20 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     this.cvsRef.nativeElement.style.touchAction = 'pan-y';
     if (!this.dragging) return;
     const d   = this.playerData[this.dragging.idx];
+    const pos = this.getPos(e);
+    const elapsed  = Date.now() - this.pointerDownTime;
+    const distance = Math.hypot(pos.x - this.pointerDownPos.x, pos.y - this.pointerDownPos.y);
+
+    if (elapsed < 300 && distance < 6) {
+      // Es un tap → emitir click para ver estadísticas
+      const jugadorId = d.id;
+      this.dragging = null;
+      this.cvsRef.nativeElement.releasePointerCapture(e.pointerId);
+      this.zone.run(() => this.playerClicked.emit(jugadorId));
+      return;
+    }
+
+    // Es un drag → emitir posición actualizada
     const pct = { ...d.pct };
     this.zone.run(() => this.positionChanged.emit({ jugadorId: d.id, x: pct.x, y: pct.y }));
     this.dragging = null;

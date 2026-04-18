@@ -250,7 +250,8 @@
               [posColorFn]="getPosColor.bind(this)"
               [dtNombre]="pais?.dtNombre || undefined"
               [dtFotoUrl]="pais?.dtFotoUrl || undefined"
-              (positionChanged)="on3dPositionChanged($event)">
+              (positionChanged)="on3dPositionChanged($event)"
+              (playerClicked)="onPitchPlayerClicked($event)">
             </app-pitch-3d>
             <!-- DT eliminado del HTML: se dibuja directamente en el canvas -->
           </div>

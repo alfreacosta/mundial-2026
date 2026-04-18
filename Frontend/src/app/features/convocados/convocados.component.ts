@@ -698,6 +698,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   // ═══ STATS PANEL ═══
 
+  /** Llamado al hacer tap sobre un jugador en el canvas pitch-3d */
+  onPitchPlayerClicked(jugadorId: number): void {
+    const player = this.players().find(p => p.internalId === jugadorId);
+    if (player) { this.selectPlayer(player); }
+  }
+
   selectPlayer(player: JugadorSeleccionable): void {
     if (this.selectedPlayer()?.internalId === player.internalId) {
       this.selectedPlayer.set(null);

@@ -1640,6 +1640,140 @@ $radius:      14px;
   font-weight: 600;
 }
 
+// ── Dashboard Plantel (debajo de la mini-cancha) ─────────
+.dash-plantel {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 10px;
+}
+
+.dash-plantel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+}
+
+.dash-plantel-pos-group {
+  margin-bottom: 8px;
+}
+
+.dash-pos-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.dash-plantel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dash-player-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.15s;
+
+  &.titular {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.12);
+  }
+}
+
+.dash-player-foto {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .dash-player-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .dash-player-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: rgba(255,255,255,0.3);
+  }
+}
+
+.dash-player-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dash-player-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-player-club {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-titular-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.3);
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &.active {
+    color: var(--pos-color, $gold);
+    border-color: var(--pos-color, $gold);
+    background: rgba(0,0,0,0.2);
+    text-shadow: 0 0 8px var(--pos-color, $gold);
+  }
+
+  &:hover:not(.active) {
+    color: rgba(255,255,255,0.6);
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+
 // ── Mobile Photo Mosaic ──────────────────────────────────
 .mobile-photo-mosaic {
   display: none; // oculto en desktop
@@ -1647,12 +1781,11 @@ $radius:      14px;
   @media (max-width: 860px) {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 6px;
+    grid-template-rows: 160px 160px;
+    gap: 4px;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
     position: relative;
-    aspect-ratio: 16/9;
     margin-bottom: 16px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.45);
   }

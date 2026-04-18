@@ -112,7 +112,7 @@
       <!-- ══ MOBILE PHOTO MOSAIC (solo visible en mobile) ════════════ -->
       <div class="mobile-photo-mosaic">
         @for (photo of slideshowPhotos.slice(0, 4); track photo; let i = $index) {
-          <div class="mosaic-cell" [class]="'mosaic-cell-' + i" [style.animation-delay]="(i * 120) + 'ms'">
+          <div class="mosaic-cell" [style.animation-delay]="(i * 120) + 'ms'">
             <img [src]="photo" alt="Mundial 2026" class="mosaic-img" loading="lazy" />
             <div class="mosaic-overlay"></div>
           </div>
@@ -204,6 +204,53 @@
                                 </div>
                               }
                               <app-mini-pitch [players]="getTitularesParaCancha(fav.paisId)"></app-mini-pitch>
+
+                              <!-- ══ PLANTEL COMPLETO debajo de la cancha ══ -->
+                              @if (getDashboardConvocados(fav.paisId).length > 0) {
+                                <div class="dash-plantel">
+                                  <div class="dash-plantel-header">
+                                    <mat-icon>group</mat-icon>
+                                    <span>Plantel · {{ getDashboardConvocados(fav.paisId).length }} jugadores</span>
+                                  </div>
+                                  @for (posAbr of ['ARQ','DEF','MED','DEL']; track posAbr) {
+                                    @let posjugadores = getDashboardConvocadosPorPos(fav.paisId, posAbr);
+                                    @if (posjugadores.length > 0) {
+                                      <div class="dash-plantel-pos-group">
+                                        <div class="dash-pos-label" [style.background-color]="getPosColorDashboard(posAbr)">
+                                          {{ posAbr }}
+                                        </div>
+                                        <div class="dash-plantel-grid">
+                                          @for (j of posjugadores; track j.id) {
+                                            <div class="dash-player-card" [class.titular]="j.titular">
+                                              <div class="dash-player-foto">
+                                                @if (j.urlFoto) {
+                                                  <img [src]="j.urlFoto" [alt]="j.apellido" class="dash-player-img" (error)="$any($event.target).style.display='none'">
+                                                }
+                                                @if (!j.urlFoto) {
+                                                  <mat-icon class="dash-player-icon">person</mat-icon>
+                                                }
+                                              </div>
+                                              <div class="dash-player-info">
+                                                <span class="dash-player-name">{{ j.apellido | uppercase }}</span>
+                                                @if (j.club) {
+                                                  <span class="dash-player-club">{{ j.club }}</span>
+                                                }
+                                              </div>
+                                              <button class="dash-titular-btn"
+                                                [class.active]="j.titular"
+                                                [style.--pos-color]="getPosColorDashboard(posAbr)"
+                                                (click)="toggleTitularDashboard(fav.paisId, j.id)"
+                                                [title]="j.titular ? 'Quitar titular' : 'Marcar titular'">
+                                                {{ j.titular ? '★' : '☆' }}
+                                              </button>
+                                            </div>
+                                          }
+                                        </div>
+                                      </div>
+                                    }
+                                  }
+                                </div>
+                              }
                             }
                           }
                         </div>

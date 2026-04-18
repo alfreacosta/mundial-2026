@@ -296,18 +296,52 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return defaults[posAbr] ?? { x: 50, y: 50 };
   }
 
-  getDashboardConvocados(paisId: number): { id: number; nombre: string; numeroCamiseta: number | null; posicionAbr: string }[] {
+  getDashboardConvocados(paisId: number): { id: number; nombre: string; apellido: string; numeroCamiseta: number | null; posicionAbr: string; urlFoto: string | null; club: string | null; titular: boolean }[] {
     const todos = this.jugadoresPorPais.get(paisId) ?? [];
     const conv  = this.convocatorias.get(paisId);
     if (!conv || todos.length === 0) return [];
-    const ids = new Set(conv.jugadoresIds);
+    const ids    = new Set(conv.jugadoresIds);
+    const titIds = new Set(conv.titularesIds ?? []);
+    const POS_ORDER: Record<string, number> = { ARQ: 1, POR: 1, DEF: 2, MED: 3, DEL: 4 };
     return todos
       .filter(j => ids.has(j.internalId))
-      .map(j => ({ id: j.internalId, nombre: (j.nombre + ' ' + (j.apellido ?? '')).trim(), numeroCamiseta: j.numeroCamiseta, posicionAbr: j.posicion.abreviatura }))
-      .sort((a, b) => {
-        const order: Record<string, number> = { POR: 1, DEF: 2, MED: 3, DEL: 4 };
-        return (order[a.posicionAbr] ?? 5) - (order[b.posicionAbr] ?? 5);
-      });
+      .map(j => ({
+        id: j.internalId,
+        nombre: j.nombre,
+        apellido: j.apellido ?? '',
+        numeroCamiseta: j.numeroCamiseta,
+        posicionAbr: j.posicion.abreviatura,
+        urlFoto: j.urlFoto,
+        club: j.club?.nombre ?? null,
+        titular: titIds.has(j.internalId),
+      }))
+      .sort((a, b) => (POS_ORDER[a.posicionAbr] ?? 5) - (POS_ORDER[b.posicionAbr] ?? 5));
+  }
+
+  getPosColorDashboard(abr: string): string {
+    const MAP: Record<string, string> = { ARQ: '#f59e0b', POR: '#f59e0b', DEF: '#3b82f6', MED: '#10b981', DEL: '#ef4444' };
+    return MAP[abr] ?? '#94a3b8';
+  }
+
+  getDashboardConvocadosPorPos(paisId: number, posAbr: string) {
+    return this.getDashboardConvocados(paisId).filter(j => j.posicionAbr === posAbr);
+  }
+
+  toggleTitularDashboard(paisId: number, jugadorId: number): void {
+    const conv = this.convocatorias.get(paisId);
+    if (!conv) return;
+    const titSet = new Set(conv.titularesIds ?? []);
+    if (titSet.has(jugadorId)) {
+      titSet.delete(jugadorId);
+    } else {
+      titSet.add(jugadorId);
+    }
+    const newTitulares = Array.from(titSet);
+    // Actualizar localmente de forma optimista
+    conv.titularesIds = newTitulares;
+    // Persistir en el backend
+    this.countriesService.guardarConvocatoria(paisId, conv.jugadoresIds, conv.noVaIds ?? [], newTitulares)
+      .subscribe({ error: () => {} });
   }
 
   getWhatsAppLink(grupo: Grupo): string {
