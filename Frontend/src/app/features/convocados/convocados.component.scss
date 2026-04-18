@@ -1093,6 +1093,38 @@ $save-bar-height: 72px;
   }
 }
 
+/* ═══ ESTRELLA TITULAR (top-right del card) ═══ */
+.titular-star-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 1rem;
+  color: #fbbf24;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  pointer-events: none;
+  z-index: 4;
+  line-height: 1;
+}
+
+/* ═══ VER STATS BUTTON ═══ */
+.btn-stats {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(99,102,241,0.25);
+    color: #c7d2fe;
+  }
+}
+
 /* ═══ TITULAR BUTTON ═══ */
 .btn-titular {
   flex: 1;
@@ -1820,43 +1852,6 @@ $save-bar-height: 72px;
   }
 }
 
-// ── Fila por posición ───────────────────────────────────
-.plantel-pos-row {
-  margin-bottom: 20px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.plantel-pos-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px 4px 6px;
-  border-radius: $radius-full;
-  margin-bottom: 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-}
-
-// ── Fila de figuritas ───────────────────────────────────
-.figuritas-row {
-  display: grid;
-  grid-template-columns: repeat(var(--fig-cols, 5), minmax(0, 110px));
-  gap: 8px;
-  justify-content: start;
-}
-
 // ── Figurita individual ─────────────────────────────────
 .figurita {
   width: 110px;
@@ -1876,14 +1871,12 @@ $save-bar-height: 72px;
     z-index: 2;
   }
 
-  // Cuando está seleccionada: overflow visible para que los botones no queden cortados
+  // Seleccionada: sube y agranda SIN afectar el grid
   &.selected {
+    transform: scale(1.1) translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.7);
+    z-index: 20;
     overflow: visible;
-    z-index: 10;
-    // Mantener border-radius en la foto para que se vea bien
-    .fig-photo {
-      border-radius: 6px 6px 0 0;
-    }
   }
 
   // Borde coloreado para titulares — más grueso
@@ -1926,12 +1919,21 @@ $save-bar-height: 72px;
 }
 
 // ── Botones de acción en figurita (Titular / Stats) ─────
+// Flotantes fuera del flujo → no inflan la altura de la fila del grid
 .fig-actions {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
   display: flex;
   gap: 4px;
   padding: 4px 4px 5px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(10, 14, 23, 0.95);
+  border-radius: 0 0 8px 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: none;
   justify-content: stretch;
+  z-index: 21;
 }
 
 .fig-btn {

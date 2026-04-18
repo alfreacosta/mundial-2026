@@ -227,8 +227,8 @@
 
     </main>
 
-    <!-- ═══ TAB: 11 TITULARES (solo lectura — cancha) ═══ -->
-    <main class="players-main titulares-main" *ngIf="activeTab() === 'titulares'">
+    <!-- ═══ TAB: TITULARES ═══ -->
+    <main class="players-main" *ngIf="activeTab() === 'titulares'">
 
       <!-- Sin titulares todavía -->
       <div class="state-container" *ngIf="totalTitulares() === 0" style="padding: 3rem 1rem">
@@ -237,114 +237,63 @@
         <p>Seleccioná titulares desde la pestaña <strong>Convocatoria</strong> usando el botón "Titular".</p>
       </div>
 
-      <!-- ═══ PLANTEL ALBUM (arriba de la cancha) ═══ -->
-      <ng-container *ngIf="jugadoresSeleccionados.length > 0">
-        <section class="plantel-album-section">
-
-          <!-- Header del plantel -->
-          <div class="plantel-album-header" [style.--flag-primary]="getFlagColors().primary" [style.--flag-secondary]="getFlagColors().secondary">
-            <div class="plantel-header-left">
-              <img *ngIf="getLogoUrl()" [src]="getLogoUrl()" [alt]="pais?.nombre" class="plantel-country-logo">
-              <div class="plantel-header-texts">
-                <span class="plantel-header-user">{{ currentUsername }}</span>
-                <span class="plantel-header-title">Mis convocados · <strong>{{ pais?.nombre }}</strong></span>
-              </div>
-            </div>
-            <span class="plantel-header-url">www.dt26.win</span>
-          </div>
-
-          <!-- Grid de figuritas 7×4 fijo -->
-          <div class="plantel-album-grid" id="plantel-album"
-               [style.--flag-primary]="getFlagColors().primary"
-               [style.--flag-secondary]="getFlagColors().secondary">
-
-            <div class="plantel-flat-grid">
-              @for (slot of getPlantelGrid(); track $index) {
-
-                <!-- Slot vacío -->
-                @if (slot === null) {
-                  <div class="fig-empty-slot">
-                    <mat-icon>person_add</mat-icon>
-                  </div>
-                }
-
-                <!-- Slot DT (último, posición 28) -->
-                @else if (slot === 'DT') {
-                  <div class="figurita figurita-dt" [style.--pos-color]="'#6366f1'">
-                    <div class="fig-top-bar"><span class="fig-number">DT</span></div>
-                    <div class="fig-photo">
-                      <img *ngIf="pais?.dtFotoUrl" [src]="pais!.dtFotoUrl!" [alt]="pais!.dtNombre!" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
-                      <div *ngIf="!pais?.dtFotoUrl" class="fig-no-photo"><mat-icon>manage_accounts</mat-icon></div>
-                    </div>
-                    <div class="fig-info">
-                      <span class="fig-pos-abr">DT</span>
-                      <span class="fig-name">{{ (pais?.dtNombre?.split(' ')?.pop()) | uppercase }}</span>
-                    </div>
-                  </div>
-                }
-
-                <!-- Figurita de jugador -->
-                @else {
-                  <div class="figurita"
-                       [class.titular]="slot.titular"
-                       [class.selected]="figuritaSeleccionada === slot.internalId"
-                       [style.--pos-color]="getPosColor(slot.posicion?.codigo)"
-                       (click)="selectFigurita(slot)">
-                    <div class="fig-photo">
-                      <img *ngIf="slot.urlFoto" [src]="slot.urlFoto" [alt]="slot.apellido" class="fig-img" crossorigin="anonymous" (error)="$any($event.target).style.display='none'">
-                      <div *ngIf="!slot.urlFoto" class="fig-no-photo"><mat-icon>person</mat-icon></div>
-                    </div>
-                    <div class="fig-info">
-                      <span class="fig-pos-abr">{{ slot.posicion?.codigo }}</span>
-                      <span class="fig-name">{{ (slot.apellido || '').split(' ')[0] | uppercase }}</span>
-                      <span class="fig-club" *ngIf="slot.club">{{ slot.club.nombre }}</span>
-                    </div>
-                    @if (slot.titular) {
-                      <span class="fig-star-titular">★</span>
-                    }
-                    @if (figuritaSeleccionada === slot.internalId) {
-                      <div class="fig-actions">
-                        <button class="fig-btn fig-btn-titular"
-                          [class.active]="slot.titular"
-                          [style.--pos-color]="'var(--pos-color)'"
-                          (click)="$event.stopPropagation(); toggleTitular(slot)">
-                          {{ slot.titular ? '★ Titular' : '☆ Titular' }}
-                        </button>
-                        <button class="fig-btn fig-btn-stats"
-                          (click)="$event.stopPropagation(); selectPlayer(slot)">
-                          <mat-icon style="font-size:12px;width:12px;height:12px">bar_chart</mat-icon>
-                          Stats
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
-
-              }
-            </div>
-
-          </div>
-        </section>
-      </ng-container>
-
-      <!-- Cancha con titulares —— DEBAJO del plantel -->
+      <!-- Lista plana de titulares (mismo layout que convocatoria) -->
       <ng-container *ngIf="totalTitulares() > 0">
-        <section class="pitch-section">
-          <div class="pitch-toolbar">
+        <section class="position-section has-players">
+
+          <div class="players-grid">
+            <div
+              *ngFor="let player of jugadoresTitulares"
+              class="player-card selected"
+              [style.--player-color]="getPosColor(player.posicion?.codigo)">
+
+              <!-- Estrella titular siempre visible -->
+              <span class="titular-star-badge">★</span>
+
+              <!-- Rating badge -->
+              <span class="rating-badge" *ngIf="player.rating">
+                {{ player.rating.toFixed(1) }} <span class="rating-star">⭐</span>
+              </span>
+
+              <!-- Avatar -->
+              <div class="player-avatar" (click)="selectPlayer(player)" style="cursor:pointer">
+                <img *ngIf="player.urlFoto" [src]="player.urlFoto" [alt]="player.nombreCompleto" class="avatar-img">
+                <div *ngIf="!player.urlFoto" class="avatar-placeholder" [style.background-color]="getPosColor(player.posicion?.codigo) + '22'">
+                  <mat-icon [style.color]="getPosColor(player.posicion?.codigo)">person</mat-icon>
+                </div>
+                <span class="jersey-number" *ngIf="player.numeroCamiseta">
+                  #{{ player.numeroCamiseta }}
+                </span>
+              </div>
+
+              <!-- Info del jugador -->
+              <div class="player-info" (click)="selectPlayer(player)" style="cursor:pointer">
+                <p class="player-name">{{ (player.apellido || '').split(' ')[0] }}</p>
+                <p class="player-club" *ngIf="player.club">
+                  <mat-icon>apartment</mat-icon>
+                  {{ player.club.nombre }}
+                </p>
+                <p class="player-club no-club" *ngIf="!player.club">
+                  <mat-icon>remove</mat-icon>
+                  Sin club registrado
+                </p>
+              </div>
+
+              <!-- Footer: Titular + Ver Stats -->
+              <div class="player-card-footer">
+                <button class="footer-btn btn-titular active"
+                  (click)="toggleTitular(player)">
+                  Titular ★
+                </button>
+                <button class="footer-btn btn-stats"
+                  (click)="selectPlayer(player)">
+                  Ver Stats
+                </button>
+              </div>
+
+            </div>
           </div>
-          <div class="pitch-canvas-wrap">
-            <app-pitch-3d
-              #pitch3d
-              [players]="jugadoresTitulares"
-              [savedPositions]="savedPositions"
-              [posColorFn]="getPosColor.bind(this)"
-              [dtNombre]="pais?.dtNombre || undefined"
-              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
-              (positionChanged)="on3dPositionChanged($event)"
-              (playerClicked)="onPitchPlayerClicked($event)">
-            </app-pitch-3d>
-            <!-- DT eliminado del HTML: se dibuja directamente en el canvas -->
-          </div>
+
         </section>
       </ng-container>
 
