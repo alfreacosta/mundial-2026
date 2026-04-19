@@ -464,7 +464,7 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
 
   // ─── Export ──────────────────────────────────────────────────────
 
-  captureSnapshot(username?: string, countryName?: string, date?: string): HTMLCanvasElement {
+  captureSnapshot(username?: string, countryName?: string, date?: string): Promise<HTMLCanvasElement> {
     const src = this.cvsRef.nativeElement;
     const out = document.createElement('canvas');
     out.width = src.width; out.height = src.height;
@@ -472,25 +472,37 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     ctx.drawImage(src, 0, 0);
     const dpr = this.dpr;
     const W = out.width, H = out.height;
+
+    // Watermark central semi-transparente
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
     ctx.font = `bold ${Math.round(32 * dpr)}px Arial`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('dt26.win', W / 2, H / 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.28)';
-    ctx.font = `600 ${Math.round(10 * dpr)}px Arial`;
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText('dt26.win', 12 * dpr, 10 * dpr);
-    if (username) {
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.font = `500 ${Math.round(8 * dpr)}px Arial`;
-      ctx.fillText(`@${username}`, 12 * dpr, 22 * dpr);
-    }
+
     if (countryName || date) {
       ctx.fillStyle = 'rgba(255,255,255,0.20)';
       ctx.font = `500 ${Math.round(8 * dpr)}px Arial`;
-      ctx.textAlign = 'right';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'top';
       ctx.fillText(`${countryName ?? ''} · ${date ?? ''}`, W - 12 * dpr, 10 * dpr);
     }
-    return out;
+    if (username) {
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.font = `500 ${Math.round(8 * dpr)}px Arial`;
+      ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+      ctx.fillText(`@${username}`, W - 12 * dpr, 22 * dpr);
+    }
+
+    // Logo DT26 en esquina superior izquierda
+    return new Promise(resolve => {
+      const logo = new Image();
+      logo.onload = () => {
+        const logoSize = Math.round(48 * dpr);
+        const pad = Math.round(10 * dpr);
+        ctx.drawImage(logo, pad, pad, logoSize, logoSize);
+        resolve(out);
+      };
+      logo.onerror = () => resolve(out);
+      logo.src = '/images/logodt26.png';
+    });
   }
 }
