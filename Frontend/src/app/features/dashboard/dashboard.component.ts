@@ -40,6 +40,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   fullRanking: (UsuarioRanking & { pos: number })[] = [];
   userEntry: (UsuarioRanking & { pos: number }) | null = null;
   gruposRanking: GrupoRanking[] = [];
+
+  perfilPublico = true;
+  perfilPublicoSaving = false;
   misGrupos: Grupo[] = [];
 
   // Datos personales del usuario
@@ -125,6 +128,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (user) {
       this.userName = user.nombre || user.user || 'Usuario';
       this.userPoints = user.puntaje ?? 0;
+      this.perfilPublico = (user as any).perfilPublico ?? true;
     }
 
     // Cargar ranking completo
@@ -384,6 +388,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.countdownTimer) clearInterval(this.countdownTimer);
     if (this.slideshowTimer) clearInterval(this.slideshowTimer);
+  }
+
+  onTogglePerfilPublico(): void {
+    if (this.perfilPublicoSaving) return;
+    this.perfilPublicoSaving = true;
+    const nuevo = !this.perfilPublico;
+    this.grupoService.togglePerfilPublico(nuevo).subscribe({
+      next: () => {
+        this.perfilPublico = nuevo;
+        this.perfilPublicoSaving = false;
+      },
+      error: () => { this.perfilPublicoSaving = false; }
+    });
   }
 
   private updateCountdown(): void {

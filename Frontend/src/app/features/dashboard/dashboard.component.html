@@ -142,6 +142,12 @@
             <div class="section-header">
               <mat-icon>sports_soccer</mat-icon>
               <span>Mi Juego</span>
+              <div class="perfil-toggle-inline">
+                <span class="perfil-toggle-label" [class.active]="perfilPublico">Perfil {{ perfilPublico ? 'público' : 'privado' }}</span>
+                <button class="perfil-toggle-btn" [class.active]="perfilPublico" (click)="onTogglePerfilPublico()" [disabled]="perfilPublicoSaving" title="Cambiar visibilidad del perfil">
+                  <span class="perfil-toggle-knob"></span>
+                </button>
+              </div>
             </div>
 
             <div class="my-game-grid">
