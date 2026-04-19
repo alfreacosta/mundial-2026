@@ -90,6 +90,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'images/1000620832.png',
     'images/1000620833.png',
     'images/1000620834.png',
+    'images/logodt26.png',
   ];
 
   currentPhotoIndex = 0;

@@ -1875,7 +1875,48 @@ $radius:      14px;
   }
 }
 
-// Perfil público toggle inline en section-header
+// ─── Perfil público toggle inline en section-header
+// ─── Brand card DT26 en favoritos
+.fav-brand-card {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.06), rgba(99, 102, 241, 0.08));
+  border: 1px solid rgba(0, 212, 255, 0.18) !important;
+  cursor: default;
+
+  &:hover {
+    border-color: rgba(0, 212, 255, 0.35) !important;
+  }
+}
+
+.fav-brand-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+}
+
+.fav-brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));
+}
+
+.fav-brand-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00d4ff;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.fav-brand-sub {
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  letter-spacing: 0.3px;
+}
 .perfil-toggle-inline {
   display: flex;
   align-items: center;
