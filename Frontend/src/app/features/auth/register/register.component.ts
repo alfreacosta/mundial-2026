@@ -70,14 +70,16 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   heroPhotosVisible = true;
   private heroSlideshowTimer: any;
 
-  private shuffleHeroPhotos(): void {
-    const shuffled = [...this.allPhotos].sort(() => Math.random() - 0.5);
-    this.heroPhotos = shuffled.slice(0, 4);
-  }
+  private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private particles!: THREE.Points;
   private animationId: number = 0;
+
+  private shuffleHeroPhotos(): void {
+    const shuffled = [...this.allPhotos].sort(() => Math.random() - 0.5);
+    this.heroPhotos = shuffled.slice(0, 4);
+  }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
