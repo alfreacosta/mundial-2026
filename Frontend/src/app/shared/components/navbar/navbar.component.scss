@@ -42,7 +42,7 @@
   }
 
   .navbar-logo-img {
-    height: 52px;
+    height: 65px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.35));
@@ -425,7 +425,7 @@
   }
 
   .navbar-logo .navbar-logo-img {
-    height: 38px;
+    height: 44px;
   }
 
   .navbar-actions.desktop-only {
@@ -466,9 +466,10 @@
   .navbar-links {
     position: fixed;
     top: 56px;
-    left: -100%;
+    left: 0;
     right: auto;
-    width: 280px;
+    width: fit-content;
+    min-width: 0;
     height: calc(100vh - 56px);
     background: linear-gradient(180deg, #0b1a2e 0%, #0f172a 50%, #091220 100%);
     flex-direction: column;
@@ -476,15 +477,14 @@
     justify-content: flex-start;
     padding: $spacing-lg;
     gap: $spacing-sm;
-    transition: left 0.3s ease;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
     overflow-x: hidden;
 
-
-    
     &.active {
-      left: 0;
+      transform: translateX(0);
     }
     
     .nav-link {

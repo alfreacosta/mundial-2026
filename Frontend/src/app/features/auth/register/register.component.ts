@@ -57,7 +57,23 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadingGoogle = false;
 
-  private scene!: THREE.Scene;
+  readonly allPhotos = [
+    'images/1000620828.jpg',
+    'images/1000620829.jpg',
+    'images/1000620830.jpg',
+    'images/1000620831.jpg',
+    'images/1000620832.jpg',
+    'images/1000620833.jpg',
+    'images/1000620834.jpg',
+  ];
+  heroPhotos: string[] = [];
+  heroPhotosVisible = true;
+  private heroSlideshowTimer: any;
+
+  private shuffleHeroPhotos(): void {
+    const shuffled = [...this.allPhotos].sort(() => Math.random() - 0.5);
+    this.heroPhotos = shuffled.slice(0, 4);
+  }
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private particles!: THREE.Points;
@@ -74,6 +90,7 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.renderer) this.renderer.dispose();
+    if (this.heroSlideshowTimer) clearInterval(this.heroSlideshowTimer);
   }
 
   private initThreeJS(): void {
@@ -142,6 +159,15 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.shuffleHeroPhotos();
+    this.heroSlideshowTimer = setInterval(() => {
+      this.heroPhotosVisible = false;
+      setTimeout(() => {
+        this.shuffleHeroPhotos();
+        this.heroPhotosVisible = true;
+      }, 400);
+    }, 5000);
+
     this.registerForm = this.fb.group({
       user:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
       email:    ['', [Validators.required, Validators.email]],
