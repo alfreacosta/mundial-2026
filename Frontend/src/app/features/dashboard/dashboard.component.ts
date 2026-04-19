@@ -80,13 +80,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   videoUrl!: SafeResourceUrl;
 
   readonly slideshowPhotos = [
-    'images/1000620828.jpg',
-    'images/1000620829.jpg',
-    'images/1000620830.jpg',
-    'images/1000620831.jpg',
-    'images/1000620832.jpg',
-    'images/1000620833.jpg',
-    'images/1000620834.jpg',
+    'images/1000620828.png',
+    'images/1000620829.png',
+    'images/1000620830.png',
+    'images/1000620831.png',
+    'images/1000620832.png',
+    'images/1000620833.png',
+    'images/1000620834.png',
   ];
 
   currentPhotoIndex = 0;
@@ -165,7 +165,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.slideshowTimer = setInterval(() => {
       this.photoVisible = false;
       setTimeout(() => {
-        this.currentPhotoIndex = (this.currentPhotoIndex + 1) % this.slideshowPhotos.length;
+        let next: number;
+        do { next = Math.floor(Math.random() * this.slideshowPhotos.length); }
+        while (next === this.currentPhotoIndex);
+        this.currentPhotoIndex = next;
         this.photoVisible = true;
       }, 400);
     }, 5000);

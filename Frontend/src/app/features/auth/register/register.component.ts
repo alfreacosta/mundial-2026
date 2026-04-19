@@ -58,13 +58,13 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   loadingGoogle = false;
 
   readonly allPhotos = [
-    'images/1000620828.jpg',
-    'images/1000620829.jpg',
-    'images/1000620830.jpg',
-    'images/1000620831.jpg',
-    'images/1000620832.jpg',
-    'images/1000620833.jpg',
-    'images/1000620834.jpg',
+    'images/1000620828.png',
+    'images/1000620829.png',
+    'images/1000620830.png',
+    'images/1000620831.png',
+    'images/1000620832.png',
+    'images/1000620833.png',
+    'images/1000620834.png',
   ];
   heroPhotos: string[] = [];
   heroPhotosVisible = true;
