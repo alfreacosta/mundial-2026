@@ -6,26 +6,12 @@ import { CommonModule } from '@angular/common';
 import type { JugadorSeleccionable } from '../convocados.component';
 import type { PlayerPos } from '../pitch-3d/pitch-3d.component';
 
-/* ── Dimensiones del campo 3D (en unidades de la escena) ── */
-const HW = 34;   // semi-ancho  (~34m)
-const HL = 40;   // semi-largo  (~40m, campo = 80m)
-const LY = 0.07; // altura sobre el pasto
+/* ── Dimensiones del campo Three.js (unidades de escena) ── */
+const HW = 34;
+const HL = 40;
+const LY = 0.07;
 const LT = 0.055;
 const LW = 0.23;
-
-/* ── Colores por posición ── */
-const POS_HEX: Record<string, number> = {
-  POR: 0xf59e0b, ARQ: 0xf59e0b,
-  DEF: 0x3b82f6,
-  MED: 0x10b981,
-  DEL: 0xef4444,
-};
-const POS_GLOW: Record<string, string> = {
-  POR: '#f59e0b', ARQ: '#f59e0b',
-  DEF: '#3b82f6',
-  MED: '#10b981',
-  DEL: '#ef4444',
-};
 
 @Component({
   selector: 'app-pitch3d-view',
@@ -33,9 +19,8 @@ const POS_GLOW: Record<string, string> = {
   imports: [CommonModule],
   template: `
     <div #container class="c3d">
-      <div class="loading" *ngIf="!ready">
-        <span>Cargando vista 3D…</span>
-      </div>
+      <canvas #overlay class="overlay-cvs"></canvas>
+      <div class="loading-msg" *ngIf="!ready">Cargando vista 3D…</div>
     </div>
   `,
   styles: [`
@@ -48,63 +33,66 @@ const POS_GLOW: Record<string, string> = {
       background: #030d03;
       position: relative;
     }
-    .loading {
+    .overlay-cvs {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .loading-msg {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.4); font-size: 14px; font-family: Arial, sans-serif;
-    }
-    /* Etiquetas CSS2D */
-    :host ::ng-deep .lbl3d {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 9px; font-weight: 900;
-      color: #fff; text-transform: uppercase;
-      letter-spacing: 1.6px; white-space: nowrap;
+      color: rgba(255,255,255,0.35);
+      font-size: 13px; font-family: Arial, sans-serif;
       pointer-events: none;
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 7px;
-      padding: 1px 7px;
-      text-shadow: 0 1px 4px #000;
     }
   `]
 })
 export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('overlay')   overlayRef!:   ElementRef<HTMLCanvasElement>;
 
-  @Input() players: JugadorSeleccionable[] = [];
-  @Input() savedPositions: Map<number, PlayerPos> = new Map();
-  @Input() posColorFn: (codigo?: string) => string = () => '#94a3b8';
-  @Input() dtNombre?: string;
+  @Input() players:        JugadorSeleccionable[] = [];
+  @Input() savedPositions: Map<number, PlayerPos>  = new Map();
+  @Input() posColorFn:     (codigo?: string) => string = () => '#94a3b8';
+  @Input() dtNombre?:  string;
   @Input() dtFotoUrl?: string;
 
   ready = false;
 
-  /* Three.js objects (typed as any para evitar import estático) */
-  private T: any;         // módulo three
-  private CSS2DO: any;    // CSS2DObject class
-  private scene: any;
-  private camera: any;
+  private T: any;
+  private scene:    any;
+  private camera:   any;
   private renderer: any;
-  private css2dR: any;
-  private glowMeshes: any[] = [];
-  private tokenGroup: any;
+
+  private octx!: CanvasRenderingContext2D;
+  private dpr = 1;
+
+  private playerData: Array<{
+    id: number;
+    p: JugadorSeleccionable;
+    pct: PlayerPos;
+    img: HTMLImageElement | null;
+    color: string;
+  }> = [];
+  private dtImg: HTMLImageElement | null = null;
+  private photoCache = new Map<string, HTMLImageElement | null>();
+
   private animId = 0;
-  private fr = 0;
   private ro!: ResizeObserver;
 
   constructor(private zone: NgZone, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
-    this.zone.runOutsideAngular(() => {
-      this.initThree();
-    });
+    this.zone.runOutsideAngular(() => this.initThree());
   }
 
   ngOnChanges(c: SimpleChanges): void {
     if (!this.scene) return;
-    if (c['players'] || c['savedPositions']) {
-      this.zone.runOutsideAngular(() => this.rebuildTokens());
+    if (c['dtFotoUrl']) this.loadDtPhoto();
+    if (c['players'] || c['savedPositions'] || c['dtNombre'] || c['dtFotoUrl']) {
+      this.buildPlayerData();
     }
   }
 
@@ -112,51 +100,40 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     cancelAnimationFrame(this.animId);
     this.ro?.disconnect();
     try { this.renderer?.dispose(); } catch { /* noop */ }
-    this.css2dR?.domElement?.parentNode?.removeChild(this.css2dR.domElement);
     this.renderer?.domElement?.parentNode?.removeChild(this.renderer.domElement);
   }
 
-  /* ── Carga lazy de Three.js ─────────────────────────────── */
   private async initThree(): Promise<void> {
     try {
-      const [threeModule, css2dModule] = await Promise.all([
-        import('three'),
-        import(/* @vite-ignore */ 'three/addons/renderers/CSS2DRenderer.js'),
-      ]);
-      this.T       = threeModule;
-      this.CSS2DO  = css2dModule.CSS2DObject;
-      const CSS2DR = css2dModule.CSS2DRenderer;
+      const [threeModule] = await Promise.all([import('three')]);
+      this.T = threeModule;
 
       const container = this.containerRef.nativeElement;
       const w = container.clientWidth  || 360;
       const h = container.clientHeight || 480;
 
-      /* Escena */
       const scene = new this.T.Scene();
       this.scene = scene;
 
-      /* Fondo: degradado oscuro verde/negro */
       {
         const cv = document.createElement('canvas');
         cv.width = 4; cv.height = 512;
         const cx = cv.getContext('2d')!;
         const g = cx.createLinearGradient(0, 0, 0, 512);
-        g.addColorStop(0,   '#060d04');
-        g.addColorStop(.3,  '#041204');
-        g.addColorStop(.7,  '#030d03');
-        g.addColorStop(1,   '#010801');
+        g.addColorStop(0,  '#060d04');
+        g.addColorStop(.3, '#041204');
+        g.addColorStop(.7, '#030d03');
+        g.addColorStop(1,  '#010801');
         cx.fillStyle = g; cx.fillRect(0, 0, 4, 512);
         scene.background = new this.T.CanvasTexture(cv);
       }
       scene.fog = new this.T.Fog(0x041204, 210, 380);
 
-      /* Cámara */
       const camera = new this.T.PerspectiveCamera(68, w / h, 0.5, 500);
       camera.position.set(0, 90, 75);
       camera.lookAt(0, 0, 0);
       this.camera = camera;
 
-      /* WebGL renderer */
       const renderer = new this.T.WebGLRenderer({ antialias: true, precision: 'highp' });
       renderer.setSize(w, h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
@@ -164,18 +141,10 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       renderer.shadowMap.type    = this.T.PCFSoftShadowMap;
       renderer.toneMapping       = this.T.NoToneMapping;
       renderer.outputColorSpace  = this.T.SRGBColorSpace;
-      container.appendChild(renderer.domElement);
+      container.insertBefore(renderer.domElement, container.firstChild);
+      renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
       this.renderer = renderer;
 
-      /* CSS2D renderer */
-      const css2dR = new CSS2DR();
-      css2dR.setSize(w, h);
-      css2dR.domElement.style.cssText =
-        'position:absolute;top:0;left:0;pointer-events:none;width:100%;height:100%;';
-      container.appendChild(css2dR.domElement);
-      this.css2dR = css2dR;
-
-      /* Iluminación */
       scene.add(new this.T.AmbientLight(0xffffff, 0.60));
       scene.add(new this.T.HemisphereLight(0xfff4d0, 0x1a6412, 0.80));
       const key = new this.T.DirectionalLight(0xfff8e8, 1.55);
@@ -187,40 +156,35 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       key.shadow.camera.near   = 20;  key.shadow.camera.far   = 260;
       key.shadow.bias = -0.001;
       scene.add(key);
-      const back  = new this.T.DirectionalLight(0xff5500, 0.28);
+      const back = new this.T.DirectionalLight(0xff5500, 0.28);
       back.position.set(14, 55, -88);
       scene.add(back);
       const fillL = new this.T.DirectionalLight(0x2244bb, 0.14);
       fillL.position.set(-88, 32, 12);
       scene.add(fillL);
 
-      /* Pasto */
       scene.add(this.buildGround());
-
-      /* Líneas */
       scene.add(this.buildFieldLines());
 
-      /* Tokens de jugadores */
-      this.tokenGroup = new this.T.Group();
-      scene.add(this.tokenGroup);
-      this.rebuildTokens();
+      this.dpr  = Math.min(window.devicePixelRatio || 1, 2);
+      this.octx = this.overlayRef.nativeElement.getContext('2d')!;
+      this.resizeOverlay(w, h);
 
-      /* ResizeObserver */
+      this.buildPlayerData();
+      if (this.dtFotoUrl) this.loadDtPhoto();
+
       this.ro = new ResizeObserver(() => this.onResize());
       this.ro.observe(container);
 
-      /* Loop */
       this.loop();
 
-      /* Avisar a Angular que ya está listo */
       this.zone.run(() => { this.ready = true; this.cdr.detectChanges(); });
 
     } catch (err) {
-      console.error('[pitch3d-view] Error cargando Three.js:', err);
+      console.error('[pitch3d-view] Error:', err);
     }
   }
 
-  /* ── Resize ─────────────────────────────────────────────── */
   private onResize(): void {
     const el = this.containerRef.nativeElement;
     const w  = el.clientWidth  || 360;
@@ -228,10 +192,18 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
-    this.css2dR.setSize(w, h);
+    this.resizeOverlay(w, h);
   }
 
-  /* ── Pasto texturizado ──────────────────────────────────── */
+  private resizeOverlay(w: number, h: number): void {
+    const cvs = this.overlayRef.nativeElement;
+    cvs.width  = w * this.dpr;
+    cvs.height = h * this.dpr;
+    cvs.style.width  = w + 'px';
+    cvs.style.height = h + 'px';
+    this.octx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+  }
+
   private buildGround(): any {
     const S = 2048;
     const cv = document.createElement('canvas');
@@ -250,7 +222,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       const x = Math.random() * S, y = Math.random() * S;
       const v = 38 + Math.floor(Math.random() * 58);
       ctx.strokeStyle = `rgba(0,${v},0,0.042)`;
-      ctx.lineWidth = 0.38 + Math.random() * 0.7;
+      ctx.lineWidth   = 0.38 + Math.random() * 0.7;
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x + (Math.random() - .5) * 0.55, y + 1.2 + Math.random() * 3.8);
@@ -268,8 +240,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     const ground = new this.T.Mesh(
       new this.T.PlaneGeometry(165, 118),
       new this.T.MeshStandardMaterial({
-        map: t,
-        color: new this.T.Color(.11, .38, .06),
+        map: t, color: new this.T.Color(.11, .38, .06),
         roughness: .84, metalness: 0,
       })
     );
@@ -278,7 +249,6 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     return ground;
   }
 
-  /* ── Líneas del campo ───────────────────────────────────── */
   private buildFieldLines(): any {
     const grp  = new this.T.Group();
     const wMat = new this.T.MeshBasicMaterial({ color: 0xffffff });
@@ -314,18 +284,14 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       grp.add(m);
     };
 
-    /* Perímetro */
     fL(-HW, -HL,  HW, -HL);
     fL( HW, -HL,  HW,  HL);
     fL( HW,  HL, -HW,  HL);
     fL(-HW,  HL, -HW, -HL);
-    /* Línea de medio */
     fL(-HW, 0, HW, 0);
-    /* Círculo y punto central */
     fC(0, 0, 9.15);
     fDot(0, 0);
 
-    /* Áreas (norte y sur) */
     const drawArea = (zs: number) => {
       const gz = zs * HL;
       const PBW = 20.16, PBD = 16.5, GBW = 9.16, GBD = 5.5;
@@ -352,22 +318,16 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     return grp;
   }
 
-  /* ── Fichas de jugadores ────────────────────────────────── */
-  private rebuildTokens(): void {
-    if (!this.scene || !this.tokenGroup) return;
-
-    /* Limpiar tokens anteriores */
-    while (this.tokenGroup.children.length > 0) {
-      this.tokenGroup.remove(this.tokenGroup.children[0]);
-    }
-    this.glowMeshes = [];
-
-    this.players.forEach(p => {
-      const id  = Number(p.internalId);
-      const pct = this.savedPositions.get(id) ?? this.defaultPct(p);
-      const token = this.makeToken(p, pct);
-      this.tokenGroup.add(token);
+  private buildPlayerData(): void {
+    const prev = new Map(this.playerData.map(d => [d.id, d]));
+    this.playerData = this.players.map(p => {
+      const id    = Number(p.internalId);
+      const prevD = prev.get(id);
+      const pct   = this.savedPositions.get(id) ?? this.defaultPct(p);
+      const color = this.posColorFn(p.posicion?.codigo);
+      return { id, p, pct, img: prevD?.img ?? null, color };
     });
+    this.loadPhotos();
   }
 
   private defaultPct(p: JugadorSeleccionable): PlayerPos {
@@ -380,169 +340,204 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     return { x, y: yMap[code] ?? 50 };
   }
 
-  /* Convierte porcentajes (0-100) a coordenadas Three.js */
-  private pctToWorld(xPct: number, yPct: number): [number, number] {
-    const x3d = (xPct / 100 * 2 - 1) * HW;
-    const z3d = (yPct / 100 * 2 - 1) * HL;
-    return [x3d, z3d];
-  }
-
-  private makeToken(p: JugadorSeleccionable, pct: PlayerPos): any {
-    const grp   = new this.T.Group();
-    const code  = p.posicion?.codigo ?? 'MED';
-    const hex   = POS_HEX[code] ?? 0x94a3b8;
-    const glow  = POS_GLOW[code] ?? '#94a3b8';
-    const [wx, wz] = this.pctToWorld(pct.x, pct.y);
-
-    /* Halo en el pasto */
-    const haloS   = 256;
-    const haloCv  = document.createElement('canvas');
-    haloCv.width  = haloS; haloCv.height = haloS;
-    const hCtx    = haloCv.getContext('2d')!;
-    const hg      = hCtx.createRadialGradient(haloS/2, haloS/2, haloS*.04, haloS/2, haloS/2, haloS/2);
-    hg.addColorStop(0,   glow + 'cc');
-    hg.addColorStop(.45, glow + '44');
-    hg.addColorStop(1,   glow + '00');
-    hCtx.fillStyle = hg; hCtx.fillRect(0, 0, haloS, haloS);
-    const haloMesh = new this.T.Mesh(
-      new this.T.CircleGeometry(5.2, 32),
-      new this.T.MeshBasicMaterial({
-        map: new this.T.CanvasTexture(haloCv),
-        transparent: true, depthWrite: false,
-        blending: this.T.AdditiveBlending,
-      })
-    );
-    haloMesh.rotation.x = -Math.PI / 2;
-    haloMesh.position.y = 0.12;
-    grp.add(haloMesh);
-
-    /* Cara del disco: canvas con foto o inicial */
-    const faceTex = this.buildFaceCanvas(p, glow);
-
-    /* Disco */
-    const sideMat = new this.T.MeshStandardMaterial({
-      color:    new this.T.Color(hex),
-      emissive: new this.T.Color(hex),
-      emissiveIntensity: .55, roughness: .12, metalness: .92,
-    });
-    const faceMat = new this.T.MeshStandardMaterial({
-      map: faceTex, emissiveMap: faceTex,
-      emissive: new this.T.Color(hex),
-      emissiveIntensity: .22, roughness: .18, metalness: .35,
-    });
-    const disc = new this.T.Mesh(
-      new this.T.CylinderGeometry(3.1, 3.1, 0.54, 56),
-      [sideMat, faceMat, faceMat]
-    );
-    disc.position.y  = 0.38;
-    disc.castShadow  = true;
-    disc.userData.sm = sideMat;
-    grp.add(disc);
-    this.glowMeshes.push(disc);
-
-    /* Foto async: si hay URL, la cargamos y actualizamos la textura */
-    if (p.urlFoto) {
-      const img   = new Image();
+  private loadPhotos(): void {
+    this.playerData.forEach(d => {
+      if (!d.p.urlFoto) return;
+      const url = d.p.urlFoto;
+      if (this.photoCache.has(url)) { d.img = this.photoCache.get(url) ?? null; return; }
+      this.photoCache.set(url, null);
+      const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        const tex = this.buildFaceCanvasWithImg(img, glow);
-        faceMat.map         = tex;
-        faceMat.emissiveMap = tex;
-        faceMat.needsUpdate = true;
+        this.photoCache.set(url, img);
+        const item = this.playerData.find(x => x.p.urlFoto === url);
+        if (item) item.img = img;
       };
-      img.src = p.urlFoto;
+      img.onerror = () => this.photoCache.set(url, null);
+      img.src = url;
+    });
+  }
+
+  private loadDtPhoto(): void {
+    if (!this.dtFotoUrl) { this.dtImg = null; return; }
+    if (this.photoCache.has(this.dtFotoUrl)) {
+      this.dtImg = this.photoCache.get(this.dtFotoUrl) ?? null;
+      return;
     }
-
-    /* Etiqueta CSS2D */
-    const label = (p.apellido?.split(' ')?.[0] ?? p.nombre ?? '?').toUpperCase();
-    const div   = document.createElement('div');
-    div.className   = 'lbl3d';
-    div.textContent = label;
-    const lbl = new this.CSS2DO(div);
-    lbl.position.set(0, 2.6, 0);
-    grp.add(lbl);
-
-    grp.position.set(wx, 0, wz);
-    grp.userData.baseX = wx;
-    grp.userData.baseZ = wz;
-    grp.userData.phase = Math.random() * Math.PI * 2;
-    return grp;
+    this.photoCache.set(this.dtFotoUrl, null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { this.photoCache.set(this.dtFotoUrl!, img); this.dtImg = img; };
+    img.onerror = () => this.photoCache.set(this.dtFotoUrl!, null);
+    img.src = this.dtFotoUrl;
   }
 
-  private buildFaceCanvas(p: JugadorSeleccionable, glow: string): any {
-    const S = 256, cx = S / 2, cy = S / 2, r = S / 2 - 4;
-    const cv = document.createElement('canvas');
-    cv.width = cv.height = S;
-    const ctx = cv.getContext('2d')!;
-
-    /* Fondo con color de posición */
-    const bg = ctx.createRadialGradient(cx, cy * .6, 0, cx, cy, r);
-    bg.addColorStop(0,  glow + 'ff');
-    bg.addColorStop(.5, glow + 'aa');
-    bg.addColorStop(1,  glow + '33');
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = bg; ctx.fill();
-
-    /* Inicial */
-    const inicial = (p.apellido || p.nombre || '?').charAt(0).toUpperCase();
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.floor(S * .42)}px Arial`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = '#000'; ctx.shadowBlur = 8;
-    ctx.fillText(inicial, cx, cy + 4);
-
-    const t = new this.T.CanvasTexture(cv);
-    t.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    return t;
+  /* Proyecta posición porcentual del campo a píxeles en pantalla */
+  private projectToScreen(xPct: number, yPct: number): [number, number] | null {
+    if (!this.camera || !this.T) return null;
+    const worldX = (xPct / 100 * 2 - 1) * HW;
+    const worldZ = (yPct / 100 * 2 - 1) * HL;
+    const vec = new this.T.Vector3(worldX, 0.5, worldZ);
+    vec.project(this.camera);
+    if (vec.z > 1) return null;
+    const el = this.containerRef.nativeElement;
+    const sw = el.clientWidth  || 360;
+    const sh = el.clientHeight || 480;
+    return [(vec.x + 1) / 2 * sw, (-vec.y + 1) / 2 * sh];
   }
 
-  private buildFaceCanvasWithImg(img: HTMLImageElement, glow: string): any {
-    const S = 256, cx = S / 2, cy = S / 2, r = S / 2 - 4;
-    const cv = document.createElement('canvas');
-    cv.width = cv.height = S;
-    const ctx = cv.getContext('2d')!;
-
-    /* Fondo */
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
-    const scale  = (S / img.naturalWidth);
-    const drawW  = S;
-    const drawH  = img.naturalHeight * scale;
-    const dy     = drawH > S ? -(drawH - S) * 0.15 : (S - drawH) / 2;
-    ctx.drawImage(img, 0, dy, drawW, drawH);
-
-    /* Borde de color */
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.strokeStyle = glow; ctx.lineWidth = 8; ctx.stroke();
-
-    const t = new this.T.CanvasTexture(cv);
-    t.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    return t;
+  /* Radio del token con escala de perspectiva suave */
+  private tokenRadius(yPct: number): number {
+    const sw       = this.containerRef.nativeElement.clientWidth || 360;
+    const baseR    = Math.round(sw / 16);
+    const depthScale = 0.68 + (yPct / 100) * 0.48;
+    return Math.round(baseR * depthScale);
   }
 
-  /* ── Loop de animación ──────────────────────────────────── */
   private loop(): void {
     this.animId = requestAnimationFrame(() => this.loop());
-    this.fr += 0.010;
-
-    /* Pulso de glow */
-    this.glowMeshes.forEach((m, i) => {
-      if (m.userData.sm) {
-        m.userData.sm.emissiveIntensity = .42 + Math.sin(this.fr * .9 + i * .75) * .16;
-      }
-    });
-
-    /* Movimiento orgánico suave */
-    if (this.tokenGroup) {
-      this.tokenGroup.children.forEach((grp: any) => {
-        const ph = grp.userData.phase ?? 0;
-        const t  = this.fr * 0.55;
-        const r  = 1.6;
-        grp.position.x = grp.userData.baseX + Math.sin(t + ph) * r;
-        grp.position.z = grp.userData.baseZ + Math.sin(t * 0.7 + ph + 1.4) * r * 0.6;
-      });
-    }
-
     this.renderer.render(this.scene, this.camera);
-    this.css2dR.render(this.scene, this.camera);
+    this.drawOverlay();
+  }
+
+  private drawOverlay(): void {
+    if (!this.octx) return;
+    const el = this.containerRef.nativeElement;
+    const w  = el.clientWidth  || 360;
+    const h  = el.clientHeight || 480;
+    this.octx.clearRect(0, 0, w, h);
+    /* Ordenar de más lejos (yPct bajo) a más cerca (yPct alto) */
+    const sorted = [...this.playerData].sort((a, b) => a.pct.y - b.pct.y);
+    sorted.forEach(d => this.drawToken(d));
+    if (this.dtNombre) this.drawDtToken();
+  }
+
+  private drawToken(d: typeof this.playerData[0]): void {
+    const proj = this.projectToScreen(d.pct.x, d.pct.y);
+    if (!proj) return;
+    const [cx, cy] = proj;
+    const R = this.tokenRadius(d.pct.y);
+    const ctx = this.octx;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur  = 8;
+    ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = d.color; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = d.color; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.87, 0, Math.PI * 2);
+    ctx.fillStyle = 'white'; ctx.fill();
+
+    const innerR = R * 0.82;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, innerR, 0, Math.PI * 2); ctx.clip();
+    if (d.img) {
+      const diam  = innerR * 2;
+      const scale = diam / d.img.naturalWidth;
+      const drawW = diam;
+      const drawH = d.img.naturalHeight * scale;
+      const dy    = drawH > diam ? -(drawH - diam) * 0.15 : (diam - drawH) / 2;
+      ctx.drawImage(d.img, cx - innerR, cy - innerR + dy, drawW, drawH);
+    } else {
+      const g = ctx.createRadialGradient(cx, cy - innerR * 0.2, 0, cx, cy, innerR);
+      g.addColorStop(0, d.color + 'cc'); g.addColorStop(1, d.color + '44');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, innerR, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.font = `bold ${Math.round(R * 0.7)}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText((d.p.apellido || d.p.nombre || '?').charAt(0).toUpperCase(), cx, cy);
+    }
+    ctx.restore();
+
+    const label  = (d.p.apellido?.split(' ')?.[0] ?? d.p.nombre ?? '').toUpperCase();
+    ctx.font     = `700 ${Math.round(R * 0.38)}px Arial`;
+    const textW  = ctx.measureText(label).width;
+    const labelW = Math.max(textW + R * 0.6, R * 1.6);
+    const labelH = Math.round(R * 0.56);
+    const lx = cx - labelW / 2;
+    const ly = cy + R + 3;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.beginPath(); this.pill(ctx, lx, ly, labelW, labelH, labelH / 2); ctx.fill();
+    ctx.strokeStyle = d.color; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 1;
+    ctx.fillText(label, cx, ly + labelH / 2);
+    ctx.restore();
+  }
+
+  private drawDtToken(): void {
+    const ctx   = this.octx;
+    const el    = this.containerRef.nativeElement;
+    const cssH  = el.clientHeight || 480;
+    const cssW  = el.clientWidth  || 360;
+    const cssR  = Math.round((cssW / 16) * 1.1);
+    const cxc   = 8 + cssR;
+    const cyc   = cssH - cssR * 2 - 10 + cssR;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 3;
+    ctx.beginPath(); ctx.arc(cxc, cyc, cssR, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e293b'; ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(cxc, cyc, cssR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    const innerR = cssR * 0.92;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cxc, cyc, innerR, 0, Math.PI * 2); ctx.clip();
+    if (this.dtImg) {
+      const diam = innerR * 2;
+      const drawW = diam;
+      const drawH = this.dtImg.naturalHeight * (diam / this.dtImg.naturalWidth);
+      const dy    = drawH > diam ? -(drawH - diam) * 0.15 : (diam - drawH) / 2;
+      ctx.drawImage(this.dtImg, cxc - innerR, cyc - innerR + dy, drawW, drawH);
+    } else {
+      ctx.fillStyle = '#334155';
+      ctx.beginPath(); ctx.arc(cxc, cyc, innerR, 0, Math.PI * 2); ctx.fill();
+      const initial = this.dtNombre?.split(' ').pop()?.charAt(0).toUpperCase() ?? 'D';
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = `bold ${Math.round(cssR * 0.65)}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(initial, cxc, cyc);
+    }
+    ctx.restore();
+
+    const apellido = (this.dtNombre?.split(' ').pop() ?? 'DT').toUpperCase();
+    ctx.font  = `700 ${Math.round(cssR * 0.36)}px Arial`;
+    const textW  = ctx.measureText(apellido).width;
+    const labelW = Math.max(textW + cssR * 0.6, cssR * 1.6);
+    const labelH = Math.round(cssR * 0.52);
+    const lx = cxc - labelW / 2;
+    const ly = cyc + cssR + 2;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.beginPath(); this.pill(ctx, lx, ly, labelW, labelH, labelH / 2); ctx.fill();
+    ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(apellido, cxc, ly + labelH / 2);
+    ctx.restore();
+  }
+
+  private pill(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);     ctx.arcTo(x + w, y,     x + w, y + r,     r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);     ctx.arcTo(x,     y + h, x,     y + h - r, r);
+    ctx.lineTo(x, y + r);         ctx.arcTo(x,     y,     x + r, y,         r);
+    ctx.closePath();
   }
 }
