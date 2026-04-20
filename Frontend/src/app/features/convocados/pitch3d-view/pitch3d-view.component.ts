@@ -113,10 +113,10 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   ready = false;
 
   /* Posición actual de cámara (para mostrar en UI) */
-  camY   = 31;
-  camZ   = 33;
-  camLZ  = -8;
-  camFov = 80;
+  camY   = 63;
+  camZ   = 29;
+  camLZ  = 0;
+  camFov = 70;
   private camX   = 0;
   private camAngle = 0; // rotación horizontal en radianes
 
@@ -182,8 +182,8 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   camReset(): void {
-    this.camY = 31; this.camZ = 33; this.camLZ = -8;
-    this.camFov = 80; this.camAngle = 0;
+    this.camY = 63; this.camZ = 29; this.camLZ = 0;
+    this.camFov = 70; this.camAngle = 0;
     this.applyCamera();
     this.cdr.detectChanges();
   }
