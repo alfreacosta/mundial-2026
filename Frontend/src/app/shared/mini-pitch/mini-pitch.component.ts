@@ -58,10 +58,14 @@ export class MiniPitchComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
-      this.initScene();
-      this.ro = new ResizeObserver(() => this.onResize());
-      this.ro.observe(this.containerRef.nativeElement);
-      this.loop();
+      try {
+        this.initScene();
+        this.ro = new ResizeObserver(() => this.onResize());
+        this.ro.observe(this.containerRef.nativeElement);
+        this.loop();
+      } catch (e) {
+        console.error('[mini-pitch] Error inicializando Three.js:', e);
+      }
     });
   }
 
@@ -515,24 +519,28 @@ export class MiniPitchComponent implements AfterViewInit, OnDestroy, OnChanges {
   // ═══════════════════════════════════════════════
   private loop(): void {
     this.animId = requestAnimationFrame(() => this.loop());
-    this.fr += 0.010;
+    try {
+      this.fr += 0.010;
 
-    // Glow pulsante en los discos
-    this.glowMeshes.forEach((m, i) => {
-      const sm = m.userData['sm'] as THREE.MeshStandardMaterial | undefined;
-      if (sm) sm.emissiveIntensity = .48 + Math.sin(this.fr * .9 + i * .75) * .17;
-    });
+      // Glow pulsante en los discos
+      this.glowMeshes.forEach((m, i) => {
+        const sm = m.userData['sm'] as THREE.MeshStandardMaterial | undefined;
+        if (sm) sm.emissiveIntensity = .48 + Math.sin(this.fr * .9 + i * .75) * .17;
+      });
 
-    // Movimiento orgánico suave de los tokens
-    this.tokenGroups.forEach(grp => {
-      const ph = grp.userData['phase'] as number;
-      const t  = this.fr * 0.55;
-      const r  = 1.8;
-      grp.position.x = grp.userData['baseX'] + Math.sin(t + ph) * r;
-      grp.position.z = grp.userData['baseZ'] + Math.sin(t * 0.7 + ph + 1.4) * r * 0.6;
-    });
+      // Movimiento orgánico suave de los tokens
+      this.tokenGroups.forEach(grp => {
+        const ph = grp.userData['phase'] as number;
+        const t  = this.fr * 0.55;
+        const r  = 1.8;
+        grp.position.x = grp.userData['baseX'] + Math.sin(t + ph) * r;
+        grp.position.z = grp.userData['baseZ'] + Math.sin(t * 0.7 + ph + 1.4) * r * 0.6;
+      });
 
-    this.renderer.render(this.scene, this.camera);
-    this.css2d.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.camera);
+      this.css2d.render(this.scene, this.camera);
+    } catch (e) {
+      // No crashear Angular si falla un frame
+    }
   }
 }
