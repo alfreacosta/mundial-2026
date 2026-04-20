@@ -60,7 +60,7 @@ export class MiniPitchComponent implements AfterViewInit, OnDestroy, OnChanges {
       // Import dinámico → Three.js va en su propio chunk, no bloquea el bundle principal
       Promise.all([
         import('three'),
-        import('three/addons/renderers/CSS2DRenderer.js' as any),
+        import(/* @vite-ignore */ 'three/addons/renderers/CSS2DRenderer.js'),
       ]).then(([THREE, { CSS2DRenderer, CSS2DObject }]) => {
         this.THREE = THREE;
         this.CSS2DRenderer = CSS2DRenderer;
