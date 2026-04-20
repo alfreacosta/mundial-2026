@@ -170,6 +170,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() dtFotoUrl?: string;
   @Input() paisNombre?: string;
   @Input() paisLogoUrl?: string | null;
+  @Input() usuario?: string;
 
   ready = false;
 
@@ -645,13 +646,20 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     }
 
     // www.dt26.win debajo del logo
+    const fontSize = Math.round(w / 28);
     const textY = logoY + logoSz + 4;
     ctx.save();
-    ctx.font = `bold ${Math.round(w / 28)}px Arial`;
+    ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = 'rgba(255,255,255,0.70)';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('www.dt26.win', logoX, textY);
+    // Usuario debajo
+    if (this.usuario) {
+      ctx.font = `${fontSize}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.50)';
+      ctx.fillText(`usuario: ${this.usuario}`, logoX, textY + fontSize + 3);
+    }
     ctx.restore();
   }
 
