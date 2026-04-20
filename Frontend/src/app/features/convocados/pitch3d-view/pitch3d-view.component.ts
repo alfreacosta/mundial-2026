@@ -17,37 +17,70 @@ const LW = 0.23;
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div #container class="c3d">
-      <canvas #overlay class="overlay-cvs"></canvas>
-      <div class="loading-msg" *ngIf="!ready">Cargando vista 3D…</div>
+    <div class="pitch3d-wrapper">
+      <div #container class="c3d">
+        <canvas #overlay class="overlay-cvs"></canvas>
+        <div class="loading-msg" *ngIf="!ready">Cargando vista 3D…</div>
+      </div>
 
-      <!-- Controles de cámara -->
-      <div class="cam-controls" *ngIf="ready">
-        <div class="cam-info">
-          Y:{{camY}} Z:{{camZ}} LZ:{{camLZ}} FOV:{{camFov}}°
+      <!-- Controles DEBAJO de la cancha -->
+      <div class="cam-panel" *ngIf="ready">
+
+        <!-- HUD completo de valores -->
+        <div class="cam-hud">
+          <div class="hud-section">
+            <span class="hud-label">📷 Cámara pos</span>
+            <span class="hud-val">X: <b>{{camPosX | number:'1.1-1'}}</b></span>
+            <span class="hud-val">Y: <b>{{camY}}</b></span>
+            <span class="hud-val">Z: <b>{{camPosZ | number:'1.1-1'}}</b></span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">🎯 Foco (lookAt)</span>
+            <span class="hud-val">X: <b>0</b></span>
+            <span class="hud-val">Y: <b>0</b></span>
+            <span class="hud-val">Z: <b>{{camLZ}}</b></span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">🔭 Proyección</span>
+            <span class="hud-val">FOV: <b>{{camFov}}°</b></span>
+            <span class="hud-val">Dist: <b>{{camZ}}</b></span>
+            <span class="hud-val">Ang: <b>{{camAngleDeg | number:'1.0-0'}}°</b></span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">💡 Luz key</span>
+            <span class="hud-val">X: <b>−18</b></span>
+            <span class="hud-val">Y: <b>92</b></span>
+            <span class="hud-val">Z: <b>58</b></span>
+          </div>
         </div>
-        <div class="cam-row">
-          <button class="cam-btn" (click)="camMove('up')"    title="Subir cámara">⬆ Subir</button>
-          <button class="cam-btn" (click)="camMove('down')"  title="Bajar cámara">⬇ Bajar</button>
-          <button class="cam-btn" (click)="camMove('in')"    title="Acercar">🔍+ Acercar</button>
-          <button class="cam-btn" (click)="camMove('out')"   title="Alejar">🔍− Alejar</button>
+
+        <!-- Botones de control -->
+        <div class="cam-controls">
+          <div class="cam-row">
+            <button class="cam-btn" (click)="camMove('up')">⬆ Subir</button>
+            <button class="cam-btn" (click)="camMove('down')">⬇ Bajar</button>
+            <button class="cam-btn" (click)="camMove('in')">🔍+ Acercar</button>
+            <button class="cam-btn" (click)="camMove('out')">🔍− Alejar</button>
+          </div>
+          <div class="cam-row">
+            <button class="cam-btn" (click)="camMove('tiltUp')">↩ Tilt ↑</button>
+            <button class="cam-btn" (click)="camMove('tiltDown')">↪ Tilt ↓</button>
+            <button class="cam-btn" (click)="camMove('rot45')">↻ 45°</button>
+            <button class="cam-btn" (click)="camMove('rot-45')">↺ −45°</button>
+          </div>
+          <div class="cam-row">
+            <button class="cam-btn" (click)="camMove('fovIn')">FOV+</button>
+            <button class="cam-btn" (click)="camMove('fovOut')">FOV−</button>
+            <button class="cam-btn cam-reset" (click)="camReset()">⟳ Reset</button>
+          </div>
         </div>
-        <div class="cam-row">
-          <button class="cam-btn" (click)="camMove('tiltUp')"   title="Rotar arriba">↩ Tilt ↑</button>
-          <button class="cam-btn" (click)="camMove('tiltDown')" title="Rotar abajo">↪ Tilt ↓</button>
-          <button class="cam-btn" (click)="camMove('rot45')"    title="Rotar 45°">↻ 45°</button>
-          <button class="cam-btn" (click)="camMove('rot-45')"   title="Rotar -45°">↺ −45°</button>
-        </div>
-        <div class="cam-row">
-          <button class="cam-btn" (click)="camMove('fovIn')"  title="Más FOV">FOV+</button>
-          <button class="cam-btn" (click)="camMove('fovOut')" title="Menos FOV">FOV−</button>
-          <button class="cam-btn cam-reset" (click)="camReset()" title="Resetear">⟳ Reset</button>
-        </div>
+
       </div>
     </div>
   `,
   styles: [`
     :host { display: block; width: 100%; }
+    .pitch3d-wrapper { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .c3d {
       width: 100%;
       height: clamp(360px, 60vw, 580px);
@@ -68,35 +101,61 @@ const LW = 0.23;
       font-size: 13px; font-family: Arial, sans-serif;
       pointer-events: none;
     }
-    .cam-controls {
-      position: absolute; bottom: 10px; right: 10px;
-      display: flex; flex-direction: column; gap: 4px;
-      z-index: 10;
+    /* Panel completo debajo de la cancha */
+    .cam-panel {
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .cam-info {
-      background: rgba(0,0,0,0.72);
+    /* HUD de valores */
+    .cam-hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .hud-section {
+      flex: 1 1 auto;
+      min-width: 130px;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hud-label {
+      font-family: monospace; font-size: 9px;
+      color: #64748b; text-transform: uppercase;
+      letter-spacing: 0.04em; margin-bottom: 2px;
+    }
+    .hud-val {
+      font-family: monospace; font-size: 11px;
+      color: #94a3b8;
+    }
+    .hud-val b { color: #7fff7f; }
+    /* Botones */
+    .cam-controls {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .cam-row { display: flex; gap: 4px; flex-wrap: wrap; }
+    .cam-btn {
+      background: #1e293b;
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 6px;
-      padding: 3px 8px;
-      font-family: monospace; font-size: 10px;
-      color: #7fff7f; white-space: nowrap; text-align: center;
-    }
-    .cam-row {
-      display: flex; gap: 4px;
-    }
-    .cam-btn {
-      background: rgba(0,0,0,0.72);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 6px;
-      color: #fff; font-size: 10px;
-      padding: 4px 7px; cursor: pointer;
+      color: #e2e8f0; font-size: 11px;
+      padding: 5px 10px; cursor: pointer;
       white-space: nowrap;
       transition: background 0.15s;
     }
-    .cam-btn:hover { background: rgba(16,185,129,0.35); border-color: #10b981; }
-    .cam-btn:active { background: rgba(16,185,129,0.55); }
-    .cam-reset { border-color: rgba(239,68,68,0.5); }
-    .cam-reset:hover { background: rgba(239,68,68,0.3); border-color: #ef4444; }
+    .cam-btn:hover { background: rgba(16,185,129,0.25); border-color: #10b981; color: #fff; }
+    .cam-btn:active { background: rgba(16,185,129,0.45); }
+    .cam-reset { border-color: rgba(239,68,68,0.4); }
+    .cam-reset:hover { background: rgba(239,68,68,0.25); border-color: #ef4444; }
   `]
 })
 export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -118,7 +177,12 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   camLZ  = 0;
   camFov = 70;
   private camX   = 0;
-  private camAngle = 0; // rotación horizontal en radianes
+  camAngle = 0; // rotación horizontal en radianes
+
+  /* Getters para el HUD */
+  get camPosX(): number { return Math.sin(this.camAngle) * this.camZ; }
+  get camPosZ(): number { return Math.cos(this.camAngle) * this.camZ; }
+  get camAngleDeg(): number { return this.camAngle * 180 / Math.PI; }
 
   private T: any;
   private scene:    any;
