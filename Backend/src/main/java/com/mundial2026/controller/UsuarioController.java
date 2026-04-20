@@ -207,6 +207,7 @@ public class UsuarioController {
     public record JugadorResumenDTO(
             Long id,
             String nombre,
+            String apellido,
             Integer numeroCamiseta,
             String posicion,
             String posicionAbr,
@@ -218,6 +219,7 @@ public class UsuarioController {
             return new JugadorResumenDTO(
                     j.getInternalId(),
                     j.getNombreCompleto() != null ? j.getNombreCompleto() : j.getNombre() + " " + (j.getApellido() != null ? j.getApellido() : ""),
+                    j.getApellido() != null ? j.getApellido() : "",
                     j.getNumeroCamiseta(),
                     pos != null ? pos.getNombre() : "",
                     pos != null ? pos.getAbreviatura() : "",

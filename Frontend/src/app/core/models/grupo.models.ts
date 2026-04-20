@@ -102,6 +102,7 @@ export interface PerfilPublico {
 export interface JugadorResumen {
   id: number;
   nombre: string;
+  apellido: string;
   numeroCamiseta: number | null;
   posicion: string;
   posicionAbr: string;

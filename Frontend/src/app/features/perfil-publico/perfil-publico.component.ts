@@ -96,7 +96,7 @@ export class PerfilPublicoComponent implements OnInit {
       const n = jugadores.length;
       jugadores.forEach((j, i) => {
         const saved = posMap.get(j.id);
-        const apellido = j.nombre.split(' ').pop() ?? j.nombre;
+        const apellido = j.apellido || j.nombre.split(' ')[1] || j.nombre;
         if (saved) {
           results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
         } else {
