@@ -22,7 +22,7 @@ const FH = 90;
   styles: [`
     :host { display: block; width: 100%; }
     .wrap { width: 100%; border-radius: 12px; overflow: hidden; background: #071a07; }
-    .cvs  { width: 100%; display: block; touch-action: pan-y; }
+    .cvs  { width: 100%; display: block; touch-action: none; }
   `]
 })
 export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -397,8 +397,6 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
     cvs.addEventListener('pointerup',     e => this.onUp(e));
     cvs.addEventListener('pointercancel', () => {
       this.dragging = null;
-      this.cvsRef.nativeElement.style.touchAction = 'pan-y';
-      document.body.style.overflow = '';
     });
   }
 
@@ -419,8 +417,6 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
         this.pointerDownPos  = { ...pos };
         this.pointerDownTime = Date.now();
         e.preventDefault();
-        this.cvsRef.nativeElement.style.touchAction = 'none';
-        document.body.style.overflow = 'hidden';
         this.cvsRef.nativeElement.setPointerCapture(e.pointerId);
         return;
       }
@@ -438,8 +434,6 @@ export class PitchThreeDComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private onUp(e: PointerEvent): void {
-    this.cvsRef.nativeElement.style.touchAction = 'pan-y';
-    document.body.style.overflow = '';
     if (!this.dragging) return;
     const d   = this.playerData[this.dragging.idx];
     const pos = this.getPos(e);
