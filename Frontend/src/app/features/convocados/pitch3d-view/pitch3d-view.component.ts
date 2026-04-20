@@ -173,7 +173,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
 
   /* Posición actual de cámara (para mostrar en UI) */
   camY   = 63;
-  camZ   = 29;
+  camZ   = 41;
   camLZ  = 0;
   camFov = 70;
   private camX   = 0;
@@ -246,7 +246,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   camReset(): void {
-    this.camY = 63; this.camZ = 29; this.camLZ = 0;
+    this.camY = 63; this.camZ = 41; this.camLZ = 0;
     this.camFov = 70; this.camAngle = 0;
     this.applyCamera();
     this.cdr.detectChanges();
