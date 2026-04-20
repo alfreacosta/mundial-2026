@@ -312,12 +312,6 @@
       <!-- Botón ir a la cancha + cancha con titulares -->
       <ng-container *ngIf="totalTitulares() > 0">
         <section class="pitch-section" id="pitch-section">
-          <div class="pitch-toolbar">
-            <button class="tactica-btn" (click)="scrollToPitch()">
-              <mat-icon>tune</mat-icon>
-              Cambiá el planteo táctico
-            </button>
-          </div>
           <div class="pitch-canvas-wrap">
             <app-pitch-3d
               #pitch3d

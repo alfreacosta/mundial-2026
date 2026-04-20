@@ -864,10 +864,16 @@ $radius:      14px;
 .dt-badge-mini {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 6px;
   margin-bottom: 4px;
-  padding-right: 4px;
+  padding: 0 4px;
+
+  .dt-badge-mini-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
   .dt-mini-foto {
     width: 28px;
@@ -884,6 +890,35 @@ $radius:      14px;
     color: rgba(255,255,255,0.85);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+}
+
+.tactica-btn-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: transparent;
+  border: 1.5px solid rgba(16,185,129,0.5);
+  color: #10b981;
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    line-height: 13px;
+  }
+
+  &:hover {
+    background: rgba(16,185,129,0.12);
+    border-color: #10b981;
   }
 }
 
