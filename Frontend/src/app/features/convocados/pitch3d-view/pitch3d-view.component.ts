@@ -548,7 +548,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
 
   private tokenRadius(yPct: number): number {
     const sw       = this.containerRef.nativeElement.clientWidth || 360;
-    const baseR    = Math.round(sw / 16);
+    const baseR    = Math.round(sw / 20);
     const depthScale = 0.68 + (yPct / 100) * 0.48;
     return Math.round(baseR * depthScale);
   }
@@ -633,13 +633,13 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private drawDtToken(): void {
-    // Posicionar el DT arriba de la cancha (extremo lejano, centro)
-    const proj = this.projectToScreen(50, 0);
-    if (!proj) return;
-    const [cxc, cyc] = proj;
+    // Posición fija: arriba-izquierda, fuera de la cancha
     const el    = this.containerRef.nativeElement;
     const cssW  = el.clientWidth  || 360;
-    const cssR  = Math.round((cssW / 16) * 1.05);
+    const cssR  = Math.round(cssW / 22);
+    const margin = 8;
+    const cxc   = margin + cssR;
+    const cyc   = margin + cssR;
     const ctx   = this.octx;
 
     ctx.save();
