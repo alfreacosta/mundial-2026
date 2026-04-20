@@ -1077,6 +1077,16 @@ $save-bar-height: 72px;
   }
 }
 
+.tab-3d {
+  &.active {
+    color: #10b981 !important;
+    border-bottom-color: #10b981 !important;
+  }
+  &:hover {
+    color: lighten(#10b981, 10%);
+  }
+}
+
 /* ═══ TITULARES INFO BAR ═══ */
 .titulares-info-bar {
   display: flex;

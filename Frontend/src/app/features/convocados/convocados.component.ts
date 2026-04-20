@@ -15,6 +15,7 @@ import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { forkJoin, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { PitchThreeDComponent } from './pitch-3d/pitch-3d.component';
+import { Pitch3dViewComponent } from './pitch3d-view/pitch3d-view.component';
 import { CountriesService, Pais, JugadorPais } from '../../core/services/countries.service';
 import { GrupoService } from '../../core/services/grupo.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -77,6 +78,7 @@ interface PosicionGroup {
     RouterLink,
     CdkDrag,
     PitchThreeDComponent,
+    Pitch3dViewComponent,
     UpperCasePipe
   ],
   templateUrl: './convocados.component.html',
@@ -93,7 +95,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   convocatoriaEstado: string | null = null;
   noEsFavorito = false;
   searchQuery = '';
-  activeTab = signal<'convocatoria' | 'titulares' | 'nova'>('convocatoria');
+  activeTab = signal<'convocatoria' | 'titulares' | 'nova' | 'vista3d'>('convocatoria');
 
   private readonly autoSave$ = new Subject<void>();
   private readonly destroy$ = new Subject<void>();
@@ -670,7 +672,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.paisId = Number(this.route.snapshot.paramMap.get('paisId'));
     const tab = this.route.snapshot.queryParamMap.get('tab');
-    if (tab === 'titulares' || tab === 'nova') {
+    if (tab === 'titulares' || tab === 'nova' || tab === 'vista3d') {
       this.activeTab.set(tab);
     }
 
@@ -1063,7 +1065,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     this.router.navigate(['/countries']);
   }
 
-  setTab(tab: 'convocatoria' | 'titulares' | 'nova'): void {
+  setTab(tab: 'convocatoria' | 'titulares' | 'nova' | 'vista3d'): void {
     this.activeTab.set(tab);
     this.router.navigate([], {
       relativeTo: this.route,

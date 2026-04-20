@@ -60,8 +60,10 @@
         <mat-icon>star</mat-icon>
         Titulares
         <span class="tab-count" *ngIf="totalTitulares() > 0">{{ totalTitulares() }}/11</span>
-      </button>
-      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="setTab('nova')">
+      </button>      <button class="tab-btn tab-3d" [class.active]="activeTab() === 'vista3d'" (click)="setTab('vista3d')">
+        <mat-icon>view_in_ar</mat-icon>
+        Vista 3D
+      </button>      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="setTab('nova')">
         <mat-icon>person_off</mat-icon>
         No Va
         <span class="tab-count nova-count" *ngIf="totalNoVa() > 0">{{ totalNoVa() }}</span>
@@ -327,6 +329,31 @@
               (positionChanged)="on3dPositionChanged($event)"
               (playerClicked)="onPitchPlayerClicked($event)">
             </app-pitch-3d>
+          </div>
+        </section>
+      </ng-container>
+
+    </main>
+
+    <!-- ═══ TAB: VISTA 3D ═══ -->
+    <main class="players-main" *ngIf="activeTab() === 'vista3d'">
+
+      <div class="state-container" *ngIf="totalTitulares() === 0" style="padding: 3rem 1rem">
+        <mat-icon class="state-icon" style="color: #94a3b8;">view_in_ar</mat-icon>
+        <h3>Sin titulares</h3>
+        <p>Seleccioná titulares desde <strong>Convocatoria</strong> para ver la vista 3D.</p>
+      </div>
+
+      <ng-container *ngIf="totalTitulares() > 0">
+        <section class="pitch-section" id="pitch-3d-section">
+          <div class="pitch-canvas-wrap">
+            <app-pitch3d-view
+              [players]="jugadoresTitulares"
+              [savedPositions]="savedPositions"
+              [posColorFn]="getPosColor.bind(this)"
+              [dtNombre]="pais?.dtNombre || undefined"
+              [dtFotoUrl]="pais?.dtFotoUrl || undefined">
+            </app-pitch3d-view>
           </div>
         </section>
       </ng-container>
