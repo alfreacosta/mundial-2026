@@ -129,9 +129,9 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       }
       scene.fog = new this.T.Fog(0x041204, 210, 380);
 
-      const camera = new this.T.PerspectiveCamera(72, w / h, 0.5, 500);
-      camera.position.set(0, 55, 50);
-      camera.lookAt(0, 0, -5);
+      const camera = new this.T.PerspectiveCamera(80, w / h, 0.5, 500);
+      camera.position.set(0, 28, 30);
+      camera.lookAt(0, 0, -8);
       this.camera = camera;
 
       const renderer = new this.T.WebGLRenderer({ antialias: true, precision: 'highp' });
