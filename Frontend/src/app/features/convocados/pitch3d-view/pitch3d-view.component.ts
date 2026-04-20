@@ -522,11 +522,13 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   private drawBranding(w: number): void {
     const ctx    = this.octx;
     const margin = 8;
-    // Logo: mismo alto que el DT token (dtR*2) pero más grande → usar ancho/9
     const logoSz = Math.round(w / 9);
+    const dtR    = Math.round(w / 22);
+    const gap    = 8;
     const logoX  = margin;
     const logoY  = margin;
 
+    // Logo DT26
     if (this.logoImg) {
       ctx.save();
       ctx.globalAlpha = 0.90;
@@ -534,11 +536,14 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       ctx.restore();
     }
 
-    // www.dt26.win a la derecha del logo
-    const textX    = logoX + logoSz + 8;
+    // Texto: a la derecha del DT token
+    // DT token center X = margin + logoSz + gap + dtR
+    const dtCX  = margin + logoSz + gap + dtR;
+    const textX = dtCX + dtR + gap;
+    const midY  = margin + Math.round(logoSz / 2);
     const fontSize = Math.round(w / 26);
     const lineH    = fontSize + 5;
-    const textTopY = logoY + Math.round((logoSz - lineH * (this.usuario ? 2 : 1)) / 2);
+    const textTopY = midY - Math.round(lineH * (this.usuario ? 1 : 0.5));
 
     ctx.save();
     ctx.textAlign    = 'left';
@@ -655,13 +660,15 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private drawDtToken(): void {
-    // Posición fija: arriba-izquierda, fuera de la cancha
+    // Posición: a la derecha del logo, centrado verticalmente con él
     const el    = this.containerRef.nativeElement;
     const cssW  = el.clientWidth  || 360;
-    const cssR  = Math.round(cssW / 22);
     const margin = 8;
-    const cxc   = margin + cssR;
-    const cyc   = margin + cssR;
+    const logoSz = Math.round(cssW / 9);
+    const cssR   = Math.round(cssW / 22);
+    const gap    = 8;
+    const cxc   = margin + logoSz + gap + cssR;
+    const cyc   = margin + Math.round(logoSz / 2);
     const ctx   = this.octx;
 
     ctx.save();
