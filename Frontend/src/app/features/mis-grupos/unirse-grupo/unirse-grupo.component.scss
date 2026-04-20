@@ -82,8 +82,8 @@
 
     &.activo {
       .paso-num {
-        background: v.$fantasy-purple;
-        border-color: v.$fantasy-purple;
+        background: #1e40af;
+        border-color: #1e40af;
         color: v.$white;
       }
       .paso-label { color: v.$gray-300; }
@@ -335,9 +335,9 @@
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 
   &.btn-primary {
-    background: v.$fantasy-purple;
+    background: #1e40af;
     color: v.$white;
-    &:hover:not(:disabled) { background: v.$fantasy-violet; }
+    &:hover:not(:disabled) { background: #1e3a8a; }
   }
 
   &.btn-secondary {

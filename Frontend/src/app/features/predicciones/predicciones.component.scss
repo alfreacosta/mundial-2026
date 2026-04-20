@@ -319,8 +319,8 @@ $ease:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .club-tag {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
 }
 
 .form-msg {
@@ -382,7 +382,7 @@ $ease:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: .02em;
 
   .ph-exact  { color: #fbbf24; font-weight: 700; }
-  .ph-diff   { color: #c084fc; font-weight: 700; }
+  .ph-diff   { color: #93c5fd; font-weight: 700; }
   .ph-result { color: #60a5fa; font-weight: 700; }
   .ph-wrong  { color: v.$gray-400; font-weight: 700; }
 }

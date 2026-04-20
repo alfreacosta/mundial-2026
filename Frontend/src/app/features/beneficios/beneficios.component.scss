@@ -160,7 +160,7 @@ $ease:    0.2s cubic-bezier(0.4,0,0.2,1);
   &[data-color="red"]    { --ac: #{$red}; }
   &[data-color="blue"]   { --ac: #3b82f6; }
   &[data-color="green"]  { --ac: #{$green}; }
-  &[data-color="purple"] { --ac: #a78bfa; }
+  &[data-color="purple"] { --ac: #60a5fa; }
 
   @media (min-width: 768px) {
     padding: 22px 20px;

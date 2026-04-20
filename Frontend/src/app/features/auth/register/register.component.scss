@@ -753,12 +753,12 @@ $border:    rgba(255,255,255,0.1);
   margin: 4px 0 0;
 
   a {
-    color: rgba(167, 139, 250, 0.9);
+    color: rgba(96, 165, 250, 0.9);
     font-weight: 600;
     text-decoration: none;
     transition: color 0.15s;
 
-    &:hover { color: #a78bfa; }
+    &:hover { color: #93c5fd; }
   }
 }
 
@@ -1295,7 +1295,7 @@ $border:    rgba(255,255,255,0.1);
     &.si-list   { background: rgba(16, 185, 129, 0.12); color: #34d399; box-shadow: 0 0 24px rgba(16,185,129,0.08); }
     &.si-ball   { background: rgba(0, 212, 255, 0.12); color: #22d3ee; box-shadow: 0 0 24px rgba(0,212,255,0.08); }
     &.si-target { background: rgba(244, 63, 94, 0.12); color: #fb7185; box-shadow: 0 0 24px rgba(244,63,94,0.08); }
-    &.si-chart  { background: rgba(168, 85, 247, 0.12); color: #c084fc; box-shadow: 0 0 24px rgba(168,85,247,0.08); }
+    &.si-chart  { background: rgba(59, 130, 246, 0.12); color: #93c5fd; box-shadow: 0 0 24px rgba(59,130,246,0.08); }
     &.si-users  { background: rgba(251, 191, 36, 0.12); color: #fbbf24; box-shadow: 0 0 24px rgba(251,191,36,0.08); }
   }
 
@@ -1465,7 +1465,7 @@ $border:    rgba(255,255,255,0.1);
       &.sc-icon-green  { background: rgba(76,175,80,0.15); color: #66bb6a; box-shadow: 0 0 20px rgba(76,175,80,0.1); }
       &.sc-icon-blue   { background: rgba(33,150,243,0.15); color: #42a5f5; box-shadow: 0 0 20px rgba(33,150,243,0.1); }
       &.sc-icon-cyan   { background: rgba(6,182,212,0.15); color: #06b6d4; box-shadow: 0 0 20px rgba(6,182,212,0.1); }
-      &.sc-icon-purple { background: rgba(156,39,176,0.15); color: #ba68c8; box-shadow: 0 0 20px rgba(156,39,176,0.1); }
+      &.sc-icon-purple { background: rgba(30,64,175,0.15); color: #93c5fd; box-shadow: 0 0 20px rgba(30,64,175,0.1); }
     }
 
     h3 {
@@ -1533,12 +1533,12 @@ $border:    rgba(255,255,255,0.1);
   }
 
   &.sc-purple {
-    background: linear-gradient(135deg, rgba(156,39,176,0.08), rgba(156,39,176,0.02));
-    border-color: rgba(156, 39, 176, 0.18);
-    .sc-pts { color: #ba68c8; }
-    .sc-highlight .sc-pts { background: rgba(156, 39, 176, 0.18); color: #ce93d8; }
+    background: linear-gradient(135deg, rgba(30,64,175,0.08), rgba(30,64,175,0.02));
+    border-color: rgba(30, 64, 175, 0.18);
+    .sc-pts { color: #93c5fd; }
+    .sc-highlight .sc-pts { background: rgba(30, 64, 175, 0.18); color: #bfdbfe; }
     .sc-danger .sc-pts { background: rgba(244, 67, 54, 0.15); color: #ef5350; }
-    &:hover { box-shadow: 0 8px 32px rgba(156,39,176,0.12); }
+    &:hover { box-shadow: 0 8px 32px rgba(30,64,175,0.12); }
   }
 
   &.sc-red {
