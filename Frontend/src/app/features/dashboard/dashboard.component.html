@@ -201,14 +201,20 @@
                                 <a [routerLink]="['/convocados', fav.paisId]">Elegir titulares</a>
                               </div>
                             } @else {
-                              @if (fav.dtNombre) {
-                                <div class="dt-badge-mini">
-                                  @if (fav.dtFotoUrl) {
-                                    <img [src]="fav.dtFotoUrl" class="dt-mini-foto" [alt]="fav.dtNombre" (error)="$any($event.target).style.display='none'">
-                                  }
-                                  <span>{{ fav.dtNombre.split(' ').at(-1) }}</span>
-                                </div>
-                              }
+                              <div class="dt-badge-mini">
+                                <a class="tactica-btn-mini" [routerLink]="['/convocados', fav.paisId]" [queryParams]="{tab:'titulares'}">
+                                  <mat-icon>tune</mat-icon>
+                                  Cambiá el planteo
+                                </a>
+                                @if (fav.dtNombre) {
+                                  <div class="dt-badge-mini-right">
+                                    @if (fav.dtFotoUrl) {
+                                      <img [src]="fav.dtFotoUrl" class="dt-mini-foto" [alt]="fav.dtNombre" (error)="$any($event.target).style.display='none'">
+                                    }
+                                    <span>{{ fav.dtNombre.split(' ').at(-1) }}</span>
+                                  </div>
+                                }
+                              </div>
                               <app-mini-pitch [players]="getTitularesParaCancha(fav.paisId)"></app-mini-pitch>
 
                               <!-- ══ PLANTEL COMPLETO debajo de la cancha ══ -->
