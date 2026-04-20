@@ -779,11 +779,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const onlyConv = !q && this.hasConvocados;
     return this.players().filter(j => {
       if (j.posicion?.codigo !== codigo || j.noVa) return false;
-      // Siempre mostrar seleccionados por el usuario
-      if (j.seleccionado) return true;
+      // Sin búsqueda activa: siempre mostrar seleccionados
+      if (!q && j.seleccionado) return true;
       // Sin búsqueda y hay convocados: solo mostrar convocados
       if (onlyConv && !j.convocadoEliminatoria) return false;
       if (!q) return true;
+      // Con búsqueda: filtrar por nombre o club (incluso seleccionados)
       const nombre = normalize(j.nombreCompleto || `${j.nombre} ${j.apellido}`);
       const club = normalize(j.club?.nombre || '');
       return nombre.includes(q) || club.includes(q);
@@ -795,7 +796,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     const onlyConv = !q && this.hasConvocados;
     return this.players().filter(j => {
       if (j.noVa) return false;
-      if (j.seleccionado) return true;
+      if (!q && j.seleccionado) return true;
       if (onlyConv && !j.convocadoEliminatoria) return false;
       if (!q) return true;
       const nombre = normalize(j.nombreCompleto || `${j.nombre} ${j.apellido}`);
