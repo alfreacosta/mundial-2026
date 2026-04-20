@@ -22,65 +22,11 @@ const LW = 0.23;
         <canvas #overlay class="overlay-cvs"></canvas>
         <div class="loading-msg" *ngIf="!ready">Cargando vista 3D…</div>
       </div>
-
-      <!-- Controles DEBAJO de la cancha -->
-      <div class="cam-panel" *ngIf="ready">
-
-        <!-- HUD completo de valores -->
-        <div class="cam-hud">
-          <div class="hud-section">
-            <span class="hud-label">📷 Cámara pos</span>
-            <span class="hud-val">X: <b>{{camPosX | number:'1.1-1'}}</b></span>
-            <span class="hud-val">Y: <b>{{camY}}</b></span>
-            <span class="hud-val">Z: <b>{{camPosZ | number:'1.1-1'}}</b></span>
-          </div>
-          <div class="hud-section">
-            <span class="hud-label">🎯 Foco (lookAt)</span>
-            <span class="hud-val">X: <b>0</b></span>
-            <span class="hud-val">Y: <b>0</b></span>
-            <span class="hud-val">Z: <b>{{camLZ}}</b></span>
-          </div>
-          <div class="hud-section">
-            <span class="hud-label">🔭 Proyección</span>
-            <span class="hud-val">FOV: <b>{{camFov}}°</b></span>
-            <span class="hud-val">Dist: <b>{{camZ}}</b></span>
-            <span class="hud-val">Ang: <b>{{camAngleDeg | number:'1.0-0'}}°</b></span>
-          </div>
-          <div class="hud-section">
-            <span class="hud-label">💡 Luz key</span>
-            <span class="hud-val">X: <b>−18</b></span>
-            <span class="hud-val">Y: <b>92</b></span>
-            <span class="hud-val">Z: <b>58</b></span>
-          </div>
-        </div>
-
-        <!-- Botones de control -->
-        <div class="cam-controls">
-          <div class="cam-row">
-            <button class="cam-btn" (click)="camMove('up')">⬆ Subir</button>
-            <button class="cam-btn" (click)="camMove('down')">⬇ Bajar</button>
-            <button class="cam-btn" (click)="camMove('in')">🔍+ Acercar</button>
-            <button class="cam-btn" (click)="camMove('out')">🔍− Alejar</button>
-          </div>
-          <div class="cam-row">
-            <button class="cam-btn" (click)="camMove('tiltUp')">↩ Tilt ↑</button>
-            <button class="cam-btn" (click)="camMove('tiltDown')">↪ Tilt ↓</button>
-            <button class="cam-btn" (click)="camMove('rot45')">↻ 45°</button>
-            <button class="cam-btn" (click)="camMove('rot-45')">↺ −45°</button>
-          </div>
-          <div class="cam-row">
-            <button class="cam-btn" (click)="camMove('fovIn')">FOV+</button>
-            <button class="cam-btn" (click)="camMove('fovOut')">FOV−</button>
-            <button class="cam-btn cam-reset" (click)="camReset()">⟳ Reset</button>
-          </div>
-        </div>
-
-      </div>
     </div>
   `,
   styles: [`
     :host { display: block; width: 100%; }
-    .pitch3d-wrapper { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .pitch3d-wrapper { display: flex; flex-direction: column; width: 100%; }
     .c3d {
       width: 100%;
       height: clamp(360px, 60vw, 580px);
@@ -101,61 +47,6 @@ const LW = 0.23;
       font-size: 13px; font-family: Arial, sans-serif;
       pointer-events: none;
     }
-    /* Panel completo debajo de la cancha */
-    .cam-panel {
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    /* HUD de valores */
-    .cam-hud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .hud-section {
-      flex: 1 1 auto;
-      min-width: 130px;
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px;
-      padding: 5px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .hud-label {
-      font-family: monospace; font-size: 9px;
-      color: #64748b; text-transform: uppercase;
-      letter-spacing: 0.04em; margin-bottom: 2px;
-    }
-    .hud-val {
-      font-family: monospace; font-size: 11px;
-      color: #94a3b8;
-    }
-    .hud-val b { color: #7fff7f; }
-    /* Botones */
-    .cam-controls {
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .cam-row { display: flex; gap: 4px; flex-wrap: wrap; }
-    .cam-btn {
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 6px;
-      color: #e2e8f0; font-size: 11px;
-      padding: 5px 10px; cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s;
-    }
-    .cam-btn:hover { background: rgba(16,185,129,0.25); border-color: #10b981; color: #fff; }
-    .cam-btn:active { background: rgba(16,185,129,0.45); }
-    .cam-reset { border-color: rgba(239,68,68,0.4); }
-    .cam-reset:hover { background: rgba(239,68,68,0.25); border-color: #ef4444; }
   `]
 })
 export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -629,36 +520,36 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private drawBranding(w: number): void {
-    const ctx  = this.octx;
-    const el   = this.containerRef.nativeElement;
-    const cssR = Math.round(w / 22);
-    // Logo DT26 sale a la derecha del token del DT
-    const dtR    = Math.round(w / 22);
-    const logoX  = 8 + dtR * 2 + 8 + 6;
-    const logoY  = 8;
-    const logoSz = dtR * 1.4;
+    const ctx    = this.octx;
+    const margin = 8;
+    // Logo: mismo alto que el DT token (dtR*2) pero más grande → usar ancho/9
+    const logoSz = Math.round(w / 9);
+    const logoX  = margin;
+    const logoY  = margin;
 
     if (this.logoImg) {
       ctx.save();
-      ctx.globalAlpha = 0.88;
+      ctx.globalAlpha = 0.90;
       ctx.drawImage(this.logoImg, logoX, logoY, logoSz, logoSz);
       ctx.restore();
     }
 
-    // www.dt26.win debajo del logo
-    const fontSize = Math.round(w / 28);
-    const textY = logoY + logoSz + 4;
+    // www.dt26.win a la derecha del logo
+    const textX    = logoX + logoSz + 8;
+    const fontSize = Math.round(w / 26);
+    const lineH    = fontSize + 5;
+    const textTopY = logoY + Math.round((logoSz - lineH * (this.usuario ? 2 : 1)) / 2);
+
     ctx.save();
-    ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillStyle = 'rgba(255,255,255,0.70)';
-    ctx.textAlign = 'left';
+    ctx.textAlign    = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('www.dt26.win', logoX, textY);
-    // Usuario debajo
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText('www.dt26.win', textX, textTopY);
     if (this.usuario) {
-      ctx.font = `${fontSize}px Arial`;
+      ctx.font = `${Math.round(fontSize * 0.85)}px Arial`;
       ctx.fillStyle = 'rgba(255,255,255,0.50)';
-      ctx.fillText(`usuario: ${this.usuario}`, logoX, textY + fontSize + 3);
+      ctx.fillText(`usuario: ${this.usuario}`, textX, textTopY + lineH);
     }
     ctx.restore();
   }
