@@ -672,6 +672,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.paisId = Number(this.route.snapshot.paramMap.get('paisId'));
     const tab = this.route.snapshot.queryParamMap.get('tab');
+    const scrollToPitch = tab === 'titulares';
     if (tab === 'titulares' || tab === 'nova' || tab === 'vista3d') {
       this.activeTab.set(tab);
     }
@@ -681,6 +682,12 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       .subscribe(() => this.guardarConvocatoria());
 
     this.loadData();
+
+    if (scrollToPitch) {
+      setTimeout(() => {
+        document.getElementById('pitch-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 800);
+    }
   }
 
   ngOnDestroy(): void {

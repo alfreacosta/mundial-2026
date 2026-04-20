@@ -287,11 +287,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       jugadores.forEach((j, i) => {
         const saved = posMap.get(j.internalId);
         if (saved) {
-          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
+          const ap = ((j.apellido ?? j.nombre) || '').split(' ')[0];
+          results.push({ id: j.internalId, apellido: ap, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
         } else {
           // Distribuir horizontalmente entre 15% y 85%
           const x = n === 1 ? 50 : 15 + (70 * i) / (n - 1);
-          results.push({ id: j.internalId, apellido: j.apellido ?? j.nombre, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x, y: baseY, urlFoto: j.urlFoto });
+          const ap = ((j.apellido ?? j.nombre) || '').split(' ')[0];
+          results.push({ id: j.internalId, apellido: ap, camiseta: j.numeroCamiseta, posAbr: j.posicion.abreviatura, x, y: baseY, urlFoto: j.urlFoto });
         }
       });
     }
