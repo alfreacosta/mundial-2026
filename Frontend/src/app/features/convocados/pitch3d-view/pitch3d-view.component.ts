@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import type { JugadorSeleccionable } from '../convocados.component';
 import type { PlayerPos } from '../pitch-3d/pitch-3d.component';
 
-/* ── Dimensiones del campo Three.js (unidades de escena) ── */
 const HW = 34;
 const HL = 40;
 const LY = 0.07;
@@ -21,21 +20,44 @@ const LW = 0.23;
     <div #container class="c3d">
       <canvas #overlay class="overlay-cvs"></canvas>
       <div class="loading-msg" *ngIf="!ready">Cargando vista 3D…</div>
+
+      <!-- Controles de cámara -->
+      <div class="cam-controls" *ngIf="ready">
+        <div class="cam-info">
+          Y:{{camY}} Z:{{camZ}} LZ:{{camLZ}} FOV:{{camFov}}°
+        </div>
+        <div class="cam-row">
+          <button class="cam-btn" (click)="camMove('up')"    title="Subir cámara">⬆ Subir</button>
+          <button class="cam-btn" (click)="camMove('down')"  title="Bajar cámara">⬇ Bajar</button>
+          <button class="cam-btn" (click)="camMove('in')"    title="Acercar">🔍+ Acercar</button>
+          <button class="cam-btn" (click)="camMove('out')"   title="Alejar">🔍− Alejar</button>
+        </div>
+        <div class="cam-row">
+          <button class="cam-btn" (click)="camMove('tiltUp')"   title="Rotar arriba">↩ Tilt ↑</button>
+          <button class="cam-btn" (click)="camMove('tiltDown')" title="Rotar abajo">↪ Tilt ↓</button>
+          <button class="cam-btn" (click)="camMove('rot45')"    title="Rotar 45°">↻ 45°</button>
+          <button class="cam-btn" (click)="camMove('rot-45')"   title="Rotar -45°">↺ −45°</button>
+        </div>
+        <div class="cam-row">
+          <button class="cam-btn" (click)="camMove('fovIn')"  title="Más FOV">FOV+</button>
+          <button class="cam-btn" (click)="camMove('fovOut')" title="Menos FOV">FOV−</button>
+          <button class="cam-btn cam-reset" (click)="camReset()" title="Resetear">⟳ Reset</button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
     :host { display: block; width: 100%; }
     .c3d {
       width: 100%;
-      height: clamp(340px, 56vw, 540px);
+      height: clamp(360px, 60vw, 580px);
       border-radius: 12px;
       overflow: hidden;
       background: #030d03;
       position: relative;
     }
     .overlay-cvs {
-      position: absolute;
-      top: 0; left: 0;
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
       pointer-events: none;
     }
@@ -46,6 +68,35 @@ const LW = 0.23;
       font-size: 13px; font-family: Arial, sans-serif;
       pointer-events: none;
     }
+    .cam-controls {
+      position: absolute; bottom: 10px; right: 10px;
+      display: flex; flex-direction: column; gap: 4px;
+      z-index: 10;
+    }
+    .cam-info {
+      background: rgba(0,0,0,0.72);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-family: monospace; font-size: 10px;
+      color: #7fff7f; white-space: nowrap; text-align: center;
+    }
+    .cam-row {
+      display: flex; gap: 4px;
+    }
+    .cam-btn {
+      background: rgba(0,0,0,0.72);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      color: #fff; font-size: 10px;
+      padding: 4px 7px; cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .cam-btn:hover { background: rgba(16,185,129,0.35); border-color: #10b981; }
+    .cam-btn:active { background: rgba(16,185,129,0.55); }
+    .cam-reset { border-color: rgba(239,68,68,0.5); }
+    .cam-reset:hover { background: rgba(239,68,68,0.3); border-color: #ef4444; }
   `]
 })
 export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges {
@@ -60,6 +111,14 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() dtFotoUrl?: string;
 
   ready = false;
+
+  /* Posición actual de cámara (para mostrar en UI) */
+  camY   = 31;
+  camZ   = 33;
+  camLZ  = -8;
+  camFov = 80;
+  private camX   = 0;
+  private camAngle = 0; // rotación horizontal en radianes
 
   private T: any;
   private scene:    any;
@@ -103,6 +162,44 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     this.renderer?.domElement?.parentNode?.removeChild(this.renderer.domElement);
   }
 
+  /* ── Controles de cámara ──────────────────────────────────── */
+  camMove(action: string): void {
+    const step = 4;
+    switch (action) {
+      case 'up':       this.camY   += step; break;
+      case 'down':     this.camY   = Math.max(5, this.camY - step); break;
+      case 'in':       this.camZ   = Math.max(5, this.camZ - step); break;
+      case 'out':      this.camZ   += step; break;
+      case 'tiltUp':   this.camLZ  -= step; break;
+      case 'tiltDown': this.camLZ  += step; break;
+      case 'rot45':    this.camAngle += Math.PI / 4; break;
+      case 'rot-45':   this.camAngle -= Math.PI / 4; break;
+      case 'fovIn':    this.camFov  = Math.min(120, this.camFov + 5); break;
+      case 'fovOut':   this.camFov  = Math.max(30,  this.camFov - 5); break;
+    }
+    this.applyCamera();
+    this.cdr.detectChanges();
+  }
+
+  camReset(): void {
+    this.camY = 31; this.camZ = 33; this.camLZ = -8;
+    this.camFov = 80; this.camAngle = 0;
+    this.applyCamera();
+    this.cdr.detectChanges();
+  }
+
+  private applyCamera(): void {
+    if (!this.camera) return;
+    /* Rotación horizontal alrededor del origen */
+    const posX = Math.sin(this.camAngle) * this.camZ;
+    const posZ = Math.cos(this.camAngle) * this.camZ;
+    this.camera.position.set(posX, this.camY, posZ);
+    this.camera.fov = this.camFov;
+    this.camera.updateProjectionMatrix();
+    this.camera.lookAt(0, 0, this.camLZ);
+  }
+
+  /* ── Init Three.js ────────────────────────────────────────── */
   private async initThree(): Promise<void> {
     try {
       const [threeModule] = await Promise.all([import('three')]);
@@ -129,9 +226,9 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       }
       scene.fog = new this.T.Fog(0x041204, 210, 380);
 
-      const camera = new this.T.PerspectiveCamera(80, w / h, 0.5, 500);
-      camera.position.set(0, 28, 30);
-      camera.lookAt(0, 0, -8);
+      const camera = new this.T.PerspectiveCamera(this.camFov, w / h, 0.5, 500);
+      camera.position.set(0, this.camY, this.camZ);
+      camera.lookAt(0, 0, this.camLZ);
       this.camera = camera;
 
       const renderer = new this.T.WebGLRenderer({ antialias: true, precision: 'highp' });
@@ -372,7 +469,6 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     img.src = this.dtFotoUrl;
   }
 
-  /* Proyecta posición porcentual del campo a píxeles en pantalla */
   private projectToScreen(xPct: number, yPct: number): [number, number] | null {
     if (!this.camera || !this.T) return null;
     const worldX = (xPct / 100 * 2 - 1) * HW;
@@ -386,7 +482,6 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     return [(vec.x + 1) / 2 * sw, (-vec.y + 1) / 2 * sh];
   }
 
-  /* Radio del token con escala de perspectiva suave */
   private tokenRadius(yPct: number): number {
     const sw       = this.containerRef.nativeElement.clientWidth || 360;
     const baseR    = Math.round(sw / 16);
@@ -406,7 +501,6 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     const w  = el.clientWidth  || 360;
     const h  = el.clientHeight || 480;
     this.octx.clearRect(0, 0, w, h);
-    /* Ordenar de más lejos (yPct bajo) a más cerca (yPct alto) */
     const sorted = [...this.playerData].sort((a, b) => a.pct.y - b.pct.y);
     sorted.forEach(d => this.drawToken(d));
     if (this.dtNombre) this.drawDtToken();
