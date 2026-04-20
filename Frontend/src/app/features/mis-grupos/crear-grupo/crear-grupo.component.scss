@@ -122,6 +122,74 @@
       font-size: 0.75rem;
       color: v.$gray-500;
       margin-top: 6px;
+
+      &.form-hint-warn {
+        color: rgba(251, 191, 36, 0.8);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
+
+    // ── Selector tipo de juego ──────────────────────────────────
+    .tipo-juego-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+
+      .tipo-juego-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: v.$radius-md;
+        padding: 10px 14px;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color 0.2s, background 0.2s;
+        color: v.$white;
+
+        &:hover { background: rgba(255,255,255,0.08); }
+
+        &.selected {
+          border-color: v.$fantasy-cyan;
+          background: rgba(6, 182, 212, 0.08);
+
+          .tipo-badge { opacity: 1; }
+        }
+
+        .tipo-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          font-weight: 700;
+          font-size: 0.9rem;
+          flex-shrink: 0;
+          opacity: 0.7;
+
+          &.tipo-A { background: rgba(16,185,129,0.25); color: #10b981; }
+          &.tipo-B { background: rgba(59,130,246,0.25); color: #60a5fa; }
+          &.tipo-C { background: rgba(168,85,247,0.25); color: #c084fc; }
+        }
+
+        .tipo-desc {
+          flex: 1;
+          font-size: 0.85rem;
+        }
+
+        .tipo-check {
+          font-size: 18px;
+          height: 18px;
+          width: 18px;
+          color: v.$fantasy-cyan;
+          flex-shrink: 0;
+        }
+      }
     }
   }
 

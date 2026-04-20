@@ -6,7 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { GrupoService } from '../../core/services/grupo.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Grupo, GrupoRow } from '../../core/models/grupo.models';
+import { Grupo, GrupoRow, TipoJuego, TIPO_JUEGO_DESC } from '../../core/models/grupo.models';
 import { CrearGrupoComponent } from './crear-grupo/crear-grupo.component';
 import { UnirseGrupoComponent } from './unirse-grupo/unirse-grupo.component';
 import { environment } from '../../../environments/environment';
@@ -59,6 +59,10 @@ export class MisGruposComponent implements OnInit {
       next: () => { this.grupos = this.grupos.filter(g => g.internalId !== id); },
       error: () => alert('No se pudo salir del grupo')
     });
+  }
+
+  getTipoJuegoDesc(tipo: TipoJuego | undefined): string {
+    return TIPO_JUEGO_DESC[tipo ?? 'A'];
   }
 
   cargarGrupos(): void {

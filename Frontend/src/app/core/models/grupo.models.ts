@@ -2,6 +2,21 @@
 // MUNDIAL 2026 - Modelos de Grupos
 // ============================================================
 
+/** A = Convocatoria + Predicciones | B = Convocatoria | C = Predicciones */
+export type TipoJuego = 'A' | 'B' | 'C';
+
+export const TIPO_JUEGO_LABELS: Record<TipoJuego, string> = {
+  A: 'Conv. + Pred.',
+  B: 'Convocatoria',
+  C: 'Predicciones',
+};
+
+export const TIPO_JUEGO_DESC: Record<TipoJuego, string> = {
+  A: 'Convocatoria + Predicciones',
+  B: 'Solo Convocatoria',
+  C: 'Solo Predicciones',
+};
+
 export interface EquipoFavorito {
   internalId: number;
   paisId: number;
@@ -48,6 +63,7 @@ export interface Grupo {
   cantidadPaises: number;
   cantidadMiembros: number | null;
   miembros: GrupoRow[] | null;
+  tipoJuego: TipoJuego;
 }
 
 // ---- Requests ----
@@ -57,6 +73,7 @@ export interface CrearGrupoRequest {
   premio?: string;
   cantidadPaises?: number;
   paisIds: number[];
+  tipoJuego?: TipoJuego;
 }
 
 export interface UnirseGrupoRequest {

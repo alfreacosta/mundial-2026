@@ -21,4 +21,10 @@ public class CrearGrupoRequest {
 
     @NotEmpty(message = "Debés seleccionar al menos un país")
     private List<Long> paisIds;
+
+    /**
+     * Tipo de juego: A = Convocatoria + Predicciones, B = Convocatoria, C = Predicciones.
+     * Valor por defecto: A.
+     */
+    private String tipoJuego;
 }

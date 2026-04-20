@@ -26,4 +26,6 @@ public class GrupoDTO {
     private Integer cantidadPaises;
     private Integer cantidadMiembros;
     private List<GrupoRowDTO> miembros;
+    /** A = Convocatoria + Predicciones | B = Convocatoria | C = Predicciones */
+    private String tipoJuego;
 }

@@ -53,4 +53,13 @@ public class Grupo {
     @Column(name = "cantidad_paises", nullable = false)
     @Builder.Default
     private Integer cantidadPaises = 5;
+
+    /**
+     * Tipo de juego: A = Convocatoria + Predicciones, B = Convocatoria, C = Predicciones.
+     * Se define al crear el grupo y no puede modificarse.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_juego", nullable = false, length = 1)
+    @Builder.Default
+    private TipoJuego tipoJuego = TipoJuego.A;
 }

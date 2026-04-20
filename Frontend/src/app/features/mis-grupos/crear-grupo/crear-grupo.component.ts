@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GrupoService } from '../../../core/services/grupo.service';
-import { EquipoFavorito, Grupo } from '../../../core/models/grupo.models';
+import { EquipoFavorito, Grupo, TipoJuego, TIPO_JUEGO_DESC } from '../../../core/models/grupo.models';
 import { FifaToFlagPipe } from '../../../shared/pipes/fifa-to-flag.pipe';
 
 @Component({
@@ -22,6 +22,12 @@ export class CrearGrupoComponent implements OnInit {
   nombre = '';
   premio = '';
   cantidadPaises = 5;
+  tipoJuego: TipoJuego = 'A';
+  readonly tiposJuego: { value: TipoJuego; label: string; desc: string }[] = [
+    { value: 'A', label: 'A', desc: TIPO_JUEGO_DESC['A'] },
+    { value: 'B', label: 'B', desc: TIPO_JUEGO_DESC['B'] },
+    { value: 'C', label: 'C', desc: TIPO_JUEGO_DESC['C'] },
+  ];
   loading = false;
   loadingFavs = false;
   error = '';
@@ -102,7 +108,8 @@ export class CrearGrupoComponent implements OnInit {
       nombre: this.nombre.trim(),
       premio: this.premio.trim() || undefined,
       cantidadPaises: this.cantidadPaises,
-      paisIds
+      paisIds,
+      tipoJuego: this.tipoJuego
     }).subscribe({
       next: (grupo) => {
         this.grupoNuevo = grupo;

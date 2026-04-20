@@ -45,6 +45,7 @@ public class GrupoService {
                 .codigoInvitacion(codigo)
                 .creador(creador)
                 .activo(true)
+                .tipoJuego(parseTipoJuego(req.getTipoJuego()))
                 .build();
 
         grupoRepository.save(grupo);
@@ -286,7 +287,14 @@ public class GrupoService {
                 .transDate(g.getTransDate())
                 .activo(g.getActivo())
                 .cantidadPaises(g.getCantidadPaises())
+                .tipoJuego(g.getTipoJuego() != null ? g.getTipoJuego().name() : "A")
                 .build();
+    }
+
+    private TipoJuego parseTipoJuego(String value) {
+        if (value == null) return TipoJuego.A;
+        try { return TipoJuego.valueOf(value.toUpperCase()); }
+        catch (IllegalArgumentException e) { return TipoJuego.A; }
     }
 
     private GrupoRowDTO toGrupoRowDTO(GrupoRow r, List<GrupoRowPais> paises) {

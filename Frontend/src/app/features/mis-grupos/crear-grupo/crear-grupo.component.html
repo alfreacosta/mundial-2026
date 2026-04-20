@@ -88,6 +88,25 @@
           </div>
           <p class="form-hint">Cada miembro elegirá {{ cantidadPaises }} {{ cantidadPaises === 1 ? 'país' : 'países' }} para competir.</p>
         </div>
+
+        <div class="form-group">
+          <label>Tipo de juego</label>
+          <div class="tipo-juego-selector">
+            <button type="button"
+                    *ngFor="let t of tiposJuego"
+                    class="tipo-juego-card"
+                    [class.selected]="tipoJuego === t.value"
+                    (click)="tipoJuego = t.value">
+              <span class="tipo-badge tipo-{{ t.value }}">{{ t.value }}</span>
+              <span class="tipo-desc">{{ t.desc }}</span>
+              <mat-icon class="tipo-check" *ngIf="tipoJuego === t.value">check_circle</mat-icon>
+            </button>
+          </div>
+          <p class="form-hint form-hint-warn">
+            <mat-icon style="font-size:14px;height:14px;width:14px;vertical-align:middle">lock</mat-icon>
+            No podrás cambiar esto después de crear el grupo.
+          </p>
+        </div>
       </ng-container>
 
       <!-- ═══ PASO 2: Seleccionar países ═══ -->

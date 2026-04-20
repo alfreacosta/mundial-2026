@@ -263,6 +263,7 @@ classDiagram
         +String codigoInvitacion
         +Usuario creador
         +Integer cantidadPaises
+        +TipoJuego tipoJuego
         +LocalDateTime transDate
         +Boolean activo
         --
@@ -271,7 +272,16 @@ classDiagram
         +esActivo()
     }
 
-    note for Grupo "codigoInvitacion: UNIQUE — cantidadPaises: 1..5, define cuántos países elige cada miembro — puntaje calculado dinamicamente como SUM de puntajes de miembros"
+    note for Grupo "codigoInvitacion: UNIQUE — cantidadPaises: 1..5, define cuántos países elige cada miembro — tipoJuego: inmutable desde creación (A|B|C)"
+
+    class TipoJuego {
+        <<enumeration>>
+        A
+        B
+        C
+    }
+
+    note for TipoJuego "A = Convocatoria + Predicciones | B = Solo Convocatoria | C = Solo Predicciones"
 
     class GrupoRow {
         +Long internalId
