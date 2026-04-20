@@ -168,8 +168,13 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() posColorFn:     (codigo?: string) => string = () => '#94a3b8';
   @Input() dtNombre?:  string;
   @Input() dtFotoUrl?: string;
+  @Input() paisNombre?: string;
+  @Input() paisLogoUrl?: string | null;
 
   ready = false;
+
+  private logoImg:    HTMLImageElement | null = null;
+  private paisLogoImg: HTMLImageElement | null = null;
 
   /* Posición actual de cámara (para mostrar en UI) */
   camY   = 63;
@@ -209,14 +214,32 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => this.initThree());
+    this.loadLogoImg();
   }
 
   ngOnChanges(c: SimpleChanges): void {
     if (!this.scene) return;
     if (c['dtFotoUrl']) this.loadDtPhoto();
+    if (c['paisLogoUrl']) this.loadPaisLogo();
     if (c['players'] || c['savedPositions'] || c['dtNombre'] || c['dtFotoUrl']) {
       this.buildPlayerData();
     }
+  }
+
+  private loadLogoImg(): void {
+    const img = new Image();
+    img.onload  = () => { this.logoImg = img; };
+    img.onerror = () => { this.logoImg = null; };
+    img.src = '/images/logodt26.png';
+  }
+
+  private loadPaisLogo(): void {
+    if (!this.paisLogoUrl) { this.paisLogoImg = null; return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = () => { this.paisLogoImg = img; };
+    img.onerror = () => { this.paisLogoImg = null; };
+    img.src = this.paisLogoUrl;
   }
 
   ngOnDestroy(): void {
@@ -565,9 +588,109 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     const w  = el.clientWidth  || 360;
     const h  = el.clientHeight || 480;
     this.octx.clearRect(0, 0, w, h);
+
+    // ── Marca de agua diagonal (3× "dt26.win" a 40°) ──────────
+    this.drawWatermark(w, h);
+
+    // ── Jugadores ──────────────────────────────────────────────
     const sorted = [...this.playerData].sort((a, b) => a.pct.y - b.pct.y);
     sorted.forEach(d => this.drawToken(d));
+
+    // ── DT (arriba-izquierda fuera de la cancha) ───────────────
     if (this.dtNombre) this.drawDtToken();
+
+    // ── Branding top-left (logo + url) ────────────────────────
+    this.drawBranding(w);
+
+    // ── País top-right ─────────────────────────────────────────
+    if (this.paisNombre) this.drawPaisLabel(w);
+  }
+
+  private drawWatermark(w: number, h: number): void {
+    const ctx = this.octx;
+    ctx.save();
+    ctx.globalAlpha = 0.07;
+    ctx.fillStyle = '#ffffff';
+    const angle = -40 * Math.PI / 180;
+    const fontSize = Math.round(w / 10);
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const offsets = [-h * 0.28, 0, h * 0.28];
+    for (const dy of offsets) {
+      ctx.save();
+      ctx.translate(w / 2, h / 2 + dy);
+      ctx.rotate(angle);
+      ctx.fillText('dt26.win', 0, 0);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  private drawBranding(w: number): void {
+    const ctx  = this.octx;
+    const el   = this.containerRef.nativeElement;
+    const cssR = Math.round(w / 22);
+    // Logo DT26 sale a la derecha del token del DT
+    const dtR    = Math.round(w / 22);
+    const logoX  = 8 + dtR * 2 + 8 + 6;
+    const logoY  = 8;
+    const logoSz = dtR * 1.4;
+
+    if (this.logoImg) {
+      ctx.save();
+      ctx.globalAlpha = 0.88;
+      ctx.drawImage(this.logoImg, logoX, logoY, logoSz, logoSz);
+      ctx.restore();
+    }
+
+    // www.dt26.win debajo del logo
+    const textY = logoY + logoSz + 4;
+    ctx.save();
+    ctx.font = `bold ${Math.round(w / 28)}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('www.dt26.win', logoX, textY);
+    ctx.restore();
+  }
+
+  private drawPaisLabel(w: number): void {
+    const ctx   = this.octx;
+    const pad   = 8;
+    const logoSz = Math.round(w / 14);
+    const fontSize = Math.round(w / 26);
+    ctx.font = `bold ${fontSize}px Arial`;
+    const textW = ctx.measureText(this.paisNombre ?? '').width;
+    const gap   = this.paisLogoImg ? logoSz + 6 : 0;
+    const totalW = gap + textW + pad * 2;
+    const totalH = Math.max(logoSz, fontSize + 4) + pad;
+
+    // Fondo semitransparente
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    const rx = w - pad - totalW;
+    const ry = pad;
+    this.pill(ctx, rx, ry, totalW, totalH, totalH / 2);
+    ctx.fill();
+
+    // Logo país
+    if (this.paisLogoImg) {
+      const imgY = ry + (totalH - logoSz) / 2;
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(this.paisLogoImg, rx + pad, imgY, logoSz, logoSz);
+      ctx.restore();
+    }
+
+    // Nombre país
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 4;
+    ctx.fillText(this.paisNombre ?? '', rx + pad + gap, ry + totalH / 2);
+    ctx.restore();
   }
 
   private drawToken(d: typeof this.playerData[0]): void {

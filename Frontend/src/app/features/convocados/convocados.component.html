@@ -347,7 +347,9 @@
               [savedPositions]="savedPositions"
               [posColorFn]="getPosColor.bind(this)"
               [dtNombre]="pais?.dtNombre || undefined"
-              [dtFotoUrl]="pais?.dtFotoUrl || undefined">
+              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
+              [paisNombre]="pais?.nombre || undefined"
+              [paisLogoUrl]="getLogoUrl()">
             </app-pitch3d-view>
           </div>
         </section>
