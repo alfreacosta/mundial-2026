@@ -342,6 +342,7 @@
         <section class="pitch-section" id="pitch-3d-section">
           <div class="pitch-canvas-wrap">
             <app-pitch3d-view
+              #pitch3dView
               [players]="jugadoresTitulares"
               [savedPositions]="savedPositions"
               [posColorFn]="getPosColor.bind(this)"
@@ -473,14 +474,27 @@
             <mat-icon>restart_alt</mat-icon>
             Reiniciar
           </button>
-          <button
-            mat-stroked-button
-            class="export-btn"
-            [disabled]="downloadingPlantel || jugadoresSeleccionados.length === 0"
-            (click)="compartirPlantelGrid()">
-            <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'share' }}</mat-icon>
-            {{ downloadingPlantel ? 'Generando…' : 'Compartir Plantel' }}
-          </button>
+          <!-- En vista3D → compartir imagen 3D; en resto → compartir plantel -->
+          <ng-container *ngIf="activeTab() === 'vista3d'; else plantelShareBtn">
+            <button
+              mat-stroked-button
+              class="export-btn"
+              [disabled]="exportingPitch || totalTitulares() === 0"
+              (click)="compartir3D()">
+              <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
+              {{ exportingPitch ? 'Exportando…' : 'Compartir 3D' }}
+            </button>
+          </ng-container>
+          <ng-template #plantelShareBtn>
+            <button
+              mat-stroked-button
+              class="export-btn"
+              [disabled]="downloadingPlantel || jugadoresSeleccionados.length === 0"
+              (click)="compartirPlantelGrid()">
+              <mat-icon>{{ downloadingPlantel ? 'hourglass_empty' : 'share' }}</mat-icon>
+              {{ downloadingPlantel ? 'Generando…' : 'Compartir Plantel' }}
+            </button>
+          </ng-template>
         </ng-template>
       </div>
     </div>

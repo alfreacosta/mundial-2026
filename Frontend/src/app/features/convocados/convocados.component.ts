@@ -1130,6 +1130,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
   // ═══ DRAG & DROP CANCHA ═══
   @ViewChild('pitchFieldRef') pitchFieldRef!: ElementRef<HTMLDivElement>;
   @ViewChild('pitch3d') pitch3dRef?: PitchThreeDComponent;
+  @ViewChild('pitch3dView') pitch3dViewRef?: Pitch3dViewComponent;
 
   trackById(_: number, player: JugadorSeleccionable): number {
     return player.internalId;
@@ -1258,5 +1259,31 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     link.download = `XI-${this.pais?.nombre ?? 'titular'}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
+  }
+
+  /** Compartir la vista 3D de titulares como imagen */
+  compartir3D(): void {
+    if (!this.pitch3dViewRef) {
+      this.snackBar.open('La vista 3D no está disponible.', '', { duration: 3000, panelClass: 'snack-error' });
+      return;
+    }
+    this.exportingPitch = true;
+    const canvas = this.pitch3dViewRef.captureImage();
+    const paisNombre = this.pais?.nombre ?? 'mi selección';
+    const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
+      `Armá tu equipo ideal en 👉 https://dt26.win\n` +
+      `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
+    canvas.toBlob(blob => {
+      if (!blob) { this.exportingPitch = false; return; }
+      const file = new File([blob], `XI-3D-${paisNombre}.png`, { type: 'image/png' });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText })
+          .catch(() => this.downloadCanvas(canvas))
+          .finally(() => { this.exportingPitch = false; });
+      } else {
+        this.downloadCanvas(canvas);
+        this.exportingPitch = false;
+      }
+    }, 'image/png');
   }
 }

@@ -633,13 +633,14 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
   }
 
   private drawDtToken(): void {
-    const ctx   = this.octx;
+    // Posicionar el DT arriba de la cancha (extremo lejano, centro)
+    const proj = this.projectToScreen(50, 0);
+    if (!proj) return;
+    const [cxc, cyc] = proj;
     const el    = this.containerRef.nativeElement;
-    const cssH  = el.clientHeight || 480;
     const cssW  = el.clientWidth  || 360;
-    const cssR  = Math.round((cssW / 16) * 1.1);
-    const cxc   = 8 + cssR;
-    const cyc   = cssH - cssR * 2 - 10 + cssR;
+    const cssR  = Math.round((cssW / 16) * 1.05);
+    const ctx   = this.octx;
 
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 10;
@@ -687,6 +688,24 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(apellido, cxc, ly + labelH / 2);
     ctx.restore();
+  }
+
+  /** Captura la imagen 3D compuesta (WebGL + overlay de jugadores) */
+  captureImage(): HTMLCanvasElement {
+    // Forzar un render fresco antes de capturar
+    if (this.renderer && this.scene && this.camera) {
+      this.renderer.render(this.scene, this.camera);
+    }
+    const webglCanvas  = this.renderer.domElement as HTMLCanvasElement;
+    const overlayCanvas = this.overlayRef.nativeElement as HTMLCanvasElement;
+    const out = document.createElement('canvas');
+    out.width  = webglCanvas.width;
+    out.height = webglCanvas.height;
+    const ctx = out.getContext('2d')!;
+    ctx.drawImage(webglCanvas,  0, 0);
+    // El overlay puede tener distinto dpr → escalar al tamaño del output
+    ctx.drawImage(overlayCanvas, 0, 0, out.width, out.height);
+    return out;
   }
 
   private pill(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
