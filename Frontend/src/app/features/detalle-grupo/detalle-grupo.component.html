@@ -34,6 +34,7 @@
         </div>
         <p class="grupo-creador">Creado por {{ grupo.creadorNombre }}</p>
         <p class="grupo-paises-qty"><mat-icon>flag</mat-icon> {{ grupo.cantidadPaises }} {{ grupo.cantidadPaises === 1 ? 'país' : 'países' }} por jugador</p>
+        <div class="tipo-juego-badge">{{ getTipoJuegoDesc(grupo.tipoJuego) }}</div>
         <p class="grupo-premio" *ngIf="grupo.premio">
           <mat-icon>emoji_events</mat-icon>
           {{ grupo.premio }}

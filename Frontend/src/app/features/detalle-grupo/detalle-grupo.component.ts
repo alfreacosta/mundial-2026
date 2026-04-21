@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GrupoService } from '../../core/services/grupo.service';
-import { Grupo, GrupoRow } from '../../core/models/grupo.models';
+import { Grupo, GrupoRow, TIPO_JUEGO_DESC, TipoJuego } from '../../core/models/grupo.models';
 import { FifaToFlagPipe } from '../../shared/pipes/fifa-to-flag.pipe';
 import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-icon.component';
 
@@ -62,6 +62,10 @@ export class DetalleGrupoComponent implements OnInit {
     const url = `${window.location.origin}/grupo/${this.grupo.codigoInvitacion}`;
     const texto = `⚽ *DT26 - Mundial 2026* ⚽\n\n¡Unite a "${this.grupo.nombre}" y demostrá que sabés más que el técnico! 💪\nArmá tu equipo, desafiá a tus amigos y competí por ser el mejor director técnico. 🏆\n\n👉 ${url}\n\nCódigo: *${this.grupo.codigoInvitacion}*`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+  }
+
+  getTipoJuegoDesc(tipo: string | undefined): string {
+    return TIPO_JUEGO_DESC[(tipo ?? 'A') as TipoJuego] ?? 'Convocatoria + Predicciones';
   }
 
   onAvatarError(id: number): void { this.brokenAvatars.add(id); }
