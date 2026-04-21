@@ -1341,7 +1341,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.fillText('Elegí tus selecciones favoritas y participá en competencias privadas  ·  https://dt26.win', W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
-    const shareText = `Armá tu equipo ideal en 👉 https://dt26.win\n` +
+    const shareText = `Armá tu equipo ideal en 👉 https://dt26.win/selecciones/titulares\n` +
       `Elegí tus selecciones favoritas, armá tu convocatoria y competí con tus amigos.\n` +
       `Es gratis y seguro.`;
     cvs.toBlob(blob => {
