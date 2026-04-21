@@ -138,8 +138,8 @@
       }
 
       @if (!datosPersonalesLoading) {
-        <!-- Con datos: Favoritos y/o Predicciones -->
-        @if (misFavoritos.length > 0 || miPrediccion) {
+        <!-- Con datos: Favoritos -->
+        @if (misFavoritos.length > 0) {
           <div class="my-game-section">
             <div class="section-header">
               <mat-icon>sports_soccer</mat-icon>
@@ -152,18 +152,15 @@
               </div>
             </div>
 
-            <div class="my-game-grid">
-            
             <!-- Mis Equipos Favoritos -->
-            @if (misFavoritos.length > 0) {
-              <div class="game-card favorites-card">
-                <div class="game-card-title">
-                  <mat-icon>favorite</mat-icon>
-                  <span>Mis Equipos</span>
-                  <span class="badge">{{ misFavoritos.length }}</span>
-                </div>
-                <div class="favorites-list">
-                  @for (fav of misFavoritos; track fav.paisId) {
+            <div class="game-card favorites-card">
+              <div class="game-card-title">
+                <mat-icon>favorite</mat-icon>
+                <span>Mis Equipos</span>
+                <span class="badge">{{ misFavoritos.length }}</span>
+              </div>
+              <div class="favorites-list">
+                @for (fav of misFavoritos; track fav.paisId) {
                     <div class="fav-compact">
                       <!-- Fila compacta: bandera + nombre + progreso + acciones -->
                       <div class="fav-row">
@@ -274,115 +271,112 @@
                   <!-- tarjeta brand eliminada -->
                 </div>
               </div>
-            }
-
-            <!-- Mis Predicciones -->
-            @if (miPrediccion) {
-              <div class="game-card predictions-card">
-                <div class="game-card-title">
-                  <mat-icon>emoji_events</mat-icon>
-                  <span>Mis Predicciones</span>
-                  @if (miPrediccion.confirmada) {
-                    <mat-icon class="confirmed-badge">lock</mat-icon>
-                  }
-                </div>
-                <div class="predictions-row">
-                  @if (miPrediccion.paisCampeonCodigo) {
-                    <div class="pred-box champion-box">
-                      <div class="pred-box-label"><mat-icon>emoji_events</mat-icon> Campeón</div>
-                      <div class="pred-box-value">
-                        <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" [alt]="miPrediccion.paisCampeonNombre" class="flag-img-small" />
-                        <span>{{ miPrediccion.paisCampeonNombre }}</span>
-                      </div>
-                    </div>
-                  }
-                  @if (miPrediccion.jugadorGoleadorNombre) {
-                    <div class="pred-box scorer-box">
-                      <div class="pred-box-label"><mat-icon>sports_soccer</mat-icon> Goleador</div>
-                      <div class="pred-box-value">
-                        @if (miPrediccion.jugadorGoleadorPaisCodigo) {
-                          <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" [alt]="miPrediccion.jugadorGoleadorNombre" class="flag-img-small" />
-                        }
-                        <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
-                      </div>
-                      @if (miPrediccion.jugadorGoleadorUrlFoto) {
-                        <img
-                          [src]="miPrediccion.jugadorGoleadorUrlFoto"
-                          [alt]="miPrediccion.jugadorGoleadorNombre"
-                          class="scorer-box-photo"
-                          (error)="$any($event.target).style.display='none'" />
-                      }
-                    </div>
-                  }
-                  @if (!miPrediccion.paisCampeonCodigo && !miPrediccion.jugadorGoleadorNombre) {
-                    <div class="empty-predictions">
-                      <mat-icon>help_outline</mat-icon>
-                      <span>Aún no hiciste tus predicciones</span>
-                      <a routerLink="/prediccion-torneo" class="pred-link">Hacer predicción →</a>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-            <!-- Mi Progreso en Partidos -->
-            @if (resumenPredicciones) {
-              <div class="game-card progreso-card" [routerLink]="'/prediccion-partidos'" style="cursor:pointer">
-                <div class="game-card-title">
-                  <mat-icon>bar_chart</mat-icon>
-                  <span>Mi Progreso</span>
-                  <span class="badge pts-badge">{{ resumenPredicciones.totalPuntosPartidos }} pts</span>
-                </div>
-                <div class="progreso-content">
-                  <div class="progreso-bar-wrap">
-                    <div class="progreso-bar">
-                      <div 
-                        class="progreso-fill"
-                        [style.width.%]="resumenPredicciones.totalPartidos > 0 
-                          ? (resumenPredicciones.predichas / resumenPredicciones.totalPartidos * 100) 
-                          : 0">
-                      </div>
-                    </div>
-                    <span class="progreso-label">
-                      {{ resumenPredicciones.predichas }}/{{ resumenPredicciones.totalPartidos }} partidos predichos
-                    </span>
-                  </div>
-                  <div class="progreso-stats-row">
-                    @if (resumenPredicciones.exactas > 0) {
-                      <span class="stat-chip exacto">
-                        <mat-icon>check_circle</mat-icon>{{ resumenPredicciones.exactas }} exactas
-                      </span>
-                    }
-                    @if (resumenPredicciones.correctas > 0) {
-                      <span class="stat-chip correcto">
-                        <mat-icon>thumb_up</mat-icon>{{ resumenPredicciones.correctas }} correctas
-                      </span>
-                    }
-                    @if (resumenPredicciones.incorrectas > 0) {
-                      <span class="stat-chip incorrecto">
-                        <mat-icon>close</mat-icon>{{ resumenPredicciones.incorrectas }} incorrectas
-                      </span>
-                    }
-                    @if (resumenPredicciones.predichas === 0) {
-                      <span class="progreso-hint">¡Empezá a predecir partidos!</span>
-                    }
-                  </div>
-                  @if (!resumenPredicciones.prediccionTorneoHecha) {
-                    <a routerLink="/prediccion-torneo" class="torneo-pending" (click)="$event.stopPropagation()">
-                      <mat-icon>warning</mat-icon> Falta tu predicción de torneo
-                    </a>
-                  } @else {
-                    <span class="torneo-done">
-                      <mat-icon>lock</mat-icon> Predicción de torneo confirmada
-                    </span>
-                  }
-                </div>
-              </div>
-            }
-
           </div>
-        </div>
-      }
+        }
+
+        <!-- Mis Predicciones -->
+        @if (miPrediccion) {
+          <div class="my-game-section">
+            <div class="section-header">
+              <mat-icon>emoji_events</mat-icon>
+              <span>Mis Predicciones</span>
+              @if (miPrediccion.confirmada) {
+                <mat-icon style="margin-left:auto; color:#fbbf24; font-size:18px; width:18px; height:18px;">lock</mat-icon>
+              }
+            </div>
+            <div class="predictions-row">
+              @if (miPrediccion.paisCampeonCodigo) {
+                <div class="pred-box champion-box">
+                  <div class="pred-box-label"><mat-icon>emoji_events</mat-icon> Campeón</div>
+                  <div class="pred-box-value">
+                    <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" [alt]="miPrediccion.paisCampeonNombre" class="flag-img-small" />
+                    <span>{{ miPrediccion.paisCampeonNombre }}</span>
+                  </div>
+                </div>
+              }
+              @if (miPrediccion.jugadorGoleadorNombre) {
+                <div class="pred-box scorer-box">
+                  <div class="pred-box-label"><mat-icon>sports_soccer</mat-icon> Goleador</div>
+                  <div class="pred-box-value">
+                    @if (miPrediccion.jugadorGoleadorPaisCodigo) {
+                      <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" [alt]="miPrediccion.jugadorGoleadorNombre" class="flag-img-small" />
+                    }
+                    <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
+                  </div>
+                  @if (miPrediccion.jugadorGoleadorUrlFoto) {
+                    <img
+                      [src]="miPrediccion.jugadorGoleadorUrlFoto"
+                      [alt]="miPrediccion.jugadorGoleadorNombre"
+                      class="scorer-box-photo"
+                      (error)="$any($event.target).style.display='none'" />
+                  }
+                </div>
+              }
+              @if (!miPrediccion.paisCampeonCodigo && !miPrediccion.jugadorGoleadorNombre) {
+                <div class="empty-predictions">
+                  <mat-icon>help_outline</mat-icon>
+                  <span>Aún no hiciste tus predicciones</span>
+                  <a routerLink="/prediccion-torneo" class="pred-link">Hacer predicción →</a>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Mi Progreso en Partidos -->
+        @if (resumenPredicciones) {
+          <div class="my-game-section progreso-section" [routerLink]="'/prediccion-partidos'" style="cursor:pointer">
+            <div class="section-header">
+              <mat-icon>bar_chart</mat-icon>
+              <span>Mi Progreso</span>
+              <span class="badge pts-badge" style="margin-left:auto; background:rgba(0,212,255,0.15); color:#00d4ff; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">{{ resumenPredicciones.totalPuntosPartidos }} pts</span>
+            </div>
+            <div class="progreso-content">
+              <div class="progreso-bar-wrap">
+                <div class="progreso-bar">
+                  <div 
+                    class="progreso-fill"
+                    [style.width.%]="resumenPredicciones.totalPartidos > 0 
+                      ? (resumenPredicciones.predichas / resumenPredicciones.totalPartidos * 100) 
+                      : 0">
+                  </div>
+                </div>
+                <span class="progreso-label">
+                  {{ resumenPredicciones.predichas }}/{{ resumenPredicciones.totalPartidos }} partidos predichos
+                </span>
+              </div>
+              <div class="progreso-stats-row">
+                @if (resumenPredicciones.exactas > 0) {
+                  <span class="stat-chip exacto">
+                    <mat-icon>check_circle</mat-icon>{{ resumenPredicciones.exactas }} exactas
+                  </span>
+                }
+                @if (resumenPredicciones.correctas > 0) {
+                  <span class="stat-chip correcto">
+                    <mat-icon>thumb_up</mat-icon>{{ resumenPredicciones.correctas }} correctas
+                  </span>
+                }
+                @if (resumenPredicciones.incorrectas > 0) {
+                  <span class="stat-chip incorrecto">
+                    <mat-icon>close</mat-icon>{{ resumenPredicciones.incorrectas }} incorrectas
+                  </span>
+                }
+                @if (resumenPredicciones.predichas === 0) {
+                  <span class="progreso-hint">¡Empezá a predecir partidos!</span>
+                }
+              </div>
+              @if (!resumenPredicciones.prediccionTorneoHecha) {
+                <a routerLink="/prediccion-torneo" class="torneo-pending" (click)="$event.stopPropagation()">
+                  <mat-icon>warning</mat-icon> Falta tu predicción de torneo
+                </a>
+              } @else {
+                <span class="torneo-done">
+                  <mat-icon>lock</mat-icon> Predicción de torneo confirmada
+                </span>
+              }
+            </div>
+          </div>
+        }
 
       @if (!datosPersonalesLoading && misFavoritos.length === 0 && !miPrediccion) {
         <div class="my-game-empty">
