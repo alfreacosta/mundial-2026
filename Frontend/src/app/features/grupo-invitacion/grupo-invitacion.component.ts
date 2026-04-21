@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GrupoService } from '../../core/services/grupo.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Grupo, GrupoRow } from '../../core/models/grupo.models';
+import { Grupo, GrupoRow, TIPO_JUEGO_DESC, TipoJuego } from '../../core/models/grupo.models';
 import { Router } from '@angular/router';
 import { AvatarIconComponent } from '../../shared/components/avatar-icon/avatar-icon.component';
 
@@ -52,6 +52,10 @@ export class GrupoInvitacionComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  getTipoJuegoDesc(tipo: string | undefined): string {
+    return TIPO_JUEGO_DESC[(tipo ?? 'A') as TipoJuego] ?? 'Convocatoria + Predicciones';
   }
 
   /** Muestra hasta 4 avatares para el stack visual */

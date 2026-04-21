@@ -48,6 +48,12 @@
         </ng-container>
       </div>
 
+      <!-- Tipo de competición -->
+      <div class="invite-tipo-juego">
+        <mat-icon class="tipo-icon">sports_soccer</mat-icon>
+        <span>{{ getTipoJuegoDesc(grupo.tipoJuego) }}</span>
+      </div>
+
       <!-- Lista de miembros con avatar + usuario -->
       <div class="invite-miembros" *ngIf="(grupo.cantidadMiembros || 0) > 0">
         <p class="invite-miembros-titulo">Ya están compitiendo</p>
