@@ -92,6 +92,14 @@ export class GrupoService {
   getRankingGrupos(): Observable<GrupoRanking[]> {
     return this.http.get<GrupoRanking[]>(`${this.base}/ranking`);
   }
+
+  // ---- Compartir ----
+
+  buildWhatsAppInviteUrl(grupo: Grupo, quien: string): string {
+    const url = `${environment.appUrl}/grupo/${grupo.codigoInvitacion}`;
+    const text = `⚽ DT26 - Mundial 2026 ⚽\n\n"${quien}" te invita a unirte a una competencia privada de DT26.\nElegí tus selecciones favoritas, armá tu equipo ideal, predecí resultados del mundial y competí con tus amigos para demostrar que sos el que más sabe de fútbol.\n\n${url}\n\nCódigo de competencia: ${grupo.codigoInvitacion}`;
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  }
 }
 
 export interface GrupoRanking {

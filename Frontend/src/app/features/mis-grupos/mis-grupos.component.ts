@@ -9,7 +9,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { Grupo, GrupoRow, TipoJuego, TIPO_JUEGO_DESC } from '../../core/models/grupo.models';
 import { CrearGrupoComponent } from './crear-grupo/crear-grupo.component';
 import { UnirseGrupoComponent } from './unirse-grupo/unirse-grupo.component';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-mis-grupos',
@@ -95,9 +94,7 @@ export class MisGruposComponent implements OnInit {
   }
 
   getWhatsAppLink(grupo: Grupo): string {
-    const url = `${environment.appUrl}/grupo/${grupo.codigoInvitacion}`;
     const quien = this.authService.getCurrentUser()?.user ?? 'Un usuario';
-    const text = `⚽ DT26 - Mundial 2026 ⚽\n\n"${quien}" te invita a unirte a una competencia privada de DT26.\nElegí tus selecciones favoritas, armá tu equipo ideal, predecí resultados del mundial y competí con tus amigos para demostrar que sos el que más sabe de fútbol.\n\n${url}\n\nCódigo de competencia: ${grupo.codigoInvitacion}`;
-    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+    return this.grupoService.buildWhatsAppInviteUrl(grupo, quien);
   }
 }
