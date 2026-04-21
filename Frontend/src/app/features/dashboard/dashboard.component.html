@@ -303,6 +303,13 @@
                         }
                         <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
                       </div>
+                      @if (miPrediccion.jugadorGoleadorUrlFoto) {
+                        <img
+                          [src]="miPrediccion.jugadorGoleadorUrlFoto"
+                          [alt]="miPrediccion.jugadorGoleadorNombre"
+                          class="scorer-box-photo"
+                          (error)="$any($event.target).style.display='none'" />
+                      }
                     </div>
                   }
                   @if (!miPrediccion.paisCampeonCodigo && !miPrediccion.jugadorGoleadorNombre) {
