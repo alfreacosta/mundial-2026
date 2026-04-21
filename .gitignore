@@ -46,3 +46,7 @@ ycopg2
 10*' psql*
 Log/
 tools/respuestas/
+
+# Archivos basura con nombres que contienen espacios y caracteres especiales
+kip =*
+t.*\" -o*
