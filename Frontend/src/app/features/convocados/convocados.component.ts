@@ -272,11 +272,8 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
           // Asegurar fondo visible en el clon
           cloned.style.background = '#0a0e17';
         }
-      } as any).then(async (canvas: HTMLCanvasElement) => {
+      } as any).then((canvas: HTMLCanvasElement) => {
         const paisNombre = this.pais?.nombre ?? 'mi selección';
-        // Logo DT26 como watermark de fondo
-        const pCtx = canvas.getContext('2d')!;
-        await this.addLogoWatermark(pCtx, canvas.width, canvas.height);
         const shareUrl = `https://dt26.win/convocados/${this.paisId}?tab=convocados`;
         const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
           `Armá tu convocatoria ideal 👉 ${shareUrl}\n` +
