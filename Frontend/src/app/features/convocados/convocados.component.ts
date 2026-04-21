@@ -633,7 +633,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
       ctx.fillText(footerLine2, CANVAS_W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
       // Compartir
-      const shareText = `🏆 Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\nArmá la tuya en 👉 https://dt26.win`;
+      const shareText = `Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\n` +
+        `Armá la tuya en 👉 https://dt26.win\n` +
+        `Es gratis y seguro.`;
       cvs.toBlob(blob => {
         if (!blob) { this.downloadingPlantel = false; return; }
         const file = new File([blob], `Plantel-${paisNombre}.png`, { type: 'image/png' });
