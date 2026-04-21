@@ -59,8 +59,9 @@ export class DetalleGrupoComponent implements OnInit {
 
   compartirWhatsApp(): void {
     if (!this.grupo) return;
-    const url = `${window.location.origin}/grupo/${this.grupo.codigoInvitacion}`;
-    const texto = `⚽ *DT26 - Mundial 2026* ⚽\n\n¡Unite a "${this.grupo.nombre}" y demostrá que sabés más que el técnico! 💪\nArmá tu equipo, desafiá a tus amigos y competí por ser el mejor director técnico. 🏆\n\n👉 ${url}\n\nCódigo: *${this.grupo.codigoInvitacion}*`;
+    const url    = `${window.location.origin}/grupo/${this.grupo.codigoInvitacion}`;
+    const quien  = this.grupo.creadorNombre || 'Un usuario';
+    const texto  = `⚽ *DT26 - Mundial 2026* ⚽\n\n"${quien}" te invita a unirte a una competencia privada de DT26.\nElegí tus selecciones favoritas, armá tu equipo ideal, predecí resultados del mundial y competí con tus amigos para demostrar que sos el que más sabe de fútbol.\n\n${url}\n\nCódigo de competencia: *${this.grupo.codigoInvitacion}*`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
   }
 
