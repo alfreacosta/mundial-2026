@@ -252,62 +252,6 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     }
   }
 
-  compartirPlantel(): void {
-    const el = document.getElementById('plantel-album');
-    if (!el) {
-      this.snackBar.open('No se encontró el elemento del plantel.', '', { duration: 3000, panelClass: 'snack-error' });
-      return;
-    }
-    this.downloadingPlantel = true;
-
-    import('html2canvas').then(({ default: h2c }) => {
-      h2c(el, {
-        backgroundColor: '#0a0e17',
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        imageTimeout: 10000,
-        onclone: (_doc: Document, cloned: HTMLElement) => {
-          // Asegurar fondo visible en el clon
-          cloned.style.background = '#0a0e17';
-        }
-      } as any).then((canvas: HTMLCanvasElement) => {
-        const paisNombre = this.pais?.nombre ?? 'mi selección';
-        const shareText = `Armá tu equipo ideal en 👉 https://dt26.win/convocados/${this.paisId}\n` +
-          `Elegí tus selecciones favoritas, armá tu convocatoria y competí con tus amigos.\n` +
-          `Es gratis y seguro.`;
-
-        canvas.toBlob(blob => {
-          if (!blob) {
-            this.snackBar.open('Error generando imagen. Intentá de nuevo.', '', { duration: 3000, panelClass: 'snack-error' });
-            this.downloadingPlantel = false;
-            return;
-          }
-          const fileName = `Plantel-${paisNombre}.png`;
-          const file = new File([blob], fileName, { type: 'image/png' });
-
-          if (navigator.share && navigator.canShare?.({ files: [file] })) {
-            navigator.share({ files: [file], title: `Mi Plantel - ${paisNombre}`, text: shareText })
-              .catch(() => this.downloadPlantelCanvas(canvas, paisNombre))
-              .finally(() => { this.downloadingPlantel = false; });
-          } else {
-            this.downloadPlantelCanvas(canvas, paisNombre);
-            this.downloadingPlantel = false;
-          }
-        }, 'image/png');
-      }).catch((err: unknown) => {
-        console.error('html2canvas error:', err);
-        this.snackBar.open('Error al generar la imagen. Intentá de nuevo.', '', { duration: 3000, panelClass: 'snack-error' });
-        this.downloadingPlantel = false;
-      });
-    }).catch((err: unknown) => {
-      console.error('Error cargando html2canvas:', err);
-      this.snackBar.open('Error cargando dependencia.', '', { duration: 3000, panelClass: 'snack-error' });
-      this.downloadingPlantel = false;
-    });
-  }
-
   private downloadPlantelCanvas(canvas: HTMLCanvasElement, paisNombre: string): void {
     const link = document.createElement('a');
     link.download = `Plantel-${paisNombre}.png`;
@@ -1236,31 +1180,6 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
   scrollToPitch(): void {
     document.getElementById('pitch-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  exportPitchAsPng(): void {
-    if (!this.pitch3dRef) return;
-    this.exportingPitch = true;
-
-    const username = this.authService.getCurrentUser()?.user;
-    const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    this.pitch3dRef.captureSnapshot(username, this.pais?.nombre, fecha).then(canvas => {
-      canvas.toBlob(blob => {
-        if (!blob) { this.exportingPitch = false; return; }
-        const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
-        const paisNombre = this.pais?.nombre ?? 'mi selección';
-        const shareText = `Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
-          `Armá tu equipo ideal en 👉 https://dt26.win\n` +
-          `Elegí tus selecciones favoritas, armá tu convocatoria y compartí el  XI ideal con tus amigos.`;
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText })
-            .catch(() => this.downloadCanvas(canvas));
-        } else {
-          this.downloadCanvas(canvas);
-        }
-        this.exportingPitch = false;
-      }, 'image/png');
-    });
   }
 
   private downloadCanvas(canvas: HTMLCanvasElement): void {
