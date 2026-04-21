@@ -59,7 +59,7 @@ public class Grupo {
      * Se define al crear el grupo y no puede modificarse.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_juego", nullable = false, length = 1)
+    @Column(name = "tipo_juego", nullable = false, length = 1, columnDefinition = "varchar(1)")
     @Builder.Default
     private TipoJuego tipoJuego = TipoJuego.A;
 }
