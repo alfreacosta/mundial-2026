@@ -67,8 +67,13 @@ body {
 
 // Scrollbar personalizado - TANGO Dark Theme
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
+
+  @media (max-width: 860px) {
+    width: 0;
+    height: 0;
+  }
 }
 
 ::-webkit-scrollbar-track {
