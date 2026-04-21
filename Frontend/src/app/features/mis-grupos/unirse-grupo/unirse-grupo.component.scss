@@ -200,6 +200,36 @@
   }
 }
 
+.paso-hint {
+  font-size: 0.78rem;
+  color: v.$gray-400;
+  margin: -8px 0 10px;
+}
+
+.filtro-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: v.$radius-sm;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+
+  mat-icon { color: v.$gray-400; font-size: 18px; }
+}
+
+.filtro-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: v.$white;
+  font-size: 0.85rem;
+  flex: 1;
+
+  &::placeholder { color: v.$gray-500; }
+}
+
 // Grid de países favoritos
 .paises-grid {
   display: grid;
@@ -237,6 +267,15 @@
     font-size: 0.82rem;
     color: v.$gray-400;
     mat-icon { font-size: 16px; width: 16px; height: 16px; color: v.$fantasy-cyan; }
+  }
+
+  .preview-tipo-juego {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    color: v.$gray-300;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; color: #fbbf24; }
   }
 }
 

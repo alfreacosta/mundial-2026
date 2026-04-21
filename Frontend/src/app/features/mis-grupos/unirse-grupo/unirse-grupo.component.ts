@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { forkJoin } from 'rxjs';
 import { GrupoService } from '../../../core/services/grupo.service';
-import { EquipoFavorito, Grupo, GrupoRow } from '../../../core/models/grupo.models';
+import { CountriesService, Pais } from '../../../core/services/countries.service';
+import { EquipoFavorito, Grupo, GrupoRow, TIPO_JUEGO_DESC, TipoJuego } from '../../../core/models/grupo.models';
 import { FifaToFlagPipe } from '../../../shared/pipes/fifa-to-flag.pipe';
 
 @Component({
@@ -26,14 +28,20 @@ export class UnirseGrupoComponent implements OnInit {
   error = '';
   yaMiembro = false;
 
-  /** Paso actual: 1 = código, 2 = seleccionar países */
+  /** Paso actual: 1 = código, 2 = seleccionar países (favoritos), 3 = elegir favoritos nuevos */
   paso = 1;
 
   grupoPreview: Grupo | null = null;
   misFavoritos: EquipoFavorito[] = [];
   paisesSeleccionados: Set<number> = new Set();
 
-  constructor(private grupoService: GrupoService) {}
+  // Para cuando el usuario no tiene suficientes favoritos
+  todosPaises: Pais[] = [];
+  filtroNuevosFavs = '';
+  nuevosSeleccionados: Set<number> = new Set();
+  guardandoFavs = false;
+
+  constructor(private grupoService: GrupoService, private countriesService: CountriesService) {}
 
   ngOnInit(): void {
     if (this.codigoInicial) {
@@ -66,19 +74,30 @@ export class UnirseGrupoComponent implements OnInit {
 
   private cargarFavoritos(): void {
     this.loadingDatos = true;
-    this.grupoService.getMisFavoritos().subscribe({
-      next: (favs) => {
+    forkJoin({
+      favs: this.grupoService.getMisFavoritos(),
+      paises: this.countriesService.getPaises()
+    }).subscribe({
+      next: ({ favs, paises }) => {
         this.misFavoritos = favs.sort((a, b) => a.orden - b.orden);
+        this.todosPaises = paises.filter(p => p.activo).sort((a, b) => a.nombre.localeCompare(b.nombre));
         this.loadingDatos = false;
-        this.paso = 2;
 
-        // Si la cantidad de favoritos es exacta, pre-seleccionar todos
-        if (this.misFavoritos.length === this.cantidadRequerida) {
-          this.misFavoritos.forEach(f => this.paisesSeleccionados.add(f.paisId));
+        if (this.misFavoritos.length >= this.cantidadRequerida) {
+          this.paso = 2;
+          // Pre-seleccionar si la cantidad es exacta
+          if (this.misFavoritos.length === this.cantidadRequerida) {
+            this.misFavoritos.forEach(f => this.paisesSeleccionados.add(f.paisId));
+          }
+        } else {
+          // No tiene suficientes: ir a elegir favoritos
+          this.paso = 3;
+          // Pre-seleccionar los que ya tiene
+          this.misFavoritos.forEach(f => this.nuevosSeleccionados.add(f.paisId));
         }
       },
       error: () => {
-        this.error = 'No se pudieron cargar tus favoritos.';
+        this.error = 'No se pudieron cargar los datos.';
         this.loadingDatos = false;
       }
     });
@@ -100,11 +119,54 @@ export class UnirseGrupoComponent implements OnInit {
     return this.paisesSeleccionados.size < this.cantidadRequerida;
   }
 
+  getTipoJuegoDesc(): string {
+    const tipo = this.grupoPreview?.tipoJuego as TipoJuego ?? 'A';
+    return TIPO_JUEGO_DESC[tipo] ?? 'Convocatoria + Predicciones';
+  }
+
   volverPaso1(): void {
     this.paso = 1;
     this.grupoPreview = null;
     this.paisesSeleccionados.clear();
+    this.nuevosSeleccionados.clear();
+    this.filtroNuevosFavs = '';
     this.error = '';
+  }
+
+  get paisesFiltrados(): Pais[] {
+    const q = this.filtroNuevosFavs.toLowerCase().trim();
+    return this.todosPaises.filter(p => !q || p.nombre.toLowerCase().includes(q));
+  }
+
+  get nuevosTitulo(): string {
+    return `Elegí tus ${this.cantidadRequerida} selecciones favoritas`;
+  }
+
+  toggleNuevoFav(paisId: number): void {
+    if (this.nuevosSeleccionados.has(paisId)) {
+      this.nuevosSeleccionados.delete(paisId);
+    } else if (this.nuevosSeleccionados.size < this.cantidadRequerida) {
+      this.nuevosSeleccionados.add(paisId);
+    }
+  }
+
+  guardarFavsYContinuar(): void {
+    if (this.nuevosSeleccionados.size < this.cantidadRequerida) return;
+    this.guardandoFavs = true;
+    this.error = '';
+    const ids = Array.from(this.nuevosSeleccionados);
+    this.grupoService.setFavoritos(ids).subscribe({
+      next: (favs) => {
+        this.misFavoritos = favs.sort((a, b) => a.orden - b.orden);
+        this.paisesSeleccionados = new Set(ids);
+        this.guardandoFavs = false;
+        this.paso = 2;
+      },
+      error: () => {
+        this.error = 'No se pudieron guardar los favoritos.';
+        this.guardandoFavs = false;
+      }
+    });
   }
 
   unirse(): void {

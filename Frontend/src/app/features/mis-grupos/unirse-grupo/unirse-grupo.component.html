@@ -68,6 +68,10 @@
           <mat-icon>flag</mat-icon>
           {{ cantidadRequerida }} {{ cantidadRequerida === 1 ? 'país' : 'países' }} por jugador
         </span>
+        <span class="preview-tipo-juego">
+          <mat-icon>sports_esports</mat-icon>
+          {{ getTipoJuegoDesc() }}
+        </span>
       </div>
 
       <p class="paso-descripcion" *ngIf="misFavoritos.length >= cantidadRequerida">
@@ -75,12 +79,11 @@
         <span class="seleccionados-count">{{ paisesSeleccionados.size }} / {{ cantidadRequerida }} seleccionados</span>
       </p>
 
-      <!-- Sin suficientes favoritos -->
+      <!-- Sin suficientes favoritos (no debería verse, lo cubre el paso 3) -->
       <div class="sin-favoritos-error" *ngIf="misFavoritos.length < cantidadRequerida">
         <mat-icon>warning</mat-icon>
         <div>
           <p>Necesitás tener al menos <strong>{{ cantidadRequerida }}</strong> equipos favoritos para unirte a este grupo.</p>
-          <p>Actualmente tenés <strong>{{ misFavoritos.length }}</strong>. Andá a <strong>Mi Juego</strong> y agregá más favoritos.</p>
         </div>
       </div>
 
@@ -99,13 +102,46 @@
     </ng-container>
   </div>
 
+  <!-- ═══ PASO 3: Elegir favoritos (usuario nuevo sin suficientes) ═══ -->
+  <div class="paso-contenido" *ngIf="paso === 3">
+    <div class="loading-datos" *ngIf="loadingDatos">
+      <mat-spinner diameter="32"></mat-spinner>
+      <p>Cargando países...</p>
+    </div>
+
+    <ng-container *ngIf="!loadingDatos">
+      <p class="paso-descripcion">
+        {{ nuevosTitulo }}
+        <span class="seleccionados-count">{{ nuevosSeleccionados.size }} / {{ cantidadRequerida }} seleccionados</span>
+      </p>
+      <p class="paso-hint">Estos quedarán guardados como tus favoritos. También podés cambiarlos en cualquier momento desde <strong>Selecciones</strong>.</p>
+
+      <div class="filtro-box">
+        <mat-icon>search</mat-icon>
+        <input type="text" [(ngModel)]="filtroNuevosFavs" placeholder="Buscar país..." class="filtro-input">
+      </div>
+
+      <div class="paises-grid">
+        <button *ngFor="let p of paisesFiltrados"
+                class="pais-btn"
+                [class.seleccionado]="nuevosSeleccionados.has(p.internalId)"
+                [disabled]="!nuevosSeleccionados.has(p.internalId) && nuevosSeleccionados.size >= cantidadRequerida"
+                (click)="toggleNuevoFav(p.internalId)">
+          <span class="fi" [class]="'fi-' + (p.codigo | fifaToFlag)"></span>
+          <span class="pais-nombre">{{ p.nombre }}</span>
+          <mat-icon class="check-icon" *ngIf="nuevosSeleccionados.has(p.internalId)">check_circle</mat-icon>
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
   <!-- Footer -->
   <div class="modal-footer">
     <button class="btn btn-secondary" *ngIf="paso === 1" (click)="cancelar.emit()" [disabled]="loading">
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button class="btn btn-secondary" *ngIf="paso === 2" (click)="volverPaso1()" [disabled]="loading">
+    <button class="btn btn-secondary" *ngIf="paso === 2 || paso === 3" (click)="volverPaso1()" [disabled]="loading || guardandoFavs">
       <mat-icon>arrow_back</mat-icon>
       Volver
     </button>
@@ -126,6 +162,15 @@
       <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
       <mat-icon *ngIf="!loading">check</mat-icon>
       {{ loading ? 'Uniéndose...' : 'Unirse al grupo' }}
+    </button>
+
+    <!-- Paso 3: Guardar favoritos y continuar -->
+    <button class="btn btn-primary" *ngIf="paso === 3"
+            (click)="guardarFavsYContinuar()"
+            [disabled]="guardandoFavs || nuevosSeleccionados.size < cantidadRequerida">
+      <mat-spinner *ngIf="guardandoFavs" diameter="18"></mat-spinner>
+      <mat-icon *ngIf="!guardandoFavs">arrow_forward</mat-icon>
+      {{ guardandoFavs ? 'Guardando...' : 'Continuar' }}
     </button>
   </div>
 
