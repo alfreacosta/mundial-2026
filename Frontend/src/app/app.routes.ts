@@ -8,7 +8,6 @@ import { StatsComponent } from './features/stats/stats.component';
 import { MyTeamComponent } from './features/my-team/my-team.component';
 import { GroupsComponent } from './features/groups/groups.component';
 import { PrivacyComponent } from './features/privacy/privacy.component';
-import { SeleccionDetailComponent } from './features/seleccion-detail/seleccion-detail.component';
 import { EstadiosComponent } from './features/estadios/estadios.component';
 import { PerfilComponent } from './features/perfil/perfil.component';
 import { MisGruposComponent } from './features/mis-grupos/mis-grupos.component';
@@ -16,8 +15,6 @@ import { DetalleGrupoComponent } from './features/detalle-grupo/detalle-grupo.co
 import { BuscarUsuariosComponent } from './features/buscar-usuarios/buscar-usuarios.component';
 import { PerfilPublicoComponent } from './features/perfil-publico/perfil-publico.component';
 import { GrupoInvitacionComponent } from './features/grupo-invitacion/grupo-invitacion.component';
-import { PrediccionTorneoComponent } from './features/prediccion-torneo/prediccion-torneo.component';
-import { PrediccionPartidosComponent } from './features/prediccion-partidos/prediccion-partidos.component';
 import { PrediccionesComponent } from './features/predicciones/predicciones.component';
 import { ReglasComponent } from './features/reglas/reglas.component';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';

@@ -677,8 +677,6 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         );
         this.convocatoriaEstado = convocatoria?.estado ?? null;
 
-        console.log('📊 Datos cargados:', { paisId: this.paisId, paisName: this.pais?.nombre, totalJugadores: jugadores.length, savedIds: Array.from(savedIds), noVaIds: Array.from(noVaIdsSet), titularIds: Array.from(titularIdsSet), convocatoria });
-
         this.players.set(jugadores.map(j => ({
           ...j,
           seleccionado: savedIds.has(String(j.internalId)) || titularIdsSet.has(String(j.internalId)),

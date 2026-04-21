@@ -20,7 +20,6 @@ registerLocaleData(localeEs, 'es');
 function initializeIdleTimeout(idleService: IdleTimeoutService) {
   return () => {
     // Solo instanciar el servicio, se auto-configura
-    console.log('[App] ✅ IdleTimeoutService inicializado');
   };
 }
 
