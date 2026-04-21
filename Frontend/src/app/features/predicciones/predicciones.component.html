@@ -256,9 +256,6 @@
                  : item.partido.estado === 'EN_CURSO'  ? '⚽ En curso'
                  : 'Finalizado' }}
               </span>
-              @if (item.partido.grupo) {
-                <span class="partido-grupo">Grupo {{ item.partido.grupo }}</span>
-              }
               <span class="partido-fecha">
                 {{ item.partido.fechaHora | date:'EEE dd MMM · HH:mm' }} hs
               </span>
