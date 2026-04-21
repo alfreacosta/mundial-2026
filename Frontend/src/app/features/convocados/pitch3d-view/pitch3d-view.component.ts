@@ -486,9 +486,9 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     if (this.logoImg) {
       const ctx = this.octx;
       ctx.save();
-      ctx.globalAlpha = 0.06;
+      ctx.globalAlpha = 0.15;
       // Escalar proporcional al canvas, centrado
-      const scale = Math.min(w, h) * 0.72;
+      const scale = Math.min(w, h) * 0.80;
       const lx = (w - scale) / 2;
       const ly = (h - scale) / 2;
       ctx.drawImage(this.logoImg, lx, ly, scale, scale);
