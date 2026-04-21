@@ -634,7 +634,7 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
       // Compartir
       const shareText = `Esta es mi lista de convocados de ${paisNombre} para el Mundial 2026!\n` +
-        `Armá la tuya en 👉 https://dt26.win\n` +
+        `Armá la tuya en 👉 https://dt26.win/selecciones/convocados\n` +
         `Es gratis y seguro.`;
       cvs.toBlob(blob => {
         if (!blob) { this.downloadingPlantel = false; return; }

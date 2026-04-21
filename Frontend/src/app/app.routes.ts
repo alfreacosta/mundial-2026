@@ -41,6 +41,8 @@ export const routes: Routes = [
   { path: 'countries', component: CountriesComponent, canActivate: [authGuard] },
   { path: 'convocados/:paisId', component: ConvocadosComponent, canActivate: [authGuard] },
   { path: 'seleccion/:codigo', redirectTo: 'countries', pathMatch: 'full' },
+  { path: 'selecciones/convocados', redirectTo: 'countries', pathMatch: 'full' },
+  { path: 'selecciones/titulares', redirectTo: 'countries', pathMatch: 'full' },
   { path: 'groups', component: GroupsComponent, canActivate: [authGuard] },
   { path: 'estadios', component: EstadiosComponent, canActivate: [authGuard] },
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard] },
