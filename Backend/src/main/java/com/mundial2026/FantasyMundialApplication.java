@@ -12,6 +12,5 @@ public class FantasyMundialApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FantasyMundialApplication.class, args);
-        System.out.println("=== MUNDIAL 2026 Backend iniciado ===");
     }
 }

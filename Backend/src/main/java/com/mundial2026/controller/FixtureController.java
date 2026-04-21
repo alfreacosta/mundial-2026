@@ -4,11 +4,11 @@ import com.mundial2026.dto.fixture.ActualizarResultadoRequest;
 import com.mundial2026.dto.fixture.FixtureDTO;
 import com.mundial2026.model.Partido;
 import com.mundial2026.repository.PartidoRepository;
+import com.mundial2026.security.SyncAuthHelper;
 import com.mundial2026.service.FixtureService;
 import com.mundial2026.service.ScoringService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +31,7 @@ public class FixtureController {
     private final FixtureService    fixtureService;
     private final PartidoRepository partidoRepository;
     private final ScoringService    scoringService;
-
-    @Value("${app.sync.api-key:}")
-    private String syncApiKey;
+    private final SyncAuthHelper    syncAuthHelper;
 
     /** Todos los partidos del Mundial */
     @GetMapping
@@ -94,7 +92,7 @@ public class FixtureController {
             @RequestBody @Valid ActualizarResultadoRequest req,
             @RequestHeader(value = "X-Sync-Key", required = false) String syncKey) {
 
-        if (!isAuthorized(syncKey)) {
+        if (!syncAuthHelper.isAuthorized(syncKey)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("error", "No autorizado. Se requiere X-Sync-Key válida."));
         }
@@ -122,12 +120,4 @@ public class FixtureController {
         ));
     }
 
-    // ── Helper de autorización (mismo patrón que SyncController) ────
-
-    private boolean isAuthorized(String providedKey) {
-        if (syncApiKey == null || syncApiKey.isBlank()) {
-            return true; // dev mode: sin key configurada, se usa JWT auth
-        }
-        return syncApiKey.equals(providedKey);
-    }
 }

@@ -40,9 +40,7 @@ public class ConvocatoriaService {
     /** Devuelve la convocatoria existente del usuario para un país (puede ser null). */
     @Transactional(readOnly = true)
     public Optional<ConvocatoriaDTO> getMiConvocatoria(String username, Long paisId) {
-        System.out.println("🔍 getMiConvocatoria() - Buscando: username='" + username + "', paisId=" + paisId);
         var result = convocatoriaRepository.findByUsernameAndPaisId(username, paisId);
-        System.out.println("🔍 getMiConvocatoria() - Resultado: " + result);
         return result.map(this::toDTO);
     }
 
@@ -52,8 +50,6 @@ public class ConvocatoriaService {
      */
     @Transactional
     public ConvocatoriaDTO guardarConvocatoria(String username, Long paisId, List<Long> jugadorIds, List<Long> noVaIds, List<Long> titularesIds) {
-        System.out.println("💾 guardarConvocatoria() - username='" + username + "', paisId=" + paisId + ", jugadorIds=" + jugadorIds + ", noVaIds=" + noVaIds);
-
         Usuario usuario = usuarioRepository.findByUser(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
 

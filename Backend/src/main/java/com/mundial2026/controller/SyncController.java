@@ -1,10 +1,10 @@
 package com.mundial2026.controller;
 
+import com.mundial2026.security.SyncAuthHelper;
 import com.mundial2026.service.SyncService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,21 +23,8 @@ import java.util.Map;
 public class SyncController {
 
     private static final Logger log = LoggerFactory.getLogger(SyncController.class);
-    private final SyncService syncService;
-
-    @Value("${app.sync.api-key:}")
-    private String syncApiKey;
-
-    /**
-     * Valida que el request tenga la API key de admin.
-     * Si no hay sync key configurada (dev), permite pasar.
-     */
-    private boolean isAuthorized(String providedKey) {
-        if (syncApiKey == null || syncApiKey.isBlank()) {
-            return true; // dev mode: sin key, se usa JWT auth normal
-        }
-        return syncApiKey.equals(providedKey);
-    }
+    private final SyncService   syncService;
+    private final SyncAuthHelper syncAuthHelper;
 
     /**
      * Sincroniza UN equipo específico (1 API call).
@@ -47,7 +34,7 @@ public class SyncController {
     public ResponseEntity<Map<String, Object>> syncTeam(
             @PathVariable String codigo,
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             log.warn("SECURITY: Acceso no autorizado a sync/team/{}", codigo);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }
@@ -62,7 +49,7 @@ public class SyncController {
     public ResponseEntity<Map<String, Object>> syncConfederacion(
             @PathVariable String codigo,
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             log.warn("SECURITY: Acceso no autorizado a sync/confederacion/{}", codigo);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }
@@ -78,7 +65,7 @@ public class SyncController {
     public ResponseEntity<Map<String, Object>> syncNext(
             @PathVariable int cantidad,
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             log.warn("SECURITY: Acceso no autorizado a sync/next/{}", cantidad);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }
@@ -97,7 +84,7 @@ public class SyncController {
     public ResponseEntity<Map<String, Object>> resyncTeamClean(
             @PathVariable String codigo,
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             log.warn("SECURITY: Acceso no autorizado a sync/resync/{}", codigo);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }
@@ -111,7 +98,7 @@ public class SyncController {
     @GetMapping("/status")
     public ResponseEntity<?> getSyncStatus(
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }
         return ResponseEntity.ok(syncService.getSyncStatus());
@@ -131,7 +118,7 @@ public class SyncController {
             @RequestParam(defaultValue = "ARG,BRA,PAR,URU,COL,ECU") String paises,
             @RequestParam(defaultValue = "0") int maxPages,
             @RequestHeader(value = "X-Sync-Key", required = false) String key) {
-        if (!isAuthorized(key)) {
+        if (!syncAuthHelper.isAuthorized(key)) {
             log.warn("SECURITY: Acceso no autorizado a sync/enrich");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "No autorizado"));
         }

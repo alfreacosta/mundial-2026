@@ -13,7 +13,6 @@ import java.util.List;
 public interface PartidoRepository extends JpaRepository<Partido, Long> {
     List<Partido> findByFaseCodigo(String faseCodigo);
     List<Partido> findByEstado(String estado);
-    List<Partido> findByFinalizadoFalse();
 
     @Query("SELECT p FROM Partido p " +
            "LEFT JOIN FETCH p.equipoLocal " +
@@ -45,11 +44,4 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
            "ORDER BY p.transDate ASC")
     List<Partido> findByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT p FROM Partido p " +
-           "LEFT JOIN FETCH p.equipoLocal el " +
-           "LEFT JOIN FETCH p.equipoVisitante ev " +
-           "JOIN FETCH p.fase f " +
-           "WHERE f.codigo = 'GRUPOS' AND (el.grupo = :grupo OR ev.grupo = :grupo) " +
-           "ORDER BY p.transDate ASC")
-    List<Partido> findByGrupo(@Param("grupo") String grupo);
 }

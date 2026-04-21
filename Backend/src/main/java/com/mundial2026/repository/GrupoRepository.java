@@ -14,9 +14,6 @@ public interface GrupoRepository extends JpaRepository<Grupo, Long> {
 
     Optional<Grupo> findByCodigoInvitacion(String codigoInvitacion);
 
-    @Query("SELECT g FROM Grupo g WHERE g.creador.internalId = :usuarioId AND g.activo = true")
-    List<Grupo> findGruposCreados(@Param("usuarioId") Long usuarioId);
-
     @Query(value = """
         SELECT g.internal_id, g.nombre,
                COALESCE(u.nombre,'') || ' ' || COALESCE(u.apellido,'') AS creador_nombre,

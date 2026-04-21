@@ -16,6 +16,7 @@ public interface ConvocatoriaRepository extends JpaRepository<Convocatoria, Long
     Optional<Convocatoria> findByUsernameAndPaisId(@Param("username") String username,
                                                    @Param("paisId") Long paisId);
 
-    /** Todas las convocatorias de un usuario (sin eager-load de rows, para uso por lotes) */
-    List<Convocatoria> findByUsuario_User(String username);
+    /** Todas las convocatorias de un usuario con rows y jugadores en una sola query (evita N+1). */
+    @Query("SELECT DISTINCT c FROM Convocatoria c LEFT JOIN FETCH c.rows r LEFT JOIN FETCH r.jugador j LEFT JOIN FETCH j.posicion WHERE c.usuario.user = :username")
+    List<Convocatoria> findByUsuario_User(@Param("username") String username);
 }

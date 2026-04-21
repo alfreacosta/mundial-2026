@@ -12,7 +12,6 @@ import java.util.Optional;
 public interface PaisRepository extends JpaRepository<Pais, Long> {
     Optional<Pais> findByCodigo(String codigo);
     List<Pais> findByConfederacionCodigo(String confederacionCodigo);
-    List<Pais> findByGrupo(String grupo);
 
     /** Carga un país con su confederación (evita LazyInitializationException) */
     @Query("SELECT p FROM Pais p JOIN FETCH p.confederacion WHERE p.codigo = :codigo")
@@ -26,5 +25,4 @@ public interface PaisRepository extends JpaRepository<Pais, Long> {
     @Query("SELECT p FROM Pais p JOIN FETCH p.confederacion c WHERE c.codigo = :codigo")
     List<Pais> findByConfederacionCodigoWithFetch(String codigo);
 
-    Optional<Pais> findByApiTeamId(Long apiTeamId);
 }
