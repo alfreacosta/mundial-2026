@@ -661,7 +661,7 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
         const filtro   = this.grupoFiltro ? `Grupo-${this.grupoFiltro}` : 'Todos';
         const filename = `Predicciones-${filtro}-${usuario}.png`;
         const file     = new File([blob], filename, { type: 'image/png' });
-        const shareText = `Estas son mis predicciones del Mundial 2026! "${usuario}"\nHacé las tuyas en https://dt26.win/predicciones\nEs gratis y seguro.`;
+        const shareText = `⚽ DT26 - Mundial 2026 ⚽\n\n"${usuario}"\nEstas son mis predicciones del Mundial 2026!\nHacé las tuyas en https://dt26.win/predicciones\nEs gratis y seguro.`;
 
         if (navigator.canShare?.({ files: [file] })) {
           try {
