@@ -1277,60 +1277,25 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     this.exportingPitch = true;
     const raw = this.pitch3dViewRef.captureImage();
     const paisNombre = this.pais?.nombre ?? 'mi selección';
-    const usuario    = this.currentUsername ?? 'dt26';
 
-    // Agregar header y footer igual que compartirPlantelGrid
+    // Solo footer (sin header)
     const DPR    = 2;
     const PAD    = 16 * DPR;
-    const HEADER = 64 * DPR;
-    const FOOTER = 64 * DPR;
+    const FOOTER = 56 * DPR;
     const W = raw.width;
-    const H = raw.height + HEADER + FOOTER;
+    const H = raw.height + FOOTER;
 
     const cvs = document.createElement('canvas');
     cvs.width  = W;
     cvs.height = H;
     const ctx = cvs.getContext('2d')!;
 
-    // Fondo
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#0a0e17');
-    bg.addColorStop(1, '#111827');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Header
-    ctx.fillStyle = 'rgba(255,255,255,0.05)';
-    ctx.fillRect(0, 0, W, HEADER + PAD);
-    const headerMidY = HEADER / 2;
-    const sideW = W * 0.28;
-
-    ctx.font = `bold ${13 * DPR}px Arial`;
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`usuario: ${usuario}`, PAD + 4 * DPR, headerMidY);
-
-    ctx.font = `bold ${13 * DPR}px Arial`;
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('www.dt26.win', W - PAD - 4 * DPR, headerMidY);
-
-    ctx.font = `bold ${14 * DPR}px Arial`;
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.fillText(`Este es mi 11 titular de ${paisNombre.toUpperCase()}`, W / 2, headerMidY - 9 * DPR, W - sideW * 2 - PAD * 4);
-    ctx.font = `${12 * DPR}px Arial`;
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fillText('para el Mundial 2026', W / 2, headerMidY + 9 * DPR);
-
-    // Canvas de la cancha 3D
-    ctx.drawImage(raw, 0, HEADER);
+    // Canvas de la cancha 3D directo arriba
+    ctx.drawImage(raw, 0, 0);
 
     // Footer
-    const footerY = HEADER + raw.height;
-    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    const footerY = raw.height;
+    ctx.fillStyle = 'rgba(0,0,0,0.70)';
     ctx.fillRect(0, footerY, W, FOOTER);
     ctx.strokeStyle = 'rgba(255,255,255,0.10)';
     ctx.lineWidth = 1 * DPR;

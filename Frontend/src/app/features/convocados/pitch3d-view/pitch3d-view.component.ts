@@ -29,7 +29,7 @@ const LW = 0.23;
     .pitch3d-wrapper { display: flex; flex-direction: column; width: 100%; }
     .c3d {
       width: 100%;
-      height: clamp(360px, 60vw, 580px);
+      height: clamp(420px, 68vw, 660px);
       border-radius: 12px;
       overflow: hidden;
       background: #030d03;
