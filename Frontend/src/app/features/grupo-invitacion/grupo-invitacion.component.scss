@@ -141,56 +141,45 @@ $ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 }
 
-// ─── Stack de avatares ───────────────────────────────
-.invite-avatares {
+// ─── Lista de miembros ───────────────────────────────
+.invite-miembros {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invite-miembros-titulo {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $text-muted;
+  text-align: left;
+}
+
+.miembro-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 7px 12px;
 }
 
-.av-stack {
-  display: flex;
-  align-items: center;
-}
-
-.av-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  border: 2px solid rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: -10px;
-  font-size: 12px;
-  font-weight: 700;
+.miembro-user {
+  font-size: 14px;
+  font-weight: 600;
   color: $text;
-
-  &:first-child { margin-left: 0; }
-
-  img { width: 100%; height: 100%; object-fit: cover; }
-}
-
-.av-more {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba($gold, 0.2);
-  border: 2px solid rgba($gold, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: -10px;
-  font-size: 11px;
-  font-weight: 800;
-  color: $gold;
 }
 
 .av-texto {
-  font-size: 13px;
+  font-size: 12px;
   color: $text-muted;
+  text-align: left;
+  margin: 0;
 }
 
 // ─── Mensaje de bloqueo ──────────────────────────────

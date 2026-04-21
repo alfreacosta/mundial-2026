@@ -48,20 +48,16 @@
         </ng-container>
       </div>
 
-      <!-- Avatares de miembros (sin nombres ni puntos) -->
-      <div class="invite-avatares" *ngIf="(grupo.cantidadMiembros || 0) > 0">
-        <div class="av-stack">
-          <div
-            *ngFor="let m of miembrosPreview; let i = index"
-            class="av-circle"
-            [style.z-index]="10 - i">
-            <app-avatar-icon [avatarId]="m.urlAvatar" [nombre]="m.usuarioNombre" [apellido]="m.usuarioApellido" [size]="36"></app-avatar-icon>
-          </div>
-          <div class="av-more" *ngIf="(grupo.cantidadMiembros || 0) > miembrosPreview.length">
-            +{{ (grupo.cantidadMiembros || 0) - miembrosPreview.length }}
-          </div>
+      <!-- Lista de miembros con avatar + usuario -->
+      <div class="invite-miembros" *ngIf="(grupo.cantidadMiembros || 0) > 0">
+        <p class="invite-miembros-titulo">Ya están compitiendo</p>
+        <div class="miembro-row" *ngFor="let m of miembrosPreview">
+          <app-avatar-icon [avatarId]="m.urlAvatar" [nombre]="m.usuarioNombre" [apellido]="m.usuarioApellido" [size]="32"></app-avatar-icon>
+          <span class="miembro-user">{{ m.user || m.usuarioNombre }}</span>
         </div>
-        <span class="av-texto">ya están compitiendo</span>
+        <p class="av-texto" *ngIf="(grupo.cantidadMiembros || 0) > miembrosPreview.length">
+          +{{ (grupo.cantidadMiembros || 0) - miembrosPreview.length }} más
+        </p>
       </div>
 
       <!-- Mensaje bloqueo -->
