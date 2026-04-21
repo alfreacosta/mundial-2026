@@ -1247,9 +1247,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         if (!blob) { this.exportingPitch = false; return; }
         const file = new File([blob], `XI-${this.pais?.nombre ?? 'titular'}.png`, { type: 'image/png' });
         const paisNombre = this.pais?.nombre ?? 'mi selección';
-        const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
+        const shareText = `Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
           `Armá tu equipo ideal en 👉 https://dt26.win\n` +
-          `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
+          `Elegí tus selecciones favoritas, armá tu convocatoria y compartí el  XI ideal con tus amigos.`;
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
           navigator.share({ files: [file], title: `Mi XI Titular - ${paisNombre}`, text: shareText })
             .catch(() => this.downloadCanvas(canvas));
@@ -1316,9 +1316,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.fillText('Elegí tus selecciones favoritas y participá en competencias privadas  ·  https://dt26.win', W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
-    const shareText = `⚽🏆 Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
+    const shareText = `Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
       `Armá tu equipo ideal en 👉 https://dt26.win\n` +
-      `Elegí tus selecciones favoritas, armá tu convocatoria y compartí tu XI con tus amigos. ¡Vamos! 🔥`;
+      `Elegí tus selecciones favoritas, armá tu convocatoria y compartí el  XI ideal con tus amigos.`;
     cvs.toBlob(blob => {
       if (!blob) { this.exportingPitch = false; return; }
       const file = new File([blob], `XI-3D-${paisNombre}.png`, { type: 'image/png' });

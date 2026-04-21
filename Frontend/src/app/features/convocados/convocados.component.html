@@ -60,7 +60,7 @@
         <mat-icon>star</mat-icon>
         Titulares
         <span class="tab-count" *ngIf="totalTitulares() > 0">{{ totalTitulares() }}/11</span>
-      </button>      <button class="tab-btn tab-3d" [class.active]="activeTab() === 'vista3d'" (click)="setTab('vista3d')">
+      </button>      <button class="tab-btn tab-3d" [class.active]="activeTab() === 'vista3d'" (click)="setTab('vista3d')" style="display:none">
         <mat-icon>view_in_ar</mat-icon>
         Vista 3D
       </button>      <button class="tab-btn tab-nova" [class.active]="activeTab() === 'nova'" (click)="setTab('nova')">
@@ -338,25 +338,22 @@
         <p>Seleccioná titulares desde <strong>Convocatoria</strong> para ver la vista 3D.</p>
       </div>
 
-      <ng-container *ngIf="totalTitulares() > 0">
-        <section class="pitch-section" id="pitch-3d-section">
-          <div class="pitch-canvas-wrap">
-            <app-pitch3d-view
-              #pitch3dView
-              [players]="jugadoresTitulares"
-              [savedPositions]="savedPositions"
-              [posColorFn]="getPosColor.bind(this)"
-              [dtNombre]="pais?.dtNombre || undefined"
-              [dtFotoUrl]="pais?.dtFotoUrl || undefined"
-              [paisNombre]="pais?.nombre || undefined"
-              [paisLogoUrl]="getLogoUrl()"
-              [usuario]="currentUsername || undefined">
-            </app-pitch3d-view>
-          </div>
-        </section>
-      </ng-container>
-
     </main>
+
+    <!-- Vista 3D siempre en DOM (off-screen) para captura de imagen -->
+    <div style="position:fixed;left:-9999px;top:-9999px;width:420px;height:560px;overflow:hidden;pointer-events:none;">
+      <app-pitch3d-view
+        #pitch3dView
+        [players]="jugadoresTitulares"
+        [savedPositions]="savedPositions"
+        [posColorFn]="getPosColor.bind(this)"
+        [dtNombre]="pais?.dtNombre || undefined"
+        [dtFotoUrl]="pais?.dtFotoUrl || undefined"
+        [paisNombre]="pais?.nombre || undefined"
+        [paisLogoUrl]="getLogoUrl()"
+        [usuario]="currentUsername || undefined">
+      </app-pitch3d-view>
+    </div>
 
     <!-- ═══ TAB: NO VA ═══ -->
     <main class="players-main nova-main" *ngIf="activeTab() === 'nova'">
@@ -458,8 +455,8 @@
           <button
             mat-stroked-button
             class="export-btn"
-            [disabled]="exportingPitch"
-            (click)="exportPitchAsPng()">
+            [disabled]="exportingPitch || totalTitulares() === 0"
+            (click)="compartir3D()">
             <mat-icon>{{ exportingPitch ? 'hourglass_empty' : 'share' }}</mat-icon>
             {{ exportingPitch ? 'Exportando…' : 'Compartir Titulares' }}
           </button>
