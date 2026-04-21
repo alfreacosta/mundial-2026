@@ -673,9 +673,10 @@ $radius:      14px;
   border: 1px solid $card-border;
   border-radius: $radius;
   padding: 20px;
+  overflow: hidden;
 
   @media (max-width: 480px) {
-    padding: 16px;
+    padding: 14px 12px;
   }
 }
 
@@ -689,8 +690,6 @@ $radius:      14px;
   letter-spacing: 1.2px;
   color: rgba(255,255,255,0.7);
   margin-bottom: 16px;
-  min-width: 0;
-  width: 100%;
 
   mat-icon {
     font-size: 20px;
@@ -703,12 +702,8 @@ $radius:      14px;
 
 .my-game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 16px;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .game-card {
@@ -826,6 +821,10 @@ $radius:      14px;
     flex-shrink: 0;
     opacity: 0.8;
     &:hover { opacity: 1; text-decoration: underline; }
+
+    @media (max-width: 860px) {
+      display: none;
+    }
   }
 }
 
