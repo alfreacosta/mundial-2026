@@ -391,7 +391,8 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authService.loginWithGoogle(response.credential).subscribe({
         next: () => {
           this.loadingGoogle = false;
-          this.router.navigate(['/dashboard']);
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+          this.router.navigate([returnUrl]);
         },
         error: (err) => {
           this.loadingGoogle = false;

@@ -37,6 +37,11 @@ export class GrupoInvitacionComponent implements OnInit {
       this.loading = false;
       return;
     }
+    // Si ya está autenticado, ir directo al modal de unirse
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/mis-grupos'], { queryParams: { codigo: this.codigoParam } });
+      return;
+    }
     this.cargarPreview();
   }
 
