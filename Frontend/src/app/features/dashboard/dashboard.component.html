@@ -177,7 +177,7 @@
                         @if (getConvocatoriaProgress(fav.paisId).total >= 23) {
                           <mat-icon class="check-sm">check_circle</mat-icon>
                         }
-                        <a class="fav-link" [routerLink]="['/convocados', fav.paisId]">Ver convocados</a>
+                        <a class="fav-link" [routerLink]="['/convocados', fav.paisId]">Convocados</a>
                         <button
                           class="btn-titulares"
                           [class.open]="titularesExpandidos.has(fav.paisId)"
