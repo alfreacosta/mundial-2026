@@ -70,8 +70,8 @@
         <p class="grupo-premio" *ngIf="grupo.premio">Premio: {{ grupo.premio }}</p>
         <div class="grupo-meta">
           <p class="grupo-paises-qty"><mat-icon>flag</mat-icon> {{ grupo.cantidadPaises }} {{ grupo.cantidadPaises === 1 ? 'país' : 'países' }} por jugador</p>
-          <span class="tipo-juego-badge tipo-{{ grupo.tipoJuego || 'A' }}" [title]="getTipoJuegoDesc(grupo.tipoJuego)">
-            {{ grupo.tipoJuego || 'A' }}
+          <span class="tipo-juego-badge tipo-{{ grupo.tipoJuego || 'A' }}">
+            {{ getTipoJuegoLabel(grupo.tipoJuego) }}
           </span>
         </div>
       </div>

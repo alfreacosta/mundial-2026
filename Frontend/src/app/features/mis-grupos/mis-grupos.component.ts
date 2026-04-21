@@ -65,6 +65,10 @@ export class MisGruposComponent implements OnInit {
     return TIPO_JUEGO_DESC[tipo ?? 'A'];
   }
 
+  getTipoJuegoLabel(tipo: TipoJuego | undefined): string {
+    return TIPO_JUEGO_DESC[tipo ?? 'A'];
+  }
+
   cargarGrupos(): void {
     this.loading = true;
     this.error = '';
