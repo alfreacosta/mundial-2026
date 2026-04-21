@@ -269,13 +269,7 @@
                       }
                     </div>
                   }
-                  <!-- Tarjeta brand DT26 al final de favoritos -->
-                  <div class="fav-compact fav-brand-card">
-                    <div class="fav-brand-inner">
-                      <img src="/images/logodt26.png" alt="DT26" class="fav-brand-logo" />
-                      <span class="fav-brand-text">dt26.win</span>
-                    </div>
-                  </div>
+                  <!-- tarjeta brand eliminada -->
                 </div>
               </div>
             }
@@ -290,47 +284,22 @@
                     <mat-icon class="confirmed-badge">lock</mat-icon>
                   }
                 </div>
-                <div class="predictions-content">
+                <div class="predictions-row">
                   @if (miPrediccion.paisCampeonCodigo) {
-                    <div class="prediction-item champion">
-                      <div class="pred-label">
-                        <mat-icon>emoji_events</mat-icon>
-                        Campeón
-                      </div>
-                      <div class="pred-value">
-                        <img 
-                          [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" 
-                          [alt]="miPrediccion.paisCampeonNombre"
-                          class="flag-img-small" />
+                    <div class="pred-box champion-box">
+                      <div class="pred-box-label"><mat-icon>emoji_events</mat-icon> Campeón</div>
+                      <div class="pred-box-value">
+                        <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" [alt]="miPrediccion.paisCampeonNombre" class="flag-img-small" />
                         <span>{{ miPrediccion.paisCampeonNombre }}</span>
                       </div>
                     </div>
                   }
                   @if (miPrediccion.jugadorGoleadorNombre) {
-                    <div class="prediction-item scorer">
-                      <div class="pred-label">
-                        <mat-icon>sports_soccer</mat-icon>
-                        Goleador
-                      </div>
-                      <div class="scorer-avatar-wrap">
-                        @if (miPrediccion.jugadorGoleadorUrlFoto) {
-                          <img
-                            [src]="miPrediccion.jugadorGoleadorUrlFoto"
-                            [alt]="miPrediccion.jugadorGoleadorNombre"
-                            class="scorer-avatar-img"
-                            (error)="$any($event.target).style.display='none'" />
-                        } @else {
-                          <div class="scorer-avatar-placeholder">
-                            <mat-icon>person</mat-icon>
-                          </div>
-                        }
-                      </div>
-                      <div class="pred-value scorer-name">
+                    <div class="pred-box scorer-box">
+                      <div class="pred-box-label"><mat-icon>sports_soccer</mat-icon> Goleador</div>
+                      <div class="pred-box-value">
                         @if (miPrediccion.jugadorGoleadorPaisCodigo) {
-                          <img 
-                            [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" 
-                            [alt]="miPrediccion.jugadorGoleadorNombre"
-                            class="flag-img-small" />
+                          <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" [alt]="miPrediccion.jugadorGoleadorNombre" class="flag-img-small" />
                         }
                         <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
                       </div>
