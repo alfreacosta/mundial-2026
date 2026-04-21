@@ -37,6 +37,8 @@ $radius:      14px;
   }
   @media (max-width: 860px) {
     grid-template-columns: 1fr;
+    padding: 0 12px;
+    gap: 16px;
     .col-left, .col-right { display: none; }
   }
 }
