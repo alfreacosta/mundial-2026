@@ -120,6 +120,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
 
   private loadLogoImg(): void {
     const img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload  = () => { this.logoImg = img; };
     img.onerror = () => { this.logoImg = null; };
     img.src = '/images/logodt26.png';
@@ -210,7 +211,7 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
       camera.lookAt(0, 0, this.camLZ);
       this.camera = camera;
 
-      const renderer = new this.T.WebGLRenderer({ antialias: true, precision: 'highp' });
+      const renderer = new this.T.WebGLRenderer({ antialias: true, precision: 'highp', preserveDrawingBuffer: true });
       renderer.setSize(w, h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
       renderer.shadowMap.enabled = true;
