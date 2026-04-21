@@ -96,9 +96,7 @@ export class PerfilPublicoComponent implements OnInit {
       const n = jugadores.length;
       jugadores.forEach((j, i) => {
         const saved = posMap.get(j.id);
-        const _partes = (j.nombre || '').split(' ').filter(Boolean);
-        const _apFallback = _partes.length >= 3 ? _partes.slice(-2).join(' ') : (_partes.slice(-1)[0] || '?');
-        const apellido = j.apellido || _apFallback;
+        const apellido = (j.apellido || '?').split(' ')[0];
         if (saved) {
           results.push({ id: j.id, apellido, camiseta: j.numeroCamiseta, posAbr: j.posicionAbr, x: saved.x, y: saved.y, urlFoto: j.urlFoto });
         } else {
