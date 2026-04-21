@@ -823,6 +823,8 @@ $radius:      14px;
     flex-shrink: 0;
     opacity: 0.8;
     &:hover { opacity: 1; text-decoration: underline; }
+
+    @media (max-width: 600px) { display: none; }
   }
 }
 
