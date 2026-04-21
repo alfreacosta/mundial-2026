@@ -95,8 +95,9 @@ export class MisGruposComponent implements OnInit {
   }
 
   getWhatsAppLink(grupo: Grupo): string {
-    const url = `${environment.appUrl}/mis-grupos?codigo=${grupo.codigoInvitacion}`;
-    const text = `⚽ *DT26 - Mundial 2026* ⚽\n\n¡Unite a "${grupo.nombre}" y demostrá que sabés más que el técnico! 💪\nArmá tu equipo, desafiá a tus amigos y competí por ser el mejor director técnico. 🏆\n\n👉 ${url}`;
+    const url = `${environment.appUrl}/grupo/${grupo.codigoInvitacion}`;
+    const quien = this.authService.getCurrentUser()?.user ?? 'Un usuario';
+    const text = `⚽ DT26 - Mundial 2026 ⚽\n\n"${quien}" te invita a unirte a una competencia privada de DT26.\nElegí tus selecciones favoritas, armá tu equipo ideal, predecí resultados del mundial y competí con tus amigos para demostrar que sos el que más sabe de fútbol.\n\n${url}\n\nCódigo de competencia: ${grupo.codigoInvitacion}`;
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
   }
 }
