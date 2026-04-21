@@ -482,19 +482,6 @@ export class Pitch3dViewComponent implements AfterViewInit, OnDestroy, OnChanges
     const h  = el.clientHeight || 480;
     this.octx.clearRect(0, 0, w, h);
 
-    // ── Logo DT26 como fondo/marca de agua (tamaño completo del canvas) ──
-    if (this.logoImg) {
-      const ctx = this.octx;
-      ctx.save();
-      ctx.globalAlpha = 0.15;
-      // Escalar proporcional al canvas, centrado
-      const scale = Math.min(w, h) * 0.80;
-      const lx = (w - scale) / 2;
-      const ly = (h - scale) / 2;
-      ctx.drawImage(this.logoImg, lx, ly, scale, scale);
-      ctx.restore();
-    }
-
     // ── Marca de agua diagonal (3× "dt26.win" a 40°) ──────────
     this.drawWatermark(w, h);
 

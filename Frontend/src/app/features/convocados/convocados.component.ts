@@ -272,8 +272,11 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
           // Asegurar fondo visible en el clon
           cloned.style.background = '#0a0e17';
         }
-      } as any).then((canvas: HTMLCanvasElement) => {
+      } as any).then(async (canvas: HTMLCanvasElement) => {
         const paisNombre = this.pais?.nombre ?? 'mi selección';
+        // Logo DT26 como watermark de fondo
+        const pCtx = canvas.getContext('2d')!;
+        await this.addLogoWatermark(pCtx, canvas.width, canvas.height);
         const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
           `Armá tu convocatoria ideal en 👉 https://dt26.win\n` +
           `Elegí tus selecciones, armá los 26 y competí con tus amigos.`;
@@ -1268,8 +1271,28 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     link.click();
   }
 
+  /** Dibuja el logo DT26 centrado como watermark de fondo en un canvas */
+  private addLogoWatermark(ctx: CanvasRenderingContext2D, W: number, H: number): Promise<void> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const size = Math.min(W, H) * 0.55;
+        const x = (W - size) / 2;
+        const y = (H - size) / 2;
+        ctx.save();
+        ctx.globalAlpha = 0.20;
+        ctx.drawImage(img, x, y, size, size);
+        ctx.restore();
+        resolve();
+      };
+      img.onerror = () => resolve();
+      img.src = '/images/logodt26.png';
+    });
+  }
+
   /** Compartir la vista 3D de titulares como imagen */
-  compartir3D(): void {
+  async compartir3D(): Promise<void> {
     if (!this.pitch3dViewRef) {
       this.snackBar.open('La vista 3D no está disponible.', '', { duration: 3000, panelClass: 'snack-error' });
       return;
@@ -1292,6 +1315,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
 
     // Canvas de la cancha 3D directo arriba
     ctx.drawImage(raw, 0, 0);
+
+    // Logo DT26 como watermark de fondo
+    await this.addLogoWatermark(ctx, W, raw.height);
 
     // Footer
     const footerY = raw.height;
