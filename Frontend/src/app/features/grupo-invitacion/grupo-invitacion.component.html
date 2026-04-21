@@ -80,7 +80,7 @@
 
       <p class="invite-hint" *ngIf="!authService.isAuthenticated()">
         ¿Ya tenés cuenta?
-        <a [routerLink]="['/register']" [queryParams]="{mode: 'login', redirect: '/grupo/' + grupo.codigoInvitacion}">Iniciá sesión</a>
+        <a [routerLink]="['/register']" [queryParams]="{mode: 'login', returnUrl: '/grupo/' + grupo.codigoInvitacion}">Iniciá sesión</a>
       </p>
 
     </div>
