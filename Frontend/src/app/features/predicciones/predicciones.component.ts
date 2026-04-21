@@ -60,6 +60,8 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
   listaFiltrada: PartidoConPrediccion[] = [];
   private _todosCache: PartidoConPrediccion[] = [];
 
+  exportandoPredicciones = false;
+
   // ── Torneo ─────────────────────────────────────────────────────────────────
   paises: Pais[] = [];
   jugadoresFiltrados: JugadorBusqueda[] = [];
@@ -400,5 +402,315 @@ export class PrediccionesComponent implements OnInit, OnDestroy {
         setTimeout(() => { this.errorTorneo = ''; this.cd.markForCheck(); }, 5000);
       }
     });
+  }
+
+  // ── Compartir predicciones como imagen ─────────────────────────────────────
+  async compartirPredicciones(): Promise<void> {
+    const partidos = this.listaFiltrada.filter(i => i.prediccion !== null);
+    if (partidos.length === 0) return;
+
+    this.exportandoPredicciones = true;
+    this.cd.markForCheck();
+
+    try {
+      const usuario = this.authService.getCurrentUser()?.user ?? 'dt26';
+      const DPR = 2;
+      const W   = 480 * DPR;
+      const PAD = 16  * DPR;
+
+      // Alturas
+      const HEADER_H  = 72 * DPR;
+      const TORNEO_H  = this.prediccionTorneo ? 52 * DPR : 0;
+      const ROW_H     = 44 * DPR;
+      const GAP       = 4  * DPR;
+      const FOOTER_H  = 48 * DPR;
+      const TOTAL_H   = HEADER_H + TORNEO_H + (partidos.length * (ROW_H + GAP)) + FOOTER_H + PAD * 2;
+
+      const cvs = document.createElement('canvas');
+      cvs.width  = W;
+      cvs.height = TOTAL_H;
+      const ctx  = cvs.getContext('2d')!;
+
+      // ── Fondo degradado ───────────────────────────────────────────
+      const bg = ctx.createLinearGradient(0, 0, 0, TOTAL_H);
+      bg.addColorStop(0,    '#0a1628');
+      bg.addColorStop(0.5,  '#0d1f3c');
+      bg.addColorStop(1,    '#060e1a');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, TOTAL_H);
+
+      // ── Watermark logo centrado ───────────────────────────────────
+      await this.loadLogoWatermark(ctx, W, TOTAL_H);
+
+      // ── Cargar banderas de los partidos ───────────────────────────
+      const flagCache = new Map<string, HTMLImageElement | null>();
+      const flagCodes = new Set<string>();
+      for (const item of partidos) {
+        flagCodes.add(item.partido.equipoLocalCodigo);
+        flagCodes.add(item.partido.equipoVisitanteCodigo);
+      }
+      await Promise.all([...flagCodes].map(code => new Promise<void>(res => {
+        const url = getFlagUrl(code, 'w40');
+        if (!url) { flagCache.set(code, null); res(); return; }
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload  = () => { flagCache.set(code, img); res(); };
+        img.onerror = () => { flagCache.set(code, null); res(); };
+        img.src = url;
+      })));
+
+      // ── HEADER ────────────────────────────────────────────────────
+      ctx.fillStyle = 'rgba(0,212,255,0.06)';
+      this.roundRect(ctx, 0, 0, W, HEADER_H, 0);
+      ctx.fill();
+
+      // Línea inferior del header
+      ctx.fillStyle = 'rgba(0,212,255,0.25)';
+      ctx.fillRect(0, HEADER_H - 1.5 * DPR, W, 1.5 * DPR);
+
+      // Logo pequeño (arriba izquierda)
+      await new Promise<void>(res => {
+        const logoImg = new Image(); logoImg.crossOrigin = 'anonymous';
+        logoImg.onload = () => {
+          const logoH = 40 * DPR;
+          const logoW = logoH;
+          ctx.drawImage(logoImg, PAD, (HEADER_H - logoH) / 2, logoW, logoH);
+          res();
+        };
+        logoImg.onerror = () => res();
+        logoImg.src = '/images/logodt26.png';
+      });
+
+      // Título
+      const logoOffset = 52 * DPR;
+      ctx.font = `800 ${15 * DPR}px Arial`;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Mis Predicciones — Mundial 2026', PAD + logoOffset, HEADER_H * 0.38);
+
+      // Filtro activo
+      let filtroLabel = 'Todos los partidos';
+      if (this.grupoFiltro) filtroLabel = `Grupo ${this.grupoFiltro}`;
+      else if (this.fechaActiva === 'HOY')    filtroLabel = 'Partidos de hoy';
+      else if (this.fechaActiva === 'MANANA') filtroLabel = 'Partidos de mañana';
+      ctx.font = `${12 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(0,212,255,0.85)';
+      ctx.fillText(filtroLabel, PAD + logoOffset, HEADER_H * 0.65);
+
+      // Usuario (derecha)
+      ctx.font = `700 ${12 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.textAlign = 'right';
+      ctx.fillText(`@${usuario}`, W - PAD, HEADER_H * 0.38);
+
+      // Predicciones: X predichas
+      ctx.font = `${11 * DPR}px Arial`;
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText(`${partidos.length} predicción${partidos.length !== 1 ? 'es' : ''}`, W - PAD, HEADER_H * 0.65);
+
+      // ── TORNEO BANNER (si existe) ─────────────────────────────────
+      let y = HEADER_H;
+      if (this.prediccionTorneo) {
+        ctx.fillStyle = 'rgba(251,191,36,0.07)';
+        ctx.fillRect(0, y, W, TORNEO_H);
+        ctx.fillStyle = 'rgba(251,191,36,0.2)';
+        ctx.fillRect(0, y + TORNEO_H - 1 * DPR, W, 1 * DPR);
+
+        const midT = y + TORNEO_H / 2;
+        ctx.font = `${11 * DPR}px Arial`;
+        ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+
+        // Campeón
+        const campNombre = this.prediccionTorneo.paisCampeonNombre || '—';
+        const flagC = flagCache.get(this.prediccionTorneo.paisCampeonCodigo ?? '') ?? null;
+        if (flagC) {
+          const fh = 18 * DPR;
+          ctx.drawImage(flagC, PAD, midT - fh / 2, fh * 1.4, fh);
+          ctx.fillText(`🏆 Campeón: ${campNombre}`, PAD + 24 * DPR, midT);
+        } else {
+          ctx.fillText(`🏆 Campeón: ${campNombre}`, PAD, midT);
+        }
+
+        // Goleador
+        const goleador = this.prediccionTorneo.jugadorGoleadorNombre || '—';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(251,191,36,0.75)';
+        ctx.fillText(`⚽ ${goleador}`, W - PAD, midT);
+
+        y += TORNEO_H;
+      }
+
+      // ── PARTIDOS ──────────────────────────────────────────────────
+      y += PAD;
+
+      const drawRoundRect = (x: number, ry: number, w: number, h: number, r: number) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, ry);
+        ctx.lineTo(x + w - r, ry); ctx.arcTo(x + w, ry, x + w, ry + r, r);
+        ctx.lineTo(x + w, ry + h - r); ctx.arcTo(x + w, ry + h, x + w - r, ry + h, r);
+        ctx.lineTo(x + r, ry + h); ctx.arcTo(x, ry + h, x, ry + h - r, r);
+        ctx.lineTo(x, ry + r); ctx.arcTo(x, ry, x + r, ry, r);
+        ctx.closePath();
+      };
+
+      for (const item of partidos) {
+        const pred = item.prediccion!;
+        const pts  = pred.puntajeObtenido;
+
+        // Color de fila según resultado
+        let rowBg: string;
+        if (pts === null || pts === undefined) rowBg = 'rgba(255,255,255,0.04)';
+        else if (pts >= 50)  rowBg = 'rgba(34,197,94,0.12)';
+        else if (pts > 0)    rowBg = 'rgba(251,191,36,0.10)';
+        else                 rowBg = 'rgba(239,68,68,0.08)';
+
+        drawRoundRect(PAD, y, W - PAD * 2, ROW_H, 6 * DPR);
+        ctx.fillStyle = rowBg;
+        ctx.fill();
+
+        const midY = y + ROW_H / 2;
+
+        // Grupo tag (izquierda pequeño)
+        if (item.partido.grupo) {
+          ctx.font = `600 ${9 * DPR}px Arial`;
+          ctx.fillStyle = 'rgba(0,212,255,0.6)';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`G ${item.partido.grupo}`, PAD + 6 * DPR, midY - 8 * DPR);
+        }
+
+        // Flags y nombres
+        const FLAG_W  = 22 * DPR;
+        const FLAG_H  = 15 * DPR;
+        const FLAG_PAD = 4 * DPR;
+        const NAME_FONT = `${11 * DPR}px Arial`;
+        const SCORE_FONT = `700 ${14 * DPR}px Arial`;
+
+        const centerX = W / 2;
+        const scoreW  = 52 * DPR; // espacio para "2 – 1"
+
+        // Local (izquierda → centro)
+        const localFlag = flagCache.get(item.partido.equipoLocalCodigo) ?? null;
+        const localX = PAD + 6 * DPR;
+        if (localFlag) {
+          ctx.drawImage(localFlag, localX, midY - FLAG_H / 2, FLAG_W, FLAG_H);
+        }
+        ctx.font = NAME_FONT;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        const localNombre = this.truncate(item.partido.equipoLocalNombre, 12);
+        ctx.fillText(localNombre, localX + FLAG_W + FLAG_PAD, midY);
+
+        // Visitante (derecha ← centro)
+        const visFlag  = flagCache.get(item.partido.equipoVisitanteCodigo) ?? null;
+        const visNombre = this.truncate(item.partido.equipoVisitanteNombre, 12);
+        ctx.font = NAME_FONT;
+        ctx.textAlign = 'right';
+        const visNombreX = W - PAD - 6 * DPR - FLAG_W - FLAG_PAD;
+        ctx.fillText(visNombre, visNombreX, midY);
+        if (visFlag) {
+          ctx.drawImage(visFlag, W - PAD - 6 * DPR - FLAG_W, midY - FLAG_H / 2, FLAG_W, FLAG_H);
+        }
+
+        // Marcador predicho (centro)
+        const scoreStr = `${pred.golLocalPred} – ${pred.golVisitantePred}`;
+        ctx.font = SCORE_FONT;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(scoreStr, centerX, midY - 2 * DPR);
+
+        // Resultado real si existe
+        if (item.partido.golLocal !== null && item.partido.golLocal !== undefined) {
+          ctx.font = `${9 * DPR}px Arial`;
+          ctx.fillStyle = 'rgba(255,255,255,0.35)';
+          ctx.fillText(`Real: ${item.partido.golLocal}–${item.partido.golVisitante}`, centerX, midY + 10 * DPR);
+        }
+
+        // Badge puntos (derecha, si tiene)
+        if (pts !== null && pts !== undefined) {
+          let ptColor = pts >= 50 ? '#22c55e' : pts > 0 ? '#fbbf24' : '#ef4444';
+          let ptLabel = pts >= 50 ? `🎯 ${pts}` : pts > 0 ? `✓ ${pts}` : '✗ 0';
+          ctx.font = `700 ${10 * DPR}px Arial`;
+          ctx.fillStyle = ptColor;
+          ctx.textAlign = 'right';
+          ctx.fillText(ptLabel, W - PAD - 6 * DPR, midY - 8 * DPR);
+        }
+
+        y += ROW_H + GAP;
+      }
+
+      // ── FOOTER ────────────────────────────────────────────────────
+      y = TOTAL_H - FOOTER_H;
+      ctx.fillStyle = 'rgba(0,212,255,0.06)';
+      ctx.fillRect(0, y, W, FOOTER_H);
+      ctx.fillStyle = 'rgba(0,212,255,0.25)';
+      ctx.fillRect(0, y, W, 1.5 * DPR);
+
+      ctx.font = `700 ${13 * DPR}px Arial`;
+      ctx.fillStyle = '#00d4ff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Hacé las tuyas en 👉 dt26.win/predicciones', W / 2, y + FOOTER_H / 2);
+
+      // ── Compartir ─────────────────────────────────────────────────
+      cvs.toBlob(async blob => {
+        if (!blob) return;
+        const filtro   = this.grupoFiltro ? `Grupo-${this.grupoFiltro}` : 'Todos';
+        const filename = `Predicciones-${filtro}-${usuario}.png`;
+        const file     = new File([blob], filename, { type: 'image/png' });
+        const shareText = `Estas son mis predicciones del Mundial 2026! 🏆\nHacé las tuyas en 👉 https://dt26.win/predicciones\nEs gratis y seguro.`;
+
+        if (navigator.canShare?.({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'Mis Predicciones — DT26', text: shareText });
+          } catch { /* usuario canceló */ }
+        } else {
+          const a = document.createElement('a');
+          a.download = filename;
+          a.href = URL.createObjectURL(blob);
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+        this.exportandoPredicciones = false;
+        this.cd.markForCheck();
+      }, 'image/png');
+
+    } catch {
+      this.exportandoPredicciones = false;
+      this.cd.markForCheck();
+    }
+  }
+
+  private loadLogoWatermark(ctx: CanvasRenderingContext2D, W: number, H: number): Promise<void> {
+    return new Promise(resolve => {
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const size = Math.min(W, H) * 0.5;
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        ctx.drawImage(img, (W - size) / 2, (H - size) / 2, size, size);
+        ctx.restore();
+        resolve();
+      };
+      img.onerror = () => resolve();
+      img.src = '/images/logodt26.png';
+    });
+  }
+
+  private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  private truncate(text: string, maxLen: number): string {
+    return text.length > maxLen ? text.substring(0, maxLen - 1) + '…' : text;
   }
 }

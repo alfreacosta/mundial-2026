@@ -12,6 +12,16 @@
       </h1>
       <p class="page-subtitle">Mundial 2026 — Elegí el campeón, el goleador y los marcadores</p>
     </div>
+    @if (!loadingPartidos && totalPredichos > 0) {
+      <button class="btn-compartir-pred" (click)="compartirPredicciones()" [disabled]="exportandoPredicciones">
+        @if (exportandoPredicciones) {
+          <mat-spinner diameter="14"></mat-spinner>
+        } @else {
+          <mat-icon>share</mat-icon>
+        }
+        Compartir
+      </button>
+    }
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->

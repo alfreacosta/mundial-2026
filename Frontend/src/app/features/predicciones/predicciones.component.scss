@@ -24,6 +24,10 @@ $ease:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
 // ── Header de página ─────────────────────────────────────────────────────────
 .page-header {
   margin-bottom: v.$spacing-md;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: v.$spacing-sm;
 }
 
 .header-left {
@@ -54,6 +58,34 @@ $ease:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
   color: rgba(255, 255, 255, 0.4);
   font-weight: 500;
   margin-left: auto;
+}
+
+// ── Botón compartir predicciones ─────────────────────────────────────────────
+.btn-compartir-pred {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  background: rgba(0, 212, 255, 0.08);
+  color: #00d4ff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background $ease, border-color $ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-spinner { --mdc-circular-progress-active-indicator-color: #00d4ff; }
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 212, 255, 0.18);
+    border-color: rgba(0, 212, 255, 0.7);
+  }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 // ── Secciones genéricas ───────────────────────────────────────────────────────
