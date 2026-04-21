@@ -27,6 +27,14 @@
     <mat-icon>error</mat-icon>{{ error }}
   </div>
 
+  <!-- Ya sos miembro -->
+  <div class="ya-miembro-box" *ngIf="yaMiembro">
+    <mat-icon class="ya-miembro-icon">check_circle</mat-icon>
+    <p><strong>¡Ya sos miembro de este grupo!</strong></p>
+    <p class="ya-miembro-sub">Podés verlo en tu lista de grupos.</p>
+    <button class="btn-ya-miembro" (click)="cancelar.emit()">Ver mis grupos</button>
+  </div>
+
   <!-- ═══ PASO 1: Código de invitación ═══ -->
   <div class="paso-contenido" *ngIf="paso === 1">
     <p class="paso-descripcion">Ingresá el código de invitación que te compartieron</p>

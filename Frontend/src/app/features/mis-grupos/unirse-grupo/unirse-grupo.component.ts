@@ -24,6 +24,7 @@ export class UnirseGrupoComponent implements OnInit {
   loading = false;
   loadingDatos = false;
   error = '';
+  yaMiembro = false;
 
   /** Paso actual: 1 = código, 2 = seleccionar países */
   paso = 1;
@@ -125,8 +126,14 @@ export class UnirseGrupoComponent implements OnInit {
         this.grupoUnido.emit(row);
       },
       error: (err) => {
-        this.error = err?.error?.message || 'No se pudo unir al grupo. Verificá el código.';
         this.loading = false;
+        const msg = err?.error?.message || err?.error?.error || '';
+        if (msg.toLowerCase().includes('miembro')) {
+          this.yaMiembro = true;
+          this.error = '';
+        } else {
+          this.error = msg || 'No se pudo unir al grupo. Verificá el código.';
+        }
       }
     });
   }
