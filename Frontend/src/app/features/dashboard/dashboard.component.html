@@ -9,7 +9,7 @@
       <div class="photo-slot left-photo">
         <img [src]="slideshowPhotos[currentPhotoIndex]"
              [class.visible]="photoVisible"
-             alt="Foto del Mundial" class="side-img slideshow-img" />
+             alt="Foto del Mundial" class="side-img slideshow-img" loading="lazy" />
       </div>
 
       <!-- TOP 5 Ranking -->
@@ -289,7 +289,7 @@
                 <div class="pred-box champion-box">
                   <div class="pred-box-label"><mat-icon>emoji_events</mat-icon> Campeón</div>
                   <div class="pred-box-value">
-                    <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" [alt]="miPrediccion.paisCampeonNombre" class="flag-img-small" />
+                    <img [src]="getFlagUrl(miPrediccion.paisCampeonCodigo)" [alt]="miPrediccion.paisCampeonNombre" class="flag-img-small" loading="lazy" />
                     <span>{{ miPrediccion.paisCampeonNombre }}</span>
                   </div>
                 </div>
@@ -299,7 +299,7 @@
                   <div class="pred-box-label"><mat-icon>sports_soccer</mat-icon> Goleador</div>
                   <div class="pred-box-value">
                     @if (miPrediccion.jugadorGoleadorPaisCodigo) {
-                      <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" [alt]="miPrediccion.jugadorGoleadorNombre" class="flag-img-small" />
+                      <img [src]="getFlagUrl(miPrediccion.jugadorGoleadorPaisCodigo)" [alt]="miPrediccion.jugadorGoleadorNombre" class="flag-img-small" loading="lazy" />
                     }
                     <span>{{ miPrediccion.jugadorGoleadorNombre }}</span>
                   </div>
@@ -308,6 +308,7 @@
                       [src]="miPrediccion.jugadorGoleadorUrlFoto"
                       [alt]="miPrediccion.jugadorGoleadorNombre"
                       class="scorer-box-photo"
+                      loading="lazy"
                       (error)="$any($event.target).style.display='none'" />
                   }
                 </div>
@@ -491,7 +492,7 @@
       <div class="photo-slot right-photo">
         <img [src]="slideshowPhotos[(currentPhotoIndex + 3) % slideshowPhotos.length]"
              [class.visible]="photoVisible"
-             alt="Foto del Mundial" class="side-img slideshow-img" />
+             alt="Foto del Mundial" class="side-img slideshow-img" loading="lazy" />
       </div>
 
       <!-- Datos clave -->

@@ -87,7 +87,6 @@ export class IdleTimeoutService implements OnDestroy {
       return;10
     }
 
-    console.log('[IdleTimeout] ✅ Iniciando detección de inactividad (10 min)');
     this.isActive = true;
     this.setupListeners();
     this.resetIdleTimer();
@@ -100,7 +99,6 @@ export class IdleTimeoutService implements OnDestroy {
   stop(): void {
     if (!this.isActive) return;
 
-    console.log('[IdleTimeout] ⏹️ Deteniendo detección de inactividad');
     this.isActive = false;
     this.clearTimers();
     this.removeListeners();

@@ -224,24 +224,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return { total: conv?.totalJugadores ?? 0, max: 26 };
   }
 
-  toggleConvocados(paisId: number): void {
-    if (this.convocadosExpandidos.has(paisId)) {
-      this.convocadosExpandidos.delete(paisId);
-      return;
-    }
-    this.convocadosExpandidos.add(paisId);
-    // Carga lazy de jugadores via GraphQL (permitAll - no requiere token)
-    if (!this.jugadoresPorPais.has(paisId) && !this.convocadosCargando.has(paisId)) {
-      this.convocadosCargando.add(paisId);
-      this.countriesService.getJugadoresPorPais(paisId).pipe(
-        catchError(() => of([]))
-      ).subscribe(jugadores => {
-        this.jugadoresPorPais.set(paisId, jugadores);
-        this.convocadosCargando.delete(paisId);
-      });
-    }
-  }
-
   toggleTitulares(paisId: number): void {
     if (this.titularesExpandidos.has(paisId)) {
       this.titularesExpandidos.delete(paisId);
@@ -298,14 +280,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     }
     return results;
-  }
-
-  private getDefaultPos(posAbr: string, _allIds: number[], _id: number): { x: number; y: number } {
-    const defaults: Record<string, { x: number; y: number }> = {
-      POR: { x: 50, y: 90 }, ARQ: { x: 50, y: 90 },
-      DEF: { x: 50, y: 70 }, MED: { x: 50, y: 44 }, DEL: { x: 50, y: 18 }
-    };
-    return defaults[posAbr] ?? { x: 50, y: 50 };
   }
 
   getDashboardConvocados(paisId: number): { id: number; nombre: string; apellido: string; numeroCamiseta: number | null; posicionAbr: string; urlFoto: string | null; club: string | null; titular: boolean }[] {
@@ -382,10 +356,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const url = `${environment.appUrl}/mis-grupos?codigo=${grupo.codigoInvitacion}`;
     const text = `⚽ *DT26 - Mundial 2026* ⚽\n\n¡Unite a "${grupo.nombre}" y demostrá que sabés más que el técnico! 💪\nArmá tu equipo, desafiá a tus amigos y competí por ser el mejor director técnico. 🏆\n\n👉 ${url}`;
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
-  }
-
-  openVideo(): void {
-    window.open('https://www.youtube.com/watch?v=QR52cerl0CQ', '_blank', 'noopener,noreferrer');
   }
 
   ngOnDestroy(): void {
