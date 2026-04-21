@@ -277,8 +277,9 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
         // Logo DT26 como watermark de fondo
         const pCtx = canvas.getContext('2d')!;
         await this.addLogoWatermark(pCtx, canvas.width, canvas.height);
+        const shareUrl = `https://dt26.win/convocados/${this.paisId}?tab=convocados`;
         const shareText = `🏆 Este es mi plantel de ${paisNombre} para el Mundial 2026!\n\n` +
-          `Armá tu convocatoria ideal en 👉 https://dt26.win\n` +
+          `Armá tu convocatoria ideal 👉 ${shareUrl}\n` +
           `Elegí tus selecciones, armá los 26 y competí con tus amigos.`;
 
         canvas.toBlob(blob => {
@@ -1342,9 +1343,10 @@ export class ConvocadosComponent implements OnInit, OnDestroy {
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.fillText('Elegí tus selecciones favoritas y participá en competencias privadas  ·  https://dt26.win', W / 2, midY + lineH / 2 + 2 * DPR, maxW);
 
+    const shareUrl = `https://dt26.win/convocados/${this.paisId}?tab=titulares`;
     const shareText = `Este es mi 11 titular de ${paisNombre} para el Mundial 2026!\n\n` +
-      `Armá tu equipo ideal en 👉 https://dt26.win\n` +
-      `Elegí tus selecciones favoritas, armá tu convocatoria y compartí el  XI ideal con tus amigos.`;
+      `Armá tu equipo ideal 👉 ${shareUrl}\n` +
+      `Elegí tus selecciones favoritas, armá tu convocatoria y compartí el XI ideal con tus amigos.`;
     cvs.toBlob(blob => {
       if (!blob) { this.exportingPitch = false; return; }
       const file = new File([blob], `XI-3D-${paisNombre}.png`, { type: 'image/png' });
