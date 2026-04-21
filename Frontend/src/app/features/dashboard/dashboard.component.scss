@@ -1777,19 +1777,28 @@ $radius:      14px;
 }
 
 // ── Mobile Photo Mosaic ──────────────────────────────────
-.mobile-photo-mosaic {
-  display: none; // oculto en desktop
+.mobile-mosaic-wrapper {
+  display: none;
 
+  @media (max-width: 860px) {
+    display: block;
+    position: relative;
+    width: 100%;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  }
+}
+
+.mobile-photo-mosaic {
   @media (max-width: 860px) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 160px 160px;
     gap: 4px;
     border-radius: 16px;
-    overflow: visible;
-    position: relative;
-    margin-bottom: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    overflow: hidden;
+    width: 100%;
   }
 }
 
@@ -1842,13 +1851,17 @@ $radius:      14px;
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 24px;
   padding: 6px 18px;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: 1px;
   z-index: 10;
   pointer-events: none;
   white-space: nowrap;
+
+  @media (max-width: 860px) {
+    display: flex;
+  }
 
   .mosaic-badge-title {
     font-size: 13px;
