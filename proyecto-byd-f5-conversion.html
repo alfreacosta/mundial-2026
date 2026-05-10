@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proyecto: Conversión BYD F5 Suri — Caja Automática → Mecánica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #e63946;
+      --accent2: #f4a261;
+      --dark: #0a0a0f;
+      --dark2: #111118;
+      --card: #16161f;
+      --card2: #1e1e2a;
+      --border: #2a2a3a;
+      --text: #e0e0ec;
+      --muted: #8888aa;
+      --green: #2ec27e;
+      --blue: #4dabf7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 2rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(230,57,70,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(244,162,97,.10) 0%, transparent 60%),
+        linear-gradient(180deg, #0a0a0f 0%, #0d0d15 100%);
+      z-index: 0;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 900px; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(230,57,70,.15);
+      border: 1px solid rgba(230,57,70,.4);
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: .4rem 1.2rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      min-width: 140px;
+    }
+
+    .hero-stat .val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-stat .lbl {
+      font-size: .8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: .8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    /* ── SECTIONS ── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .section-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .5rem;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: .75rem;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── CARDS ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      transition: border-color .3s, transform .3s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .card p, .card li {
+      font-size: .9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .card ul { list-style: none; }
+    .card ul li::before { content: "›  "; color: var(--accent); font-weight: 700; }
+
+    /* ── VEHICLE GALLERY ── */
+    .vehicle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .vehicle-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color .3s, transform .3s;
+    }
+
+    .vehicle-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-4px);
+    }
+
+    .vehicle-img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      background: var(--card2);
+    }
+
+    .vehicle-img-placeholder {
+      width: 100%;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      background: linear-gradient(135deg, var(--card2) 0%, var(--card) 100%);
+    }
+
+    .vehicle-body { padding: 1.25rem 1.5rem 1.5rem; }
+
+    .vehicle-badge {
+      display: inline-block;
+      background: rgba(244,162,97,.12);
+      border: 1px solid rgba(244,162,97,.35);
+      color: var(--accent2);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      margin-bottom: .75rem;
+    }
+
+    .vehicle-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .vehicle-card p { font-size: .85rem; color: var(--muted); }
+
+    .vehicle-specs {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: .75rem;
+    }
+
+    .spec-tag {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      font-size: .72rem;
+      color: var(--muted);
+      padding: .2rem .6rem;
+      border-radius: 6px;
+    }
+
+    /* ── PROCESS STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      transition: border-color .3s;
+    }
+
+    .step:hover { border-color: var(--blue); }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      background: rgba(77,171,247,.12);
+      border: 1px solid rgba(77,171,247,.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .step-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .step-body p { font-size: .88rem; color: var(--muted); }
+
+    /* ── BUDGET TABLE ── */
+    .budget-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .budget-table th {
+      background: rgba(230,57,70,.12);
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 1rem 1.5rem;
+      text-align: left;
+    }
+
+    .budget-table td {
+      padding: 1rem 1.5rem;
+      font-size: .9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .budget-table tr:hover td { background: rgba(255,255,255,.025); }
+
+    .budget-table .price { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .budget-total td {
+      background: rgba(46,194,126,.08) !important;
+      border-top: 2px solid rgba(46,194,126,.3) !important;
+      color: var(--green) !important;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    /* ── WARNINGS ── */
+    .alert {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-warn {
+      background: rgba(244,162,97,.08);
+      border: 1px solid rgba(244,162,97,.3);
+    }
+
+    .alert-info {
+      background: rgba(77,171,247,.08);
+      border: 1px solid rgba(77,171,247,.3);
+    }
+
+    .alert-danger {
+      background: rgba(230,57,70,.08);
+      border: 1px solid rgba(230,57,70,.3);
+    }
+
+    .alert-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .alert-body h4 { font-size: .9rem; font-weight: 700; margin-bottom: .25rem; }
+    .alert-body p { font-size: .85rem; color: var(--muted); }
+
+    /* ── QUOTE BOX ── */
+    .quote-box {
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 1.5rem 2rem;
+      margin: 2rem 0;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--blue));
+      border-radius: 2px;
+    }
+
+    .tl-item {
+      position: relative;
+      padding: 0 0 2rem 2rem;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 2px solid var(--dark);
+    }
+
+    .tl-item h4 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+    .tl-item p { font-size: .85rem; color: var(--muted); }
+    .tl-week {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .25rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    footer strong { color: var(--accent); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .hero-stats { gap: 1rem; }
+      .hero-stat { min-width: 110px; }
+      .step { flex-direction: column; gap: 1rem; }
+      .budget-table th, .budget-table td { padding: .75rem 1rem; }
+    }
+
+    /* ── GLOW ANIMATIONS ── */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: .6; }
+      50% { opacity: 1; }
+    }
+
+    .glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+    /* ── TAG PILLS ── */
+    .pill {
+      display: inline-block;
+      background: rgba(230,57,70,.1);
+      border: 1px solid rgba(230,57,70,.3);
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      margin: .2rem;
+    }
+
+    .pill-green {
+      background: rgba(46,194,126,.1);
+      border-color: rgba(46,194,126,.3);
+      color: var(--green);
+    }
+
+    .pill-blue {
+      background: rgba(77,171,247,.1);
+      border-color: rgba(77,171,247,.3);
+      color: var(--blue);
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .compare-table th {
+      background: var(--card2);
+      padding: 1rem 1.5rem;
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: left;
+    }
+
+    .compare-table td {
+      padding: .9rem 1.5rem;
+      font-size: .9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .compare-table .good { color: var(--green); font-weight: 600; }
+    .compare-table .bad  { color: var(--accent); font-weight: 600; }
+
+    /* logo svg */
+    .logo-deco {
+      display: block;
+      margin: 0 auto 1.5rem;
+      width: 80px;
+      height: 80px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="badge">🔧 Proyecto de Conversión Mecánica</div>
+
+    <svg class="logo-deco glow" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" stroke="#e63946" stroke-width="2" opacity=".4"/>
+      <circle cx="40" cy="40" r="28" stroke="#e63946" stroke-width="1.5" opacity=".3"/>
+      <path d="M40 16 L40 24 M40 56 L40 64 M16 40 L24 40 M56 40 L64 40" stroke="#e63946" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="40" cy="40" r="10" fill="#e63946" opacity=".15"/>
+      <circle cx="40" cy="40" r="5" fill="#e63946" opacity=".8"/>
+      <path d="M28 28 L52 52 M52 28 L28 52" stroke="#e63946" stroke-width="1" opacity=".3"/>
+    </svg>
+
+    <h1>BYD F5 Suri<br/><span>Conversión DCT → Manual</span></h1>
+    <p class="hero-sub">
+      Proyecto técnico de reemplazo de transmisión: de caja automática de doble embrague (6DCT)
+      a caja manual de 5 velocidades de origen Toyota/BYD para mayor fiabilidad y simplicidad de mantenimiento.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="val">~12M</span>
+        <span class="lbl">Gs. inversión máx.</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">7 días</span>
+        <span class="lbl">Tiempo de taller</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">5 vel.</span>
+        <span class="lbl">Caja manual</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">6+</span>
+        <span class="lbl">Modelos donantes</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#objetivo">Objetivo</a>
+  <a href="#donantes">Vehículos Donantes</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#desafios">Desafíos</a>
+  <a href="#cronograma">Cronograma</a>
+  <a href="#presupuesto">Presupuesto</a>
+  <a href="#recomendacion">Recomendación</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     OBJETIVO / POR QUÉ
+══════════════════════════════════════════════ -->
+<section id="objetivo">
+  <div class="section-label">Punto de partida</div>
+  <h2 class="section-title">¿Por qué hacer la conversión?</h2>
+  <p class="section-desc">
+    La transmisión 6DCT (Doble Embrague Seco) del BYD F5 presenta fallas conocidas a nivel mundial.
+    La conversión a caja manual elimina la complejidad electrónica y la mecatrónica costosa, dejando
+    el vehículo con una transmisión simple, confiable y de fácil reparación local.
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <span class="card-icon">⚠️</span>
+      <h3>El problema: 6DCT de BYD</h3>
+      <ul>
+        <li>Mecatrónica de alto costo de reposición</li>
+        <li>Fallas prematuras documentadas (sacudidas, patinaje)</li>
+        <li>Sin repuestos locales accesibles en Paraguay</li>
+        <li>Reparación especializada casi imposible</li>
+        <li>El tablero ya indica "caja muerta"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="card-icon">✅</span>
+      <h3>La solución: Caja Manual Toyota</h3>
+      <ul>
+        <li>Transmisión Serie C comprobada hace décadas</li>
+        <li>Repuestos disponibles en cualquier desguace regional</li>
+        <li>Reparable por cualquier mecánico competente</li>
+        <li>Sin electrónica de transmisión que falle</li>
+        <li>Mayor durabilidad con el motor turbo</li>
+      </ul>
+    </div>
+  </div>
+
+  <br/>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Característica</th>
+        <th>6DCT Original (BYD)</th>
+        <th>Manual Toyota Serie C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Costo de reparación</td>
+        <td class="bad">Muy alto (mecatrónica)</td>
+        <td class="good">Bajo (mecánica convencional)</td>
+      </tr>
+      <tr>
+        <td>Disponibilidad de repuestos en Paraguay</td>
+        <td class="bad">Casi nula</td>
+        <td class="good">Alta (Toyota muy común)</td>
+      </tr>
+      <tr>
+        <td>Complejidad electrónica</td>
+        <td class="bad">Alta (sensors, TCM, mecatrónica)</td>
+        <td class="good">Ninguna</td>
+      </tr>
+      <tr>
+        <td>Confiabilidad documentada</td>
+        <td class="bad">Fallas conocidas mundialmente</td>
+        <td class="good">Décadas de uso probado</td>
+      </tr>
+      <tr>
+        <td>Valor de reventa del auto</td>
+        <td class="bad">Muy bajo con caja muerta</td>
+        <td class="good">Recupera valor</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     VEHÍCULOS DONANTES
+══════════════════════════════════════════════ -->
+<section id="donantes">
+  <div class="section-label">Fuentes de Transmisión</div>
+  <h2 class="section-title">Vehículos Donantes Compatibles</h2>
+  <p class="section-desc">
+    Buscá transmisiones manuales de la <strong>Serie C de Toyota</strong> (C50, C52, C56).
+    Todos estos modelos son comunes en Paraguay, Argentina, Chile y Brasil —lo que facilita
+    la búsqueda en desguaces y chatarreras.
+  </p>
+
+  <div class="vehicle-grid">
+
+    <!-- Toyota Corolla E120 -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Toyota_Corolla_E120_--_03-21-2010.jpg/800px-Toyota_Corolla_E120_--_03-21-2010.jpg"
+           alt="Toyota Corolla E120"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚗</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">⭐ OPCIÓN PRINCIPAL</span>
+        <h3>Toyota Corolla E120 / E130</h3>
+        <p>La mejor opción. Motor 1.6 (3ZZ-FE) o 1.8 (1ZZ-FE). Caja C52/C56 muy robusta para el torque turbo del F5. Modelo 2014.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2003–2008</span>
+          <span class="spec-tag">1.6 / 1.8L</span>
+          <span class="spec-tag">C52 / C56</span>
+          <span class="spec-tag">5 velocidades</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toyota Corolla Altis -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Toyota_Corolla_Altis_2001_%28Thailand%29_%28cropped%29.jpg/800px-Toyota_Corolla_Altis_2001_%28Thailand%29_%28cropped%29.jpg"
+           alt="Toyota Corolla Altis"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚗</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">Alternativa viable</span>
+        <h3>Toyota Corolla Altis</h3>
+        <p>Versiones manuales de la misma generación E120/E130. Comparte exactamente la misma configuración de campana y patrón de pernos.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2001–2007</span>
+          <span class="spec-tag">1.6 / 1.8L</span>
+          <span class="spec-tag">C52</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toyota Auris -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Toyota_Auris_--_02-15-2010.jpg/800px-Toyota_Auris_--_02-15-2010.jpg"
+           alt="Toyota Auris"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚙</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">Alternativa viable</span>
+        <h3>Toyota Auris (1.ª gen.)</h3>
+        <p>Algunos modelos con motor 1.6 comparten la misma configuración de campana. Verificar que sea versión manual.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2006–2012</span>
+          <span class="spec-tag">1.6L</span>
+          <span class="spec-tag">Verificar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toyota Avensis -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Toyota_Avensis_T25_front_20080228.jpg/800px-Toyota_Avensis_T25_front_20080228.jpg"
+           alt="Toyota Avensis"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚗</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">Alternativa viable</span>
+        <h3>Toyota Avensis (2.ª gen.)</h3>
+        <p>Las versiones 1.8L manuales montan cajas Serie C compatibles. Menos común en Paraguay pero buscable via Chile.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2003–2009</span>
+          <span class="spec-tag">1.8L</span>
+          <span class="spec-tag">C52</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toyota Matrix -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/2003-2004_Toyota_Matrix_--_05-14-2011.jpg/800px-2003-2004_Toyota_Matrix_--_05-14-2011.jpg"
+           alt="Toyota Matrix"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚐</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">Menos común</span>
+        <h3>Toyota Matrix / Pontiac Vibe 1.8L</h3>
+        <p>Exactamente la misma mecánica que el Corolla E120. Menos comunes en la región pero son la opción más directa si aparece.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2003–2008</span>
+          <span class="spec-tag">1.8L</span>
+          <span class="spec-tag">C52 / C56</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BYD F3 -->
+    <div class="vehicle-card">
+      <img class="vehicle-img"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/BYD_F3_%28first_generation%2C_facelift%2C_China%29_front.jpg/800px-BYD_F3_%28first_generation%2C_facelift%2C_China%29_front.jpg"
+           alt="BYD F3"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+      />
+      <div class="vehicle-img-placeholder" style="display:none;">🚘</div>
+      <div class="vehicle-body">
+        <span class="vehicle-badge">⭐ OPCIÓN DIRECTA BYD</span>
+        <h3>BYD F3 (versión manual)</h3>
+        <p>El BYD F3 manual usa una caja derivada directamente del Toyota Corolla. Es la opción con mayor compatibilidad de pedales y palier. Buscarlo con caja en buen estado.</p>
+        <div class="vehicle-specs">
+          <span class="spec-tag">2005–2015</span>
+          <span class="spec-tag">1.5L</span>
+          <span class="spec-tag">5 vel. Toyota-derived</span>
+          <span class="spec-tag">Alta compatibilidad</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     COMPONENTES
+══════════════════════════════════════════════ -->
+<section id="componentes">
+  <div class="section-label">Lista de Compras</div>
+  <h2 class="section-title">Componentes Necesarios</h2>
+  <p class="section-desc">
+    Todos los elementos que se deben conseguir antes de iniciar el trabajo en el taller.
+    Se recomienda tener todo en mano para no frenar el trabajo.
+  </p>
+
+  <div class="grid-3">
+    <div class="card">
+      <span class="card-icon">⚙️</span>
+      <h3>Transmisión Manual</h3>
+      <p>Caja Toyota Serie C (C50 / C52 / C56) — o de BYD F3 manual. Verificar estado interno: sin ruidos, sin holguras en sincronizados.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔄</span>
+      <h3>Volante de Inercia (Flywheel)</h3>
+      <p>Compatible con motor 1.5/1.6 Toyota Serie ZZ/NZ. Verificar que no tenga fisuras. Rectificarlo si ya tiene uso.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💿</span>
+      <h3>Kit de Embrague Completo</h3>
+      <p>Disco, prensa y rulemán de empuje nuevos. Se recomienda marca LUK o Sachs. Nunca colocar embrague usado al hacer una conversión.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🦶</span>
+      <h3>Pedalera de Embrague</h3>
+      <p>Juego de pedales con el tercer pedal de embrague. Se recomienda adaptar la del BYD F3 por mayor compatibilidad de montaje.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💧</span>
+      <h3>Sistema Hidráulico</h3>
+      <p>Bomba principal (cilindro maestro), bomba auxiliar (cilindro esclavo) y cañería de embrague. Sistema hidráulico es más confiable que cable.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🕹️</span>
+      <h3>Selector de Cambios</h3>
+      <p>Palanca de cambios y cables selectores compatibles con la caja elegida. Verificar recorrido y punto de agarre.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔩</span>
+      <h3>Semiejes (Palieres)</h3>
+      <p>Verificar si los del DCT calzan en la nueva caja. Si no, usar los del Toyota donante y hermanarlos con las masas originales del F5.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛠️</span>
+      <h3>Soporte de Caja</h3>
+      <p>El soporte del lado conductor deberá ser fabricado en tornería. Pieza clave del proyecto — coordinar con tornero antes de empezar.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔌</span>
+      <h3>Cableado / Bypass ECU</h3>
+      <p>Resistencias o módulo para simular la señal del selector P/N y permitir el arranque. Puede requerir reprogramación de ECU.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     DESAFÍOS TÉCNICOS
+══════════════════════════════════════════════ -->
+<section id="desafios">
+  <div class="section-label">Para el Mecánico</div>
+  <h2 class="section-title">Desafíos Técnicos</h2>
+  <p class="section-desc">
+    Estos son los puntos críticos que el mecánico debe tener en cuenta antes de aceptar el trabajo.
+  </p>
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body">
+      <h4>Soporte de Caja — Fabricación Obligatoria</h4>
+      <p>El soporte del lado del conductor (izquierdo) debe ser modificado o fabricado desde cero para alinear la nueva transmisión con el chasis del F5. Requiere tornería de precisión.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-danger">
+    <span class="alert-icon">🔌</span>
+    <div class="alert-body">
+      <h4>Gestión Electrónica — Punto Más Crítico</h4>
+      <p>La ECU del motor recibirá códigos de error por la ausencia de la mecatrónica DCT. Se debe realizar un "bypass" del sensor de posición P/N para que el motor arranque. Evaluar si afecta el control del turbo o si requiere reprogramación de la ECU.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">🏎️</span>
+    <div class="alert-body">
+      <h4>Velocímetro / Sensor de Velocidad</h4>
+      <p>Verificar si el sensor de velocidad de la caja Toyota es compatible con el tablero del BYD F5. Si no lo es, se puede tomar la señal de los sensores de ABS (alternativa muy limpia).</p>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">🔗</span>
+    <div class="alert-body">
+      <h4>Semiejes / Palieres — Verificación Previa</h4>
+      <p>Medir el diámetro y espline de los palieres del DCT antes de desarmarlo. Si coinciden con los del Toyota donante, se ahorra un punto de adaptación importante.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">🔧</span>
+    <div class="alert-body">
+      <h4>Patrón de Pernos — Punto Favorable</h4>
+      <p>El bloque del motor del BYD F5 es compatible con el patrón de pernos de la serie ZZ/NZ de Toyota. El acople al motor NO es el desafío principal — lo son la electrónica y el soporte.</p>
+    </div>
+  </div>
+
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     CRONOGRAMA
+══════════════════════════════════════════════ -->
+<section id="cronograma">
+  <div class="section-label">Plan de Trabajo</div>
+  <h2 class="section-title">Cronograma Estimado</h2>
+  <p class="section-desc">
+    El trabajo completo lleva al menos una semana de taller. El tiempo dependerá de la disponibilidad
+    de los componentes y de si el soporte de caja puede fabricarse rápidamente.
+  </p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-week">Día 1–2</div>
+      <h4>Desmontaje y Evaluación</h4>
+      <p>Retirar la caja DCT. Fotografiar todo el cableado. Medir palieres y patrón de pernos. Confirmar compatibilidad exacta con la caja conseguida.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Día 2–3</div>
+      <h4>Tornería y Soporte de Caja</h4>
+      <p>Llevar medidas al tornero para fabricar el soporte del lado conductor. Simultáneamente preparar el flywheel (rectificación si es necesario).</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Día 3–4</div>
+      <h4>Instalación de Pedalera y Sistema Hidráulico</h4>
+      <p>Montar la pedalera de embrague. Instalar cilindro maestro y esclavo. Tender la cañería hidráulica. Purgado del sistema.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Día 4–5</div>
+      <h4>Montaje de Transmisión</h4>
+      <p>Colocar flywheel, embrague y caja manual. Instalar soporte fabricado. Montar palieres. Ajustar selector de cambios y verificar recorridos.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Día 5–6</div>
+      <h4>Intervención Electrónica</h4>
+      <p>Bypass del sensor P/N. Limpiar o gestionar los códigos de error de la ECU. Verificar velocímetro (ABS si es necesario). Primera prueba de arranque.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Día 7</div>
+      <h4>Prueba de Ruta y Ajustes Finales</h4>
+      <p>Prueba de manejo. Verificar punto de embrague, recorrido del selector y ausencia de ruidos. Ajustar lo necesario. Entrega del vehículo.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     PRESUPUESTO
+══════════════════════════════════════════════ -->
+<section id="presupuesto">
+  <div class="section-label">Inversión</div>
+  <h2 class="section-title">Presupuesto Estimado</h2>
+  <p class="section-desc">
+    Valores referenciales en guaraníes paraguayos. Los precios reales dependen de la fuente de los
+    componentes y la complejidad que encuentre el mecánico.
+  </p>
+
+  <table class="budget-table">
+    <thead>
+      <tr>
+        <th>Ítem</th>
+        <th>Detalle</th>
+        <th>Costo Estimado (Gs.)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Transmisión + Componentes (Desguace)</td>
+        <td>Caja usada, palieres, palanca, cables selector</td>
+        <td class="price">3.500.000 – 5.500.000</td>
+      </tr>
+      <tr>
+        <td>Kit de Embrague Nuevo</td>
+        <td>Disco, prensa y rulemán (LUK / Sachs recomendado)</td>
+        <td class="price">800.000 – 1.200.000</td>
+      </tr>
+      <tr>
+        <td>Sistema Hidráulico</td>
+        <td>Cilindro maestro, esclavo y cañería</td>
+        <td class="price">400.000 – 700.000</td>
+      </tr>
+      <tr>
+        <td>Pedalera de Embrague</td>
+        <td>Del BYD F3 o adaptación</td>
+        <td class="price">300.000 – 600.000</td>
+      </tr>
+      <tr>
+        <td>Mano de Obra (Adaptación + Montaje)</td>
+        <td>Mínimo 1 semana de taller especializado</td>
+        <td class="price">2.500.000 – 4.500.000</td>
+      </tr>
+      <tr>
+        <td>Tornería / Soporte de Caja</td>
+        <td>Fabricación del soporte lateral conductor</td>
+        <td class="price">500.000 – 800.000</td>
+      </tr>
+      <tr>
+        <td>Imprevistos y Materiales Varios</td>
+        <td>Tornillos, juntas, fluidos, cables, etc.</td>
+        <td class="price">500.000 – 700.000</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr class="budget-total">
+        <td colspan="2"><strong>INVERSIÓN TOTAL APROXIMADA</strong></td>
+        <td class="price"><strong>Gs. 8.000.000 – 12.200.000</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════════
+     RECOMENDACIÓN FINAL
+══════════════════════════════════════════════ -->
+<section id="recomendacion">
+  <div class="section-label">Para el Mecánico</div>
+  <h2 class="section-title">Recomendación Técnica Final</h2>
+  <p class="section-desc">
+    Resumen técnico para presentarle al mecánico y que entienda el alcance real del trabajo.
+  </p>
+
+  <div class="quote-box">
+    "El bloque del motor del BYD F5 Suri es compatible con el patrón de pernos de la serie ZZ/NZ de Toyota.
+    El desafío principal <strong>no es el acople al motor</strong>, sino la gestión electrónica de la ECU original del F5
+    (bypass del sensor P/N y posible reprogramación) y la fabricación del soporte de caja del lado izquierdo."
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Priorizar BYD F3 manual o Toyota Corolla E120 como donante</h3>
+        <p>El BYD F3 manual ofrece la mayor compatibilidad directa. El Toyota Corolla 2003–2008 (motor 1.8L / 1ZZ-FE) es la alternativa más robusta para el torque del turbo del F5.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Resolver la electrónica ANTES de instalar la caja</h3>
+        <p>Consultar con un electrónico automotriz sobre el bypass del sensor P/N y los códigos de error de la ECU. Definir si se necesita reprogramación antes de avanzar con el montaje mecánico.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Conseguir todos los componentes antes de desarmar</h3>
+        <p>El auto no puede quedar inmovilizado esperando piezas. Tener la caja, el embrague, los palieres y el soporte fabricado antes de iniciar el desmontaje.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Embrague nuevo siempre</h3>
+        <p>Nunca colocar embrague usado cuando se hace una conversión. El kit nuevo (Gs. 800.000–1.200.000) es la inversión más importante en términos de durabilidad.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Velocímetro vía ABS si el sensor de caja no es compatible</h3>
+        <p>Si el sensor de velocidad de la caja Toyota no da señal correcta al tablero del F5, tomar la señal del módulo ABS. Solución limpia y permanente.</p>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="grid-3" style="margin-top: 2rem;">
+    <div class="card" style="border-color: rgba(46,194,126,.3);">
+      <span class="card-icon">💡</span>
+      <h3>Palabras clave para el mecánico</h3>
+      <p style="margin-bottom:.75rem;">Etiquetas técnicas del proyecto:</p>
+      <div>
+        <span class="pill pill-green">Serie ZZ/NZ Toyota</span>
+        <span class="pill pill-green">C52 / C56</span>
+        <span class="pill pill-green">1ZZ-FE</span>
+        <span class="pill pill-blue">Bypass P/N</span>
+        <span class="pill pill-blue">ABS Speed Signal</span>
+        <span class="pill">BYD F3 Manual</span>
+        <span class="pill">Soporte Lateral Izq.</span>
+      </div>
+    </div>
+    <div class="card" style="border-color: rgba(77,171,247,.3);">
+      <span class="card-icon">📋</span>
+      <h3>Verificar antes de cerrar precio</h3>
+      <ul>
+        <li>¿Los palieres del DCT entran en la nueva caja?</li>
+        <li>¿El sensor de velocidad es compatible?</li>
+        <li>¿Se necesita reprogramar la ECU?</li>
+        <li>¿El tornero puede fabricar el soporte?</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color: rgba(230,57,70,.3);">
+      <span class="card-icon">🏁</span>
+      <h3>Resultado esperado</h3>
+      <ul>
+        <li>Auto funcionando con caja manual confiable</li>
+        <li>Sin dependencia de mecatrónica DCT</li>
+        <li>Mantenimiento accesible localmente</li>
+        <li>Recuperación del valor del vehículo</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer>
+  <p style="font-size:1.5rem; margin-bottom:.5rem;">🔧</p>
+  <p><strong>Proyecto: BYD F5 Suri — Conversión Caja Automática 6DCT → Manual</strong></p>
+  <p style="margin-top:.5rem; color: var(--muted);">
+    Documento técnico de referencia · Mayo 2026 ·
+    Para uso exclusivo de mecánico y propietario
+  </p>
+</footer>
+
+</body>
+</html>
